@@ -11,6 +11,8 @@ def read_func(filename):
     names = names.split("\t")
     names[:] = [item for item in names if item != ''] #remove empty entries (between two \t's)
     colors = textfile.readline()
+    colors = colors.split("\t")
+    colors[:] = [item for item in colors if item != '']
     data = []           #fill with data
     for i in range(121):
         line = textfile.readline()
@@ -27,8 +29,8 @@ def plot_func(names,colors,data):
     for i in range(len(names)-1):
         fig = plt.figure()
         for j in range(6):
-            plt.plot(data[:,6*i+j])
-        #plt.legend((colors[6*i:6*i+6]))
+            plt.plot(data[:,6*i+j],label = str(colors[6*i+j]))
+        plt.legend()
         plt.title(names[counter])
         plt.show()
         counter += 1
