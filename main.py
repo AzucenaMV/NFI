@@ -14,14 +14,14 @@ def read_func(filename):
     colors = colors.split("\t")
     colors[:] = [item for item in colors if item != '']
     data = []           #fill with data
-    for i in range(121):
+    for i in range(5000):
         line = textfile.readline()
         splitted = line.split("\t")
         #splitted.remove("")
         splitted[:] = [int(item) for item in splitted if (item != '' and item != '\n')]
         data.append(splitted)
     data = np.array(data)
-    data = data.transpose()
+    #data = data.transpose()
     return names,colors,data
 
 def plot_func(names,colors,data):
@@ -40,4 +40,5 @@ def plot_func(names,colors,data):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     names, colors, data= read_func('SizedTraceData.txt')
+    #print(data.shape)
     plot_func(names,colors,data)
