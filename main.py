@@ -25,14 +25,14 @@ def read_func(filename):
 def plot_func(titles, colors, data):
     counter = 0
     for i in range(len(titles)-1):
-        fig = plt.figure()
         for j in range(6):
-            plt.plot(data[:][6*i+j], label=str(colors[6*i+j]))
+            plt.figure()
+            plt.plot(data[:,6*i+j], label=str(colors[6*i+j]))
         plt.legend()
         plt.title(titles[counter])
         plt.show()
         counter += 1
-    return fig
+    return None
 
 
 def plot_6C(title,colors,data):
