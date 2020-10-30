@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+import pandas as pd
 
 def read_func(filename):
     """ Function to read data files\
@@ -70,7 +70,6 @@ def plot_6C(data, title, colors):
 
 
 def plot_compare(data_raw, data_sized, titles, colors):
-    # data_raw_short = data_raw[-len(data_sized)]
     difference = len(data_raw)-len(data_sized)
     data_raw_short = data_raw[difference::, :]
     counter = 0
@@ -84,3 +83,8 @@ def plot_compare(data_raw, data_sized, titles, colors):
             plt.show()
         counter += 1
     return None
+
+
+def csv_read(filename):
+    answers = pd.read_csv(filename)
+    print(answers)
