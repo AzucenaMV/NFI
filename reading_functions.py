@@ -1,8 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from xml.dom import minidom
+from csv import reader
 
-def read_func(filename):
+
+def read_data(filename):
     """ Function to read data files\
     Returns a list of sample names, colors, \
     and the data itself as matrix."""
@@ -23,7 +26,7 @@ def read_func(filename):
     return titles, colors, data
 
 
-def read_func_old(filename):
+def read_data_old(filename):
     """ Outdated: Function to read data files using readline"""
     textfile = open(filename, "r")
     textfile.readline()             # first two lines are not important
@@ -39,12 +42,12 @@ def read_func_old(filename):
         line = textfile.readline()
         splitted = line.split("\t")
         splitted[:] = [int(item) for item in splitted if (item != '' and item != '\n')]
-        data.append(splitted)
+        data.append(np.array(splitted))
     data = np.array(data)
     return names, colors, data
 
 
-def plot_func(data, titles, colors):
+def plot_data(data, titles, colors):
     """"Plots all single colors in lists"""
     counter = 0
     for i in range(len(titles)-1):
@@ -85,6 +88,13 @@ def plot_compare(data_raw, data_sized, titles, colors):
     return None
 
 
-def csv_read(filename):
+def csv_read_alleles(filename):
     answers = pd.read_csv(filename)
-    print(answers)
+    with open(filename, 'r') as read_obj:
+        csv_reader = reader(read_obj)
+        list_of_rows = list(csv_reader)
+    return list_of_rows
+
+
+def xml_read_bins(filename):
+    pass
