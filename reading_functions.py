@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from xml.dom import minidom
+import xml.etree.ElementTree as ET
 from csv import reader
 
 
@@ -97,4 +98,20 @@ def csv_read_alleles(filename):
 
 
 def xml_read_bins(filename):
-    pass
+    #thedomfile = minidom.parse(filename)
+    thetreefile = ET.parse(filename)
+    #alleles = thedomfile.getElementsByTagName('Allele')
+    #print(alleles[12].attributes['Label'].value)
+    #loci = thedomfile.getElementsByTagName('Locus')
+    root = thetreefile.getroot()
+    # find all "item" objects and print their "name" attribute
+    allele_dict = {}
+    for locus in root[5]: # root[5] is the loci
+        current_marker = locus.find('MarkerTitle').text
+        for allele in locus.findall('Allele'):
+            allele_label = allele.get('Label')
+            keyname = str(current_marker)+str(allele_label)
+            valuename = str(allele.get('Size'))
+            # still not sure about difference between Size and DefSize
+            allele_dict[keyname] = valuename
+    return allele_dict
