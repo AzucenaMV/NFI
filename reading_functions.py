@@ -88,9 +88,22 @@ def plot_compare(data_raw, data_sized, titles, colors):
         counter += 1
     return None
 
+def csv_read_actual(filename):
+    """"Read csv file of actual alleles\
+     combines with ???? for peak heights?"""
+    # there may be more than one sample in one file
+    pass
 
-def csv_read_alleles(filename):
-    answers = pd.read_csv(filename)
+
+def csv_read_analyst(filename):
+    """"Read csv file of identified alleles\
+    returns """
+    # I can use output of xml_read_bins to find colors of alleles
+    # there may be more than one sample in one file
+    results = pd.read_csv(filename)
+    for index, row in results.iterrows():
+        print(index)
+
     with open(filename, 'r') as read_obj:
         csv_reader = reader(read_obj)
         list_of_rows = list(csv_reader)
@@ -98,20 +111,26 @@ def csv_read_alleles(filename):
 
 
 def xml_read_bins(filename):
-    #thedomfile = minidom.parse(filename)
+    """Read xml file for bins of each allele, \
+    returns dictionary of horizontal values"""
     thetreefile = ET.parse(filename)
-    #alleles = thedomfile.getElementsByTagName('Allele')
-    #print(alleles[12].attributes['Label'].value)
-    #loci = thedomfile.getElementsByTagName('Locus')
     root = thetreefile.getroot()
-    # find all "item" objects and print their "name" attribute
+    # create a dictionary per color
     allele_dict = {}
+    dye_dict = {}
     for locus in root[5]: # root[5] is the loci
+        # get the name of the marker
         current_marker = locus.find('MarkerTitle').text
+        # maybe use these:
+        dye = locus.find('DyeIndex').text
+        dye_dict[current_marker] = dye
         for allele in locus.findall('Allele'):
+            # get the name of the allele (number or X/Y)
             allele_label = allele.get('Label')
-            keyname = str(current_marker)+str(allele_label)
+            # combine marker+allele into key
+            keyname = str(current_marker)+"_"+str(allele_label)
+            # store the horizontal location as value
             valuename = str(allele.get('Size'))
             # still not sure about difference between Size and DefSize
             allele_dict[keyname] = valuename
-    return allele_dict
+    return allele_dict, dye_dict
