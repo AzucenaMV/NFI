@@ -1,4 +1,5 @@
 import numpy as np
+import math as m
 import matplotlib.pyplot as plt
 import pandas as pd
 from xml.dom import minidom
@@ -97,17 +98,35 @@ def csv_read_actual(filename):
 
 def csv_read_analyst(filename):
     """"Read csv file of identified alleles\
-    returns """
+    returns list of alleles and corresponding peaks"""
     # I can use output of xml_read_bins to find colors of alleles
     # there may be more than one sample in one file
     results = pd.read_csv(filename)
+    name = results['Sample Name'][0]    # to start iteration
+    allele_lists = []                   # initialize big lists
+    height_lists = []
+    allele_list = []                    # initialize small lists
+    height_list = []
     for index, row in results.iterrows():
-        print(index)
-
-    with open(filename, 'r') as read_obj:
-        csv_reader = reader(read_obj)
-        list_of_rows = list(csv_reader)
-    return list_of_rows
+    # iterate over all rows, because each row contains
+    # the peaks for one locus
+        if name != row[0]:                      # then start new sample
+            allele_lists.append(allele_list)    # store current sample data
+            height_lists.append(height_list)
+            allele_list = []                    # empty lists
+            height_list = []
+        name = row[0]                           # then set name to current sample name
+        for i in range(2,12):
+        # go over the 10 possible locations of peak identification
+            if str(row[i]) == row[i]:
+                # append value only if non-empty
+                # empty entries are converted to (float-type) NaN's by pandas
+                # so str(row[i]) == row[i] filters out empty entries
+                allele_list.append(row[1]+"_"+row[i])
+                # heights are 10 indices further than
+                # their corresponding allele names
+                height_list.append(row[i+10])
+    return allele_lists, height_lists
 
 
 def xml_read_bins(filename):
@@ -121,9 +140,9 @@ def xml_read_bins(filename):
     for locus in root[5]: # root[5] is the loci
         # get the name of the marker
         current_marker = locus.find('MarkerTitle').text
-        # maybe use these:
+        # make dict of which locus belongs to which colour
         dye = locus.find('DyeIndex').text
-        dye_dict[current_marker] = dye
+
         for allele in locus.findall('Allele'):
             # get the name of the allele (number or X/Y)
             allele_label = allele.get('Label')
@@ -133,4 +152,15 @@ def xml_read_bins(filename):
             valuename = str(allele.get('Size'))
             # still not sure about difference between Size and DefSize
             allele_dict[keyname] = valuename
+            dye_dict[keyname] = int(dye)
     return allele_dict, dye_dict
+
+def plot_actual(alleles, heights, allele_dict, dye_dict):
+    plt.figure()
+    for i in range(len(alleles)):
+        # use dye_dict to plot correct color
+        plt.subplot(6,1,dye_dict[alleles[i]])
+        print(dye_dict[alleles[i]])
+        plt.plot([allele_dict[str(alleles[i])]],[heights[i]],"*")
+    plt.show()
+    pass
