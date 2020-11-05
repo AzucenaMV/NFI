@@ -1,10 +1,9 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 import xml.etree.ElementTree as et
 
 
-def read_data(filename):
+def txt_read_data(filename):
     """ Function to read data files\
     Returns a list of sample names, colors, \
     and the data itself as matrix."""
@@ -25,7 +24,7 @@ def read_data(filename):
     return titles, colors, data
 
 
-def read_data_old(filename):
+def txt_read_data_old(filename):
     """ Outdated: Function to read data files using readline"""
     textfile = open(filename, "r")
     textfile.readline()             # first two lines are not important
@@ -46,45 +45,32 @@ def read_data_old(filename):
     return names, colors, data
 
 
-def plot_data(data, titles, colors):
-    """"Plots all single colors in lists"""
-    counter = 0
-    for i in range(len(titles)-1):
-        for j in range(6):
-            plt.figure()
-            plt.plot(data[:, 6*i+j], label=str(colors[6*i+j]))
-        plt.legend()
-        plt.title(titles[counter])
-        plt.show()
-        counter += 1
-    return None
-
-
-def plot_6C(data, colors):
-    """"Plots one 3x2 set of all 6 colors of one hid file"""
-    fig = plt.figure()
-    for i in range(6):
-        plt.subplot(3, 2, i+1)
-        plt.plot(data[:, i])
-        plt.title(str(colors[i]))
-    plt.show()
-    return fig
-
-
-def plot_compare(data_raw, data_sized, titles, colors):
-    difference = len(data_raw)-len(data_sized)
-    data_raw_short = data_raw[difference::, :]
-    counter = 0
-    for i in range(len(titles)-1):
-        for j in range(6):
-            plt.figure()
-            plt.plot(data_raw_short[:, 6 * i + j])
-            plt.plot(data_sized[:, 6 * i + j])
-            title = str(titles[i]) + "_color_" + str(colors[6*i+j])
-            plt.title(title)
-            plt.show()
-        counter += 1
-    return None
+def xml_read_bins(filename):
+    """Read xml file for bins of each allele, \
+    returns dictionary of horizontal values"""
+    thetreefile = et.parse(filename)
+    root = thetreefile.getroot()
+    # create a dictionary per color
+    allele_dict = {}
+    dye_dict = {}
+    for locus in root[5]:  # root[5] is the loci
+        # get the name of the marker
+        current_marker = locus.find('MarkerTitle').text
+        # make dict of which locus belongs to which colour
+        temp_dict = {1: 'FL-6C', 2: 'JOE-6C', 3: 'TMR-6C', 4: 'CXR-6C', 6: 'TOM-6C'}
+        dye = locus.find('DyeIndex').text
+        dye_dict[current_marker] = temp_dict[int(dye)]
+        allele_dict[current_marker] = {}
+        for allele in locus.findall('Allele'):
+            # get the name of the allele (number or X/Y)
+            allele_label = allele.get('Label')
+            # combine marker+allele into key
+            # keyname = str(current_marker)+"_"+str(allele_label)
+            # store the horizontal location as value
+            valuename = float(allele.get('Size'))
+            # still not sure about difference between Size and DefSize
+            allele_dict[current_marker][allele_label] = valuename
+    return allele_dict, dye_dict
 
 
 def csv_read_actual(filename):
@@ -128,47 +114,3 @@ def csv_read_analyst(filename):
     allele_lists.append(allele_list)
     height_lists.append(height_list)
     return allele_lists, height_lists
-
-
-def xml_read_bins(filename):
-    """Read xml file for bins of each allele, \
-    returns dictionary of horizontal values"""
-    thetreefile = et.parse(filename)
-    root = thetreefile.getroot()
-    # create a dictionary per color
-    allele_dict = {}
-    dye_dict = {}
-    for locus in root[5]:  # root[5] is the loci
-        # get the name of the marker
-        current_marker = locus.find('MarkerTitle').text
-        # make dict of which locus belongs to which colour
-        temp_dict = {1: 'FL-6C', 2: 'JOE-6C', 3: 'TMR-6C', 4: 'CXR-6C', 6: 'TOM-6C'}
-        dye = locus.find('DyeIndex').text
-        dye_dict[current_marker] = temp_dict[int(dye)]
-        allele_dict[current_marker] = {}
-        for allele in locus.findall('Allele'):
-            # get the name of the allele (number or X/Y)
-            allele_label = allele.get('Label')
-            # combine marker+allele into key
-            # keyname = str(current_marker)+"_"+str(allele_label)
-            # store the horizontal location as value
-            valuename = float(allele.get('Size'))
-            # still not sure about difference between Size and DefSize
-            allele_dict[current_marker][allele_label] = valuename
-    return allele_dict, dye_dict
-
-
-def plot_actual(alleles, heights, allele_dict, dye_dict, comparison, colors):
-    """uses both the analysts identifies peak and sized data for comparison to plot both in one image"""
-    temp_dict = {'FL-6C': 'b', 'JOE-6C': 'g', 'TMR-6C': 'y', 'CXR-6C': 'r', 'WEN-6C': 'k', 'TOM-6C': 'm'}
-    for j in range(6):
-        plt.figure()
-        plt.title(str('color is ' + str(colors[j])))
-        plt.plot(np.linspace(0, 620, len(comparison[:, j])), comparison[:, j])
-        for i in range(len(alleles)):
-            # use dye_dict to plot correct color
-            a, b = alleles[i].split("_")
-            color = temp_dict[dye_dict[a]]
-            plt.plot([allele_dict[a][b]], [heights[i]], str(color + "*"))  # add colour
-        plt.show()
-    pass
