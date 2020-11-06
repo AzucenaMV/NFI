@@ -52,6 +52,7 @@ def xml_read_bins(filename):
     root = thetreefile.getroot()
     # create a dictionary per color
     allele_dict = {}
+    empty_dict = {}
     dye_dict = {}
     for locus in root[5]:  # root[5] is the loci
         # get the name of the marker
@@ -61,6 +62,7 @@ def xml_read_bins(filename):
         dye = locus.find('DyeIndex').text
         dye_dict[current_marker] = temp_dict[int(dye)]
         allele_dict[current_marker] = {}
+        empty_dict[current_marker] = {}
         for allele in locus.findall('Allele'):
             # get the name of the allele (number or X/Y)
             allele_label = allele.get('Label')
@@ -70,14 +72,64 @@ def xml_read_bins(filename):
             valuename = float(allele.get('Size'))
             # still not sure about difference between Size and DefSize
             allele_dict[current_marker][allele_label] = valuename
-    return allele_dict, dye_dict
+            empty_dict[current_marker][allele_label] = 0
+    return allele_dict, dye_dict, empty_dict
 
 
-def csv_read_actual(filename):
-    """"Read csv file of actual alleles\
-     combines with ???? for peak heights?"""
+def csv_read_actual(filename, goalname, allele_peaks):
+    """Read csv file of actual alleles\
+     combines with info in word file for peak heights?"""
     # there may be more than one sample in one file
-    return filename
+    # goalname can be 1A2 for example
+    donor_peaks = pd.read_csv(filename, dtype = str, delimiter = ";")
+    donor_set, mixture_type, number_of_donors = goalname
+    # check if names match, otherwise donorset is different and output makes no sense
+    if filename[-5] != donor_set:
+        print("Filename "+filename+" does not match "+donor_set)
+        return None
+    ############################################################################3
+    #   All this could be done anywhere, just don't have a location for it
+    #   A: 	300:150	300:150:150	300:150:150:150	300:150:150:150:150
+    #   B: 	300:30	300:30:30	300:30:30:30	300:30:30:30:30
+    #   C: 	150:150	150:150:60	150:150:60:60	150:150:60:60:60
+    #   D:	150:30	150:30:60	150:30:60:30	150:30:60:30:30
+    #   E:	600:30	600:30:60	600:30:60:30	600:30:60:30:30
+    # relative contributions
+    #   A:  2:1     2:1:1       2:1:1:1         2:1:1:1:1
+    #      2/3:1/3  .5:.25:.25  .4:.2:.2:.2     2/7:1/7:1/7
+    #   B: 10:1     10:1:1      10:1:1:1        10:1:1:1:1
+    #      10/11:1/11
+    picograms = np.array([[300, 150, 150, 150, 150],
+                          [300, 30,  30,  30,  30],
+                          [150, 150, 60,  60,  60],
+                          [150, 30,  60,  30,  30],
+                          [600, 30,  60,  30,  30]])
+    total_picograms = np.zeros((5,4))
+    for i in range(5):
+        row = picograms[i]
+        for j in range(4):
+            total_picograms[i,j] = sum(row[:j+2])
+    #########################################################################3
+    # mixture_type decides which row of matrix to use
+    # number_of_donors decides which column in totals
+    letter_to_number = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4}
+    current = letter_to_number[mixture_type]
+    parts = picograms[current]
+    total = total_picograms[current,int(number_of_donors)-2]
+    # initialize column/donor
+    donor = 0
+    # intialize comparison variable
+    sample = donor_peaks["SampleName"][0]
+    for index, row in donor_peaks.iterrows():
+        if row[0] != sample:
+            donor += 1
+        if donor >= int(number_of_donors):
+            # break if amount of donors is reached
+            break
+        sample = row[0]
+        allele_peaks[row[1]][row[2]] += parts[donor]/total  # Allele 1
+        allele_peaks[row[1]][row[3]] += parts[donor]/total  # Allele 2
+    return allele_peaks
 
 
 def csv_read_analyst(filename):
