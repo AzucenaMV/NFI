@@ -77,17 +77,18 @@ def xml_read_bins(filename):
 
 
 def csv_read_actual(filename, goalname, allele_peaks):
-    """Read csv file of actual alleles\
-     combines with info in word file for peak heights?"""
-    # there may be more than one sample in one file
+    """Read csv file of actual alleles of donors
+     combines with info in word file for relative peak heights (/1)
+     returns dictionary of all alleles, with nonzero values is present"""
     # goalname can be 1A2 for example
+
     donor_peaks = pd.read_csv(filename, dtype = str, delimiter = ";")
     donor_set, mixture_type, number_of_donors = goalname
     # check if names match, otherwise donorset is different and output makes no sense
     if filename[-5] != donor_set:
         print("Filename "+filename+" does not match "+donor_set)
         return None
-    ############################################################################3
+    # ###########################################################################3
     #   All this could be done anywhere, just don't have a location for it
     #   A: 	300:150	300:150:150	300:150:150:150	300:150:150:150:150
     #   B: 	300:30	300:30:30	300:30:30:30	300:30:30:30:30
@@ -104,18 +105,18 @@ def csv_read_actual(filename, goalname, allele_peaks):
                           [150, 150, 60,  60,  60],
                           [150, 30,  60,  30,  30],
                           [600, 30,  60,  30,  30]])
-    total_picograms = np.zeros((5,4))
+    total_picograms = np.zeros((5, 4))
     for i in range(5):
         row = picograms[i]
         for j in range(4):
-            total_picograms[i,j] = sum(row[:j+2])
-    #########################################################################3
+            total_picograms[i, j] = sum(row[:j+2])
+    # ########################################################################3
     # mixture_type decides which row of matrix to use
     # number_of_donors decides which column in totals
     letter_to_number = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4}
     current = letter_to_number[mixture_type]
     parts = picograms[current]
-    total = total_picograms[current,int(number_of_donors)-2]
+    total = total_picograms[current, int(number_of_donors)-2]
     # initialize column/donor
     donor = 0
     # intialize comparison variable

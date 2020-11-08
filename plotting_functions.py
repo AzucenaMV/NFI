@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.signal import find_peaks
 
 
 # GLOBAL VARIABLES
@@ -11,7 +12,7 @@ color_dict = {'FL-6C': 'b', 'JOE-6C': 'g', 'TMR-6C': 'y', 'CXR-6C': 'r', 'WEN-6C
 
 def plot_data(data, titles):
     """"Plots all data per color for entire lists"""
-    # take one off since last pocon is semi-empty?
+    # take one off since last pocon is mainly empty?
     for i in range(len(titles)-1):
         plt.figure()
         for j in range(6):
@@ -25,7 +26,7 @@ def plot_data(data, titles):
 def plot_6C(data, titles):
     """"Plots one combined plot of all 6 colors of one hid file"""
     for j in range(len(titles)-1):
-        fig = plt.figure()
+        plt.figure()
         plt.suptitle(titles[j])
         for i in range(6):
             plt.subplot(6, 1, i + 1)
@@ -53,15 +54,32 @@ def plot_raw_vs_sized(data_raw, data_sized, titles):
 
 
 def plot_compare(alleles, heights, allele_dict, dye_dict, comparison):
-    """uses both the analysts identifies peak and sized data for comparison to plot both in one image"""
+    """uses both the analysts identified peaks and sized data \
+    for comparison to plot both in one image"""
+
     for j in range(6):
         plt.figure()
-        plt.title(str('filename: 1A2.3, color: ' + str(color_list[j])))
+        plt.title(str('filename: 1A2.3, dye: ' + str(color_list[j])))
         plt.plot(np.linspace(0, 620, len(comparison[:, j])), comparison[:, j])
         for i in range(len(alleles)):
             # use dye_dict to plot correct color
             a, b = alleles[i].split("_")
-            color = color_dict[dye_dict[a]]
-            plt.plot([allele_dict[a][b]], [heights[i]], str(color + "*"))  # add colour
+            dye = dye_dict[a]
+            color = str(color_dict[dye])
+            if dye == color_list[j]:
+                plt.plot([allele_dict[a][b]], [heights[i]], str(color + "*"))  # add colour
         plt.show()
     pass
+
+
+def plot_sizestd_peaks(sizestd):
+    """The goal of this function was to determine the factor needed \
+    for resizing the sized data to base pairs\
+    Input is one size standard array, output was a plot"""
+    peaks, rest = find_peaks(sizestd, distance=200)
+    plt.figure()
+    plt.plot(sizestd)
+    print(peaks)
+    plt.plot(peaks, sizestd[peaks], "*")
+    plt.show()
+    return None
