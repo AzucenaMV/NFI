@@ -53,21 +53,23 @@ def plot_raw_vs_sized(data_raw, data_sized, titles):
     return None
 
 
-def plot_compare(alleles, heights, allele_dict, dye_dict, comparison):
+def plot_compare(name, alleles, heights, allele_dict, dye_dict, comparison):
     """uses both the analysts identified peaks and sized data \
     for comparison to plot both in one image"""
-
     for j in range(6):
         plt.figure()
-        plt.title(str('filename: 1A2.3, dye: ' + str(color_list[j])))
-        plt.plot(np.linspace(0, 620, len(comparison[:, j])), comparison[:, j])
+        plt.title(str('filename: '+name+', dye: ' + str(color_list[j])))
+        plt.xlim([50, 500])
+        current_plot = comparison[:, j]
+        plt.plot(np.linspace(0, len(current_plot)/10, len(current_plot)), comparison[:, j])
+        plt.ylim([-50, max(current_plot[1000:])*1.5])
         for i in range(len(alleles)):
             # use dye_dict to plot correct color
-            a, b = alleles[i].split("_")
-            dye = dye_dict[a]
+            locus, allele = alleles[i].split("_")
+            dye = dye_dict[locus]
             color = str(color_dict[dye])
             if dye == color_list[j]:
-                plt.plot([allele_dict[a][b]], [heights[i]], str(color + "*"))  # add colour
+                plt.plot([allele_dict[locus][allele]], [heights[i]], str(color + "*"))  # add colour
         plt.show()
     pass
 
@@ -83,3 +85,28 @@ def plot_sizestd_peaks(sizestd):
     plt.plot(peaks, sizestd[peaks], "*")
     plt.show()
     return None
+
+
+def plot_actual(name, actual_dict, allele_dict, dye_dict, comparison):
+    """uses both the theoretical actual relative peaks and \
+    sized data for comparison to plot both in one image"""
+
+    for j in range(6):
+        plt.figure()
+        plt.title(str('filename: '+name+', dye: ' + str(color_list[j])))
+        plt.xlim([50, 500])
+        plt.ylim([-50, 20000])
+        current_plot = comparison[:, j]
+        plt.plot(np.linspace(0, len(current_plot)/10, len(current_plot)), comparison[:, j])
+        for locus, value in actual_dict.items():
+            for allele, rel_perc in value.items():
+                # ######MIGHT WANT TO USE FILTER FUNCTION###############TO ITERATE DICT####
+                # use dye_dict to plot correct color
+                dye = dye_dict[locus]
+                if rel_perc != 0 and dye == color_list[j]:
+                    color = color_dict[dye]
+                    print(rel_perc)
+                    #######RELATIVE PERCENTAGES ARE LARGER THAN 1!!
+                    plt.plot([allele_dict[locus][allele]], [rel_perc*4000], str(color + "*"))  # add colour
+        plt.show()
+    pass
