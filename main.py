@@ -10,4 +10,4 @@ if __name__ == '__main__':
     # resulting_dict = rf.csv_read_actual('donor_profiles/Refs_dataset2.csv', '2A5', empty_dict)
     allele_list, height_list = rf.csv_read_analyst("analysts_data_filtered/1A2_New.csv")
     alleles_actual = rf.csv_read_actual("donor_profiles/Refs_dataset1.csv", "1A2", empty_dict)
-    pf.plot_actual("1A2.3",alleles_actual, allele_dict, dye_dict, sizeddata[:,48:54])
+    pf.plot_actual("1A2.1",alleles_actual, allele_dict, dye_dict, sizeddata[:,36:42])

@@ -94,9 +94,11 @@ def plot_actual(name, actual_dict, allele_dict, dye_dict, comparison):
     for j in range(6):
         plt.figure()
         plt.title(str('filename: '+name+', dye: ' + str(color_list[j])))
-        plt.xlim([50, 500])
-        plt.ylim([-50, 20000])
         current_plot = comparison[:, j]
+        plt.xlim([50, 500])
+        plt.ylim([-50, max(current_plot[1000:]) * 1.5])
+        max_rel = 4000
+        plt.hlines(max_rel,0,500)
         plt.plot(np.linspace(0, len(current_plot)/10, len(current_plot)), comparison[:, j])
         for locus, value in actual_dict.items():
             for allele, rel_perc in value.items():
@@ -105,8 +107,9 @@ def plot_actual(name, actual_dict, allele_dict, dye_dict, comparison):
                 dye = dye_dict[locus]
                 if rel_perc != 0 and dye == color_list[j]:
                     color = color_dict[dye]
-                    print(rel_perc)
-                    #######RELATIVE PERCENTAGES ARE LARGER THAN 1!!
-                    plt.plot([allele_dict[locus][allele]], [rel_perc*4000], str(color + "*"))  # add colour
+                    # ######RELATIVE PERCENTAGES ARE LARGER THAN 1!!
+                    # -> due to one person having same allele twice
+                    # is this a problem?
+                    plt.plot([allele_dict[locus][allele]], [rel_perc*max_rel], str(color + "*"))  # add colour
         plt.show()
     pass
