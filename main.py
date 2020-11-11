@@ -1,5 +1,33 @@
+from dataclasses import dataclass
+from typing import List
+
 import reading_functions as rf
 import plotting_functions as pf
+
+@dataclass
+class Dye:
+    name: str
+    plot_color: str
+    pos: int
+
+@dataclass
+class Allele:
+    midpoint: int
+    name: str
+
+@dataclass
+class Locus:
+    alleles: List[Allele]
+    name: str
+    dye: Dye
+
+# class voor:
+# mengsel (gemeten waarde) (wel rfu)
+# persoon (theoretische waarde) (geen rfu, maar allelen)
+# (ook wat analyst heeft aangewezen?)
+
+# misschien uiteindelijk:
+# output class/geanalyseerd profiel, welke pieken zijn aangewezen door CNN
 
 
 if __name__ == '__main__':

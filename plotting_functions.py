@@ -3,12 +3,13 @@ import numpy as np
 from scipy.signal import find_peaks
 
 
-# GLOBAL VARIABLES
+# GLOBAL VARIABLES --> in apart Python bestand
 # list of colors as they appear in (sized) data files
 color_list = ['FL-6C', 'JOE-6C', 'TMR-6C', 'CXR-6C', 'TOM-6C', 'WEN-6C']
 # dict of color names to colors to be plotted
 color_dict = {'FL-6C': 'b', 'JOE-6C': 'g', 'TMR-6C': 'y', 'CXR-6C': 'r', 'WEN-6C': 'k', 'TOM-6C': 'm'}
 
+# IPV ALLELE_DICT EEN CLASS SCHRIJVEN
 
 def plot_data(data, titles):
     """"Plots all data per color for entire lists"""

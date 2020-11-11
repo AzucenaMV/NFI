@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import xml.etree.ElementTree as et
-
+from GLOBALS import *
 
 def txt_read_data(filename):
     """ Function to read data files\
@@ -44,14 +44,14 @@ def txt_read_data_old(filename):
     data = np.array(data)
     return names, colors, data
 
-
-def xml_read_bins(filename):
+# def xml_read_bins(filename: str) -> Locus:
+def xml_read_bins(filename: str):
     """Read xml file for bins of each allele, \
     returns dictionary of horizontal values"""
     thetreefile = et.parse(filename)
     root = thetreefile.getroot()
     # create a dictionary per color
-    allele_dict = {}
+    allele_dict = {} # --> class
     empty_dict = {}
     dye_dict = {}
     for locus in root[5]:  # root[5] is the loci
@@ -88,29 +88,8 @@ def csv_read_actual(filename, goalname, allele_peaks):
     if filename[-5] != donor_set:
         print("Filename "+filename+" does not match "+donor_set)
         return None
-    # ###########################################################################3
-    #   All this could be done anywhere, just don't have a location for it
-    #   A: 	300:150	300:150:150	300:150:150:150	300:150:150:150:150
-    #   B: 	300:30	300:30:30	300:30:30:30	300:30:30:30:30
-    #   C: 	150:150	150:150:60	150:150:60:60	150:150:60:60:60
-    #   D:	150:30	150:30:60	150:30:60:30	150:30:60:30:30
-    #   E:	600:30	600:30:60	600:30:60:30	600:30:60:30:30
-    # relative contributions
-    #   A:  2:1     2:1:1       2:1:1:1         2:1:1:1:1
-    #      2/3:1/3  .5:.25:.25  .4:.2:.2:.2     2/7:1/7:1/7
-    #   B: 10:1     10:1:1      10:1:1:1        10:1:1:1:1
-    #      10/11:1/11
-    picograms = np.array([[300, 150, 150, 150, 150],
-                          [300, 30,  30,  30,  30],
-                          [150, 150, 60,  60,  60],
-                          [150, 30,  60,  30,  30],
-                          [600, 30,  60,  30,  30]])
-    total_picograms = np.zeros((5, 4))
-    for i in range(5):
-        row = picograms[i]
-        for j in range(4):
-            total_picograms[i, j] = sum(row[:j+2])
-    # ########################################################################3
+
+
     # mixture_type decides which row of matrix to use
     # number_of_donors decides which column in totals
     letter_to_number = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4}
@@ -128,8 +107,8 @@ def csv_read_actual(filename, goalname, allele_peaks):
             # break if amount of donors is reached
             break
         sample = row[0]
-        allele_peaks[row[1]][row[2]] += parts[donor]/total  # Allele 1
-        allele_peaks[row[1]][row[3]] += parts[donor]/total  # Allele 2
+        allele_peaks[row[1]][row[2]] += parts[donor]/total/2  # Allele 1
+        allele_peaks[row[1]][row[3]] += parts[donor]/total/2  # Allele 2
     return allele_peaks
 
 
