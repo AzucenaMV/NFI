@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import xml.etree.ElementTree as et
 from GLOBALS import *
