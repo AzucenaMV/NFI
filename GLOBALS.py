@@ -32,7 +32,7 @@ class Dye:
 @dataclass
 class Allele:
     name: str
-    midpoint: float
+    mid: float
     left: float
     right: float
     #note: leftbinning is not always equal to rightbinning
@@ -43,16 +43,19 @@ class Locus:
     alleles: List[Allele]
     name: str
     dye: Dye
+    lower: float
+    upper: float
 
 @dataclass
 class Sample:
+    """Class for sample"""
     name: str
     data: List
 
 @dataclass
 class Person:
     name: str
-    alleles: Dict[Allele]
+    alleles: Dict[str,float]
 
 # misschien uiteindelijk:
 # output class/geanalyseerd profiel, welke pieken zijn aangewezen door CNN

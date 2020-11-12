@@ -101,7 +101,6 @@ def plot_actual(name, actual_dict, allele_dict, dye_dict, comparison):
         plt.plot(np.linspace(0, len(current_plot)/10, len(current_plot)), comparison[:, j])
         for locus, value in actual_dict.items():
             for allele, rel_perc in value.items():
-                # ######MIGHT WANT TO USE FILTER FUNCTION###############TO ITERATE DICT####
                 # use dye_dict to plot correct color
                 dye = dye_dict[locus]
                 if rel_perc != 0 and dye == color_list[j]:
@@ -112,3 +111,16 @@ def plot_actual(name, actual_dict, allele_dict, dye_dict, comparison):
                     plt.plot([allele_dict[locus][allele]], [rel_perc*max_rel], str(color + "*"))  # add colour
         plt.show()
     pass
+
+
+def plot_markers(locusList):
+    """Just a quick function to test marker boundaries"""
+    plt.figure()
+    for locus in locusList:
+        plt.subplot(6,1,locus.dye.plot_index)
+        plt.plot([locus.lower, locus.upper], [0,0], color = locus.dye.plot_color, marker = "s")
+        for allele in locus.alleles:
+            start = allele.mid - allele.left
+            end = allele.mid + allele.right
+            plt.plot([start, end], [1,1])
+    plt.show()

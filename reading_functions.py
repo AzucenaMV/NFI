@@ -47,32 +47,32 @@ def txt_read_data_old(filename):
 def xml_read_bins(filename: str):
     """Read xml file for bins of each allele, \
     returns dictionary of horizontal values"""
+    BLUE = Dye('FL-6C', 'b', 1)
+    GREEN = Dye('JOE-6C', 'g', 2)
+    YELLOW = Dye('TMR-6C', 'y', 3)
+    RED = Dye('CXR-6C', 'r', 4)
+    PURPLE = Dye('TOM-6C', 'm', 5)
+    LADDER = Dye('WEN-6C', 'k', 6)
+
     thetreefile = et.parse(filename)
     root = thetreefile.getroot()
-    # create a dictionary per color
-    allele_dict = {} # --> class
-    empty_dict = {}
-    dye_dict = {}
-    for locus in root[5]:  # root[5] is the loci
-        # get the name of the marker
-        current_marker = locus.find('MarkerTitle').text
-        # make dict of which locus belongs to which colour
-        temp_dict = {1: 'FL-6C', 2: 'JOE-6C', 3: 'TMR-6C', 4: 'CXR-6C', 6: 'TOM-6C'}
-        dye = locus.find('DyeIndex').text
-        dye_dict[current_marker] = temp_dict[int(dye)]
-        allele_dict[current_marker] = {}
-        empty_dict[current_marker] = {}
+    locusList = []
+    for locus in root[5]:
+        name = locus.find('MarkerTitle').text
+        temp_dict = {1: BLUE, 2: GREEN, 3: YELLOW, 4: RED, 5: LADDER, 6: PURPLE}
+        dye = int(locus.find('DyeIndex').text)
+        lower = float(locus.find('LowerBoundary').text)
+        upper = float(locus.find('UpperBoundary').text)
+        newLocus = Locus([], name, temp_dict[dye], lower, upper)
         for allele in locus.findall('Allele'):
-            # get the name of the allele (number or X/Y)
-            allele_label = allele.get('Label')
-            # combine marker+allele into key
-            # keyname = str(current_marker)+"_"+str(allele_label)
-            # store the horizontal location as value
-            valuename = float(allele.get('Size'))
-            # still not sure about difference between Size and DefSize
-            allele_dict[current_marker][allele_label] = valuename
-            empty_dict[current_marker][allele_label] = 0
-    return allele_dict, dye_dict, empty_dict
+            name = allele.get('Label')
+            mid = float(allele.get('Size'))
+            left = float(allele.get('Left_Binning'))
+            right = float(allele.get('Right_Binning'))
+            newAllele = Allele(name, mid, left, right)
+            newLocus.alleles.append(newAllele)
+        locusList.append(newLocus)
+    return locusList
 
 
 def csv_read_actual(filename, goalname, allele_peaks):
