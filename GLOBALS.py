@@ -48,7 +48,11 @@ class Locus:
 
 @dataclass
 class Sample:
-    """Class for sample"""
+    """
+    Class for samples, data is (nx6) matrix of all 6 colours
+    Should I split this into a list per color attribute?
+    Should I add the color_list here instead of in pf? Only used icw Samples
+    """
     name: str
     data: List
 

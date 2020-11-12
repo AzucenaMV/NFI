@@ -12,7 +12,7 @@ def txt_read_data(filename):
     # lines 1 and 2 are not interesting
     titles = texts[2].split('\t')                       # get titles of files
     titles = [item for item in titles if item != '']    # remove empty entries after splitting
-    colors = texts[3].split('\t')                       # get names of colors
+    colors = texts[3].split('\t')
     data = np.zeros((len(texts[4:]), len(colors)))
     counter = 0
     for elt in texts[4:]:
@@ -20,7 +20,12 @@ def txt_read_data(filename):
         new[new == ''] = 0
         data[counter, :] = new
         counter += 1
-    return titles, colors, data
+
+    sample_list = []
+    for i in range(len(titles)):
+        newSample = Sample(titles[i], data[:,6*i:6*i+6])
+        sample_list.append(newSample)
+    return sample_list
 
 
 def txt_read_data_old(filename):
