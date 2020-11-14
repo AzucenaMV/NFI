@@ -85,8 +85,8 @@ def csv_read_persons(donorset, locus_dict):
             alleles = []
         person_name = row[0]
         locus = row[1]
-        allele1 = locus_dict[locus].alleles[row[2]]
-        allele2 = locus_dict[locus].alleles[row[3]]
+        allele1 = locus + "_" + row[2]
+        allele2 = locus + "_" + row[3]
         alleles.append(allele1)
         alleles.append(allele2)
     return person_list
@@ -102,15 +102,16 @@ def make_mixture(personlist, mixturename: str, locus_dict):
     # number_of_donors decides which column in picogram total matrix
     # ############## COULD DO THIS IN SEPARATE FUNCTION #####################
     letter_to_number = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4}
-    mixtype = letter_to_number[mixture_type]
-    parts = picograms[mixtype]
-    total = total_picograms[mixtype, number_of_donors-2]
+    mixrow = letter_to_number[mixture_type]
+    parts = picograms[mixrow]
+    total = total_picograms[mixrow, number_of_donors-2]
 
     for i in range(number_of_donors):
         allele_list = personlist[i].alleles
         for allele in allele_list:
+            loc, allel = allele.split("_")
             relative = parts[i]/total/2
-            locus_dict[allele.marker].alleles[allele.name].height += relative
+            locus_dict[loc].alleles[allel].height += relative
 
     allele_list = []
     height_list = []

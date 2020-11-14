@@ -67,7 +67,7 @@ class Sample:
 class Person:
     """ Class to store alleles a Person has. """
     name: str               # name is A - Z, letter used to identify person
-    alleles: List[Allele]   # list of alleles
+    alleles: List[str]   # list of alleles
 
 
 @dataclass
