@@ -1,8 +1,9 @@
 import pandas as pd
-import xml.etree.ElementTree as et
+import xml.etree.ElementTree as eT
 from GLOBALS import *
 
-def txt_read_data(filename):
+
+def txt_read_data(filename: str):
     """ Function to read data files\
     Returns a list of sample names, colors, \
     and the data itself as matrix."""
@@ -12,7 +13,7 @@ def txt_read_data(filename):
     # lines 1 and 2 are not interesting
     titles = texts[2].split('\t')                       # get titles of files
     titles = [item for item in titles if item != '']    # remove empty entries after splitting
-    colors = texts[3].split('\t')
+    colors = texts[3].split('\t')                       # only needed for width of lines
     data = np.zeros((len(texts[4:]), len(colors)))
     counter = 0
     for elt in texts[4:]:
@@ -23,97 +24,106 @@ def txt_read_data(filename):
 
     sample_list = []
     for i in range(len(titles)):
-        newSample = Sample(titles[i], data[:,6*i:6*i+6])
-        sample_list.append(newSample)
+        new_sample = Sample(titles[i].split('_')[0], data[:, 6*i:6*i+6])
+        sample_list.append(new_sample)
     return sample_list
 
-
-def txt_read_data_old(filename):
-    """ Outdated: Function to read data files using readline"""
-    textfile = open(filename, "r")
-    textfile.readline()             # first two lines are not important
-    textfile.readline()
-    names = textfile.readline()     # names are separated by multiple tabs
-    names = names.split("\t")
-    names[:] = [item for item in names if item != '']   # remove empty entries (between two \t's)
-    colors = textfile.readline()
-    colors = colors.split("\t")
-    colors[:] = [item for item in colors if item != '']
-    data = []           # fill with data
-    for i in range(5000):
-        line = textfile.readline()
-        splitted = line.split("\t")
-        splitted[:] = [int(item) for item in splitted if (item != '' and item != '\n')]
-        data.append(np.array(splitted))
-    data = np.array(data)
-    return names, colors, data
 
 # def xml_read_bins(filename: str) -> Locus:
 def xml_read_bins(filename: str):
     """Read xml file for bins of each allele, \
     returns dictionary of horizontal values"""
-    BLUE = Dye('FL-6C', 'b', 1)
-    GREEN = Dye('JOE-6C', 'g', 2)
-    YELLOW = Dye('TMR-6C', 'y', 3)
-    RED = Dye('CXR-6C', 'r', 4)
-    PURPLE = Dye('TOM-6C', 'm', 5)
-    LADDER = Dye('WEN-6C', 'k', 6)
 
-    thetreefile = et.parse(filename)
+    # Only want to define each color once, maybe in GLOBALS.py?
+    blue = Dye('FL-6C', 'b', 1)
+    green = Dye('JOE-6C', 'g', 2)
+    yellow = Dye('TMR-6C', 'y', 3)
+    red = Dye('CXR-6C', 'r', 4)
+    purple = Dye('TOM-6C', 'm', 5)
+    ladder = Dye('WEN-6C', 'k', 6)
+
+    thetreefile = eT.parse(filename)
     root = thetreefile.getroot()
-    locusList = []
+    locus_dict = {}
+    # root[5] is the loci
     for locus in root[5]:
-        name = locus.find('MarkerTitle').text
-        temp_dict = {1: BLUE, 2: GREEN, 3: YELLOW, 4: RED, 5: LADDER, 6: PURPLE}
+        locus_name = locus.find('MarkerTitle').text
+        # to translate the numbers in xml file to colors
+        temp_dict = {1: blue, 2: green, 3: yellow, 4: red, 5: ladder, 6: purple}
         dye = int(locus.find('DyeIndex').text)
         lower = float(locus.find('LowerBoundary').text)
         upper = float(locus.find('UpperBoundary').text)
-        newLocus = Locus([], name, temp_dict[dye], lower, upper)
+        # store info so far in Locus dataclass
+        new_locus = Locus({}, locus_name, temp_dict[dye], lower, upper)
+        # add all alleles to locus
         for allele in locus.findall('Allele'):
-            name = allele.get('Label')
+            allele_name = allele.get('Label')
             mid = float(allele.get('Size'))
             left = float(allele.get('Left_Binning'))
             right = float(allele.get('Right_Binning'))
-            newAllele = Allele(name, mid, left, right)
-            newLocus.alleles.append(newAllele)
-        locusList.append(newLocus)
-    return locusList
+            # store in Allele dataclass
+            new_allele = Allele(allele_name, mid, left, right, locus_name, 0)
+            # add to alleles dict of locus
+            new_locus.alleles[allele_name] = new_allele
+        # add created locus to locus dict
+        locus_dict[locus_name] = new_locus
+    return locus_dict
 
 
-def csv_read_actual(filename, goalname, allele_peaks):
-    """Read csv file of actual alleles of donors
-     combines with info in word file for relative peak heights (/1)
-     returns dictionary of all alleles, with nonzero values is present"""
-    # goalname can be 1A2 for example
-
-    donor_peaks = pd.read_csv(filename, dtype = str, delimiter = ";")
-    donor_set, mixture_type, number_of_donors = goalname
-    # check if names match, otherwise donorset is different and output makes no sense
-    if filename[-5] != donor_set:
-        print("Filename "+filename+" does not match "+donor_set)
-        return None
-
-
-    # mixture_type decides which row of matrix to use
-    # number_of_donors decides which column in totals
-    letter_to_number = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4}
-    current = letter_to_number[mixture_type]
-    parts = picograms[current]
-    total = total_picograms[current, int(number_of_donors)-2]
-    # initialize column/donor
-    donor = 0
-    # intialize comparison variable
-    sample = donor_peaks["SampleName"][0]
+def csv_read_persons(donorset, locus_dict):
+    """reads all profiles from donorset"""
+    filename = 'donor_profiles/Refs_dataset' + str(donorset) + '.csv'
+    donor_peaks = pd.read_csv(filename, dtype=str, delimiter=";")
+    person_list = []
+    alleles = []
+    person_name = donor_peaks['SampleName'][0]
     for index, row in donor_peaks.iterrows():
-        if row[0] != sample:
-            donor += 1
-        if donor >= int(number_of_donors):
-            # break if amount of donors is reached
-            break
-        sample = row[0]
-        allele_peaks[row[1]][row[2]] += parts[donor]/total/2  # Allele 1
-        allele_peaks[row[1]][row[3]] += parts[donor]/total/2  # Allele 2
-    return allele_peaks
+        if row[0] != person_name:
+            # we have arrived at a new person
+            # store up to now in Person, start new
+            person_list.append(Person(person_name, alleles))
+            alleles = []
+        person_name = row[0]
+        locus = row[1]
+        allele1 = locus_dict[locus].alleles[row[2]]
+        allele2 = locus_dict[locus].alleles[row[3]]
+        alleles.append(allele1)
+        alleles.append(allele2)
+    return person_list
+
+
+def make_mixture(personlist, mixturename: str, locus_dict):
+    """ Uses Persons and mixturename to combine into expected relative peakheights"""
+    # mixturename can be 1A2 for example
+    # expected string of length 3, so unpack each character
+    donor_set, mixture_type, number_of_donors = mixturename
+    number_of_donors = int(number_of_donors)
+    # mixture_type decides which row of picogram matrix to use
+    # number_of_donors decides which column in picogram total matrix
+    # ############## COULD DO THIS IN SEPARATE FUNCTION #####################
+    letter_to_number = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4}
+    mixtype = letter_to_number[mixture_type]
+    parts = picograms[mixtype]
+    total = total_picograms[mixtype, number_of_donors-2]
+
+    for i in range(number_of_donors):
+        allele_list = personlist[i].alleles
+        for allele in allele_list:
+            relative = parts[i]/total/2
+            locus_dict[allele.marker].alleles[allele.name].height += relative
+
+    allele_list = []
+    height_list = []
+    for key in locus_dict:
+        allele_dict = locus_dict[key].alleles
+        for key2 in allele_dict:
+            value2 = allele_dict[key2]
+            if value2.height != 0:
+                allele_list.append(value2)
+                height_list.append(value2.height)
+
+    new_mixture = Mixture(mixturename, allele_list, height_list)
+    return new_mixture
 
 
 def csv_read_analyst(filename):

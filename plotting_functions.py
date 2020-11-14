@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 from scipy.signal import find_peaks
 from GLOBALS import *
 
@@ -9,18 +8,18 @@ color_list = ['FL-6C', 'JOE-6C', 'TMR-6C', 'CXR-6C', 'TOM-6C', 'WEN-6C']
 color_dict = {'FL-6C': 'b', 'JOE-6C': 'g', 'TMR-6C': 'y', 'CXR-6C': 'r', 'WEN-6C': 'k', 'TOM-6C': 'm'}
 
 
-def plot_data(sample):
+def plot_data(sample: Sample):
     """"Simple plot of all colors of one sample in the same figure"""
     plt.figure()
     for i in range(6):
-        plt.plot(sample.data[:,i], label=str(color_list[i]))
+        plt.plot(sample.data[:, i], label=str(color_list[i]))
     plt.legend()
     plt.title(sample.name)
     plt.show()
     return None
 
 
-def plot_6C(sample):
+def plot_6C(sample: Sample):
     """"Plots one combined plot of all 6 colors of one hid file"""
     plt.figure()
     plt.suptitle(sample.name)
@@ -77,7 +76,7 @@ def plot_actual(name, actual_dict, allele_dict, dye_dict, comparison):
         plt.xlim([50, 500])
         plt.ylim([-50, max(current_plot[1000:]) * 1.5])
         max_rel = 4000
-        plt.hlines(max_rel,0,500)
+        plt.hlines(max_rel, 0, 500)
         plt.plot(np.linspace(0, len(current_plot)/10, len(current_plot)), comparison[:, j])
         for locus, value in actual_dict.items():
             for allele, rel_perc in value.items():
@@ -97,8 +96,8 @@ def plot_markers(locusList):
     """Just a quick function to test marker boundaries"""
     plt.figure()
     for locus in locusList:
-        plt.subplot(6,1,locus.dye.plot_index)
-        plt.plot([locus.lower, locus.upper], [0,0], color = locus.dye.plot_color, marker = "s")
+        plt.subplot(6, 1, locus.dye.plot_index)
+        plt.plot([locus.lower, locus.upper], [0, 0], color = locus.dye.plot_color, marker = "s")
         for allele in locus.alleles:
             start = allele.mid - allele.left
             end = allele.mid + allele.right
