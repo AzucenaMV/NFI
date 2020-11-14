@@ -60,19 +60,22 @@ class Sample:
     Should I add the color_list here instead of in pf? Only used icw Samples for ordering
     """
     name: str
+    # actually a numpy array of nx6, but this seems to work?
     data: List
 
 
 @dataclass
 class Person:
     name: str
-    alleles: List[Allele]
+    alleles: List[str]
 
 
 @dataclass
 class Mixture:
     name: str
-    alleles: List[Allele]
+    # alleles is a list of locus_allele names (e.g. 'AMEL_X')
+    alleles: List[str]
+    # heights can either be relative (0-1) or absolute (in rfu)
     heights: List[float]
 
 

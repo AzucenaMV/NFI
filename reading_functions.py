@@ -119,7 +119,7 @@ def make_mixture(personlist, mixturename: str, locus_dict):
         for key2 in allele_dict:
             value2 = allele_dict[key2]
             if value2.height != 0:
-                allele_list.append(value2)
+                allele_list.append(key+"_"+key2)
                 height_list.append(value2.height)
 
     new_mixture = Mixture(mixturename, allele_list, height_list)
@@ -134,16 +134,14 @@ def csv_read_analyst(filename):
     # there may be more than one sample in one file
     results = pd.read_csv(filename)
     name = results['Sample Name'][0]    # to start iteration
-    allele_lists = []                   # initialize big lists
-    height_lists = []
+    mixture_list = []                   # initialize big lists
     allele_list = []                    # initialize small lists
     height_list = []
     for index, row in results.iterrows():
         # iterate over all rows, because each row contains
         # the peaks for one locus
         if name != row[0]:                      # then start new sample
-            allele_lists.append(allele_list)    # store current sample data
-            height_lists.append(height_list)
+            mixture_list.append(Mixture(name, allele_list, height_list))    # store current sample data
             allele_list = []                    # empty lists
             height_list = []
         name = row[0]                           # then set name to current sample name
@@ -157,6 +155,5 @@ def csv_read_analyst(filename):
                 # heights are 10 indices further than
                 # their corresponding allele names
                 height_list.append(row[i+10])
-    allele_lists.append(allele_list)
-    height_lists.append(height_list)
-    return allele_lists, height_lists
+    mixture_list.append(Mixture(name, allele_list, height_list))
+    return mixture_list
