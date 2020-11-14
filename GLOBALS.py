@@ -36,7 +36,6 @@ class Allele:
     mid: float
     left: float
     right: float
-    marker: str
     height: float
     # note: leftbinning is not always equal to rightbinning
     # also, not always 0.5, sometimes 0.4
@@ -66,24 +65,24 @@ class Sample:
 
 @dataclass
 class Person:
-    name: str
-    alleles: List[str]
+    """ Class to store alleles a Person has. """
+    name: str               # name is A - Z, letter used to identify person
+    alleles: List[Allele]   # list of alleles
 
 
 @dataclass
 class Mixture:
-    name: str
-    # alleles is a list of locus_allele names (e.g. 'AMEL_X')
-    alleles: List[str]
-    # heights can either be relative (0-1) or absolute (in rfu)
-    heights: List[float]
+    """ Class to store peaks identified/expected in mixture. """
+    name: str               # name of mixture, '1A2' for example
+    alleles: List[str]      # alleles is a list of locus_allele names (e.g. 'AMEL_X')
+    heights: List[float]    # heights can either be relative (0-1) or absolute (in rfu)
 
 
 # misschien uiteindelijk:
 # output class/geanalyseerd profiel, welke pieken zijn aangewezen door CNN
 @dataclass
 class Result:
+    """ TBD """
     name: str
-    # something to store peaks and heights
     peaks: Dict[Locus, float]
     thresholds: List[float]
