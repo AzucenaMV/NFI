@@ -1,76 +1,54 @@
 import matplotlib.pyplot as plt
-import numpy as np
 from scipy.signal import find_peaks
+from GLOBALS import *
 
-
-# GLOBAL VARIABLES --> in apart Python bestand
-# list of colors as they appear in (sized) data files
+# list of colors in the order they appear in (sized) trace data files
 color_list = ['FL-6C', 'JOE-6C', 'TMR-6C', 'CXR-6C', 'TOM-6C', 'WEN-6C']
 # dict of color names to colors to be plotted
 color_dict = {'FL-6C': 'b', 'JOE-6C': 'g', 'TMR-6C': 'y', 'CXR-6C': 'r', 'WEN-6C': 'k', 'TOM-6C': 'm'}
 
-# IPV ALLELE_DICT EEN CLASS SCHRIJVEN
 
-def plot_data(data, titles):
-    """"Plots all data per color for entire lists"""
-    # take one off since last pocon is mainly empty?
-    for i in range(len(titles)-1):
-        plt.figure()
-        for j in range(6):
-            plt.plot(data[:, 6*i+j], label=str(color_list[j]))
-        plt.legend()
-        plt.title(titles[i])
-        plt.show()
+def plot_data(sample: Sample):
+    """"Simple plot of all colors of one sample in the same figure"""
+    plt.figure()
+    for i in range(6):
+        plt.plot(sample.data[:, i], label=str(color_list[i]))
+    plt.legend()
+    plt.title(sample.name)
+    plt.show()
     return None
 
 
-def plot_6C(data, titles):
+def plot_6C(sample: Sample):
     """"Plots one combined plot of all 6 colors of one hid file"""
-    for j in range(len(titles)-1):
-        plt.figure()
-        plt.suptitle(titles[j])
-        for i in range(6):
-            plt.subplot(6, 1, i + 1)
-            plt.plot(data[:, 6 * j + i])
-            plt.title(color_list[i % 6])
-        plt.show()
+    plt.figure()
+    plt.suptitle(sample.name)
+    for i in range(6):
+        plt.subplot(6, 1, i + 1)
+        plt.plot(sample.data[:, i])
+        plt.title(color_list[i])
+    plt.show()
     return None
 
 
-def plot_raw_vs_sized(data_raw, data_sized, titles):
-    """Currently broken, probably won't use anymore, so not fixin't"""
-    difference = len(data_raw)-len(data_sized)
-    data_raw_short = data_raw[difference::, :]
-    counter = 0
-    for i in range(len(titles)-1):
-        for j in range(6):
-            plt.figure()
-            plt.plot(data_raw_short[:, 6 * i + j])
-            plt.plot(data_sized[:, 6 * i + j])
-            title = str(titles[i]) + "_color_" + str(color_list[j])
-            plt.title(title)
-            plt.show()
-        counter += 1
-    return None
-
-
-def plot_compare(name, alleles, heights, allele_dict, dye_dict, comparison):
+def plot_compare(name: str, mixture: Mixture, locus_dict: dict, comparison: Sample):
     """uses both the analysts identified peaks and sized data \
     for comparison to plot both in one image"""
     for j in range(6):
         plt.figure()
         plt.title(str('filename: '+name+', dye: ' + str(color_list[j])))
         plt.xlim([50, 500])
-        current_plot = comparison[:, j]
-        plt.plot(np.linspace(0, len(current_plot)/10, len(current_plot)), comparison[:, j])
+        current_plot = comparison.data[:, j]
+        plt.plot(np.linspace(0, len(current_plot)/10, len(current_plot)), comparison.data[:, j])
         plt.ylim([-50, max(current_plot[1000:])*1.5])
-        for i in range(len(alleles)):
+        for i in range(len(mixture.alleles)):
             # use dye_dict to plot correct color
-            locus, allele = alleles[i].split("_")
-            dye = dye_dict[locus]
-            color = str(color_dict[dye])
-            if dye == color_list[j]:
-                plt.plot([allele_dict[locus][allele]], [heights[i]], str(color + "*"))  # add colour
+            locus, allele = mixture.alleles[i].split("_")
+            dye = locus_dict[locus].dye
+            dye_name = dye.name
+            color = dye.plot_color
+            if dye_name == color_list[j]:
+                plt.plot([locus_dict[locus].alleles[allele].mid], [mixture.heights[i]], str(color + "*"))  # add colour
         plt.show()
     pass
 
@@ -88,29 +66,39 @@ def plot_sizestd_peaks(sizestd):
     return None
 
 
-def plot_actual(name, actual_dict, allele_dict, dye_dict, comparison):
+def plot_actual(name: str, mix: Mixture, locus_dict: dict, comparison: Sample):
     """uses both the theoretical actual relative peaks and \
     sized data for comparison to plot both in one image"""
 
     for j in range(6):
         plt.figure()
         plt.title(str('filename: '+name+', dye: ' + str(color_list[j])))
-        current_plot = comparison[:, j]
+        current_plot = comparison.data[:, j]
         plt.xlim([50, 500])
         plt.ylim([-50, max(current_plot[1000:]) * 1.5])
-        max_rel = 4000
-        plt.hlines(max_rel,0,500)
-        plt.plot(np.linspace(0, len(current_plot)/10, len(current_plot)), comparison[:, j])
-        for locus, value in actual_dict.items():
-            for allele, rel_perc in value.items():
-                # ######MIGHT WANT TO USE FILTER FUNCTION###############TO ITERATE DICT####
-                # use dye_dict to plot correct color
-                dye = dye_dict[locus]
-                if rel_perc != 0 and dye == color_list[j]:
-                    color = color_dict[dye]
-                    # ######RELATIVE PERCENTAGES ARE LARGER THAN 1!!
-                    # -> due to one person having same allele twice
-                    # is this a problem?
-                    plt.plot([allele_dict[locus][allele]], [rel_perc*max_rel], str(color + "*"))  # add colour
+        max_rel = 20000
+        plt.hlines(max_rel, 0, 500)
+        plt.plot(np.linspace(0, len(current_plot)/10, len(current_plot)), comparison.data[:, j])
+        for locus, value in locus_dict.items():
+            for allele_name, allele in value.alleles.items():
+                dye = value.dye
+                if allele.height != 0 and dye.name == color_list[j]:
+                    color = dye.plot_color
+                    plt.plot([allele.mid], [allele.height*max_rel], str(color + "*"))  # add colour
         plt.show()
     pass
+
+
+def plot_markers(locusDict):
+    """Just a quick function to test marker boundaries"""
+    plt.figure()
+    for key_locus in locusDict:
+        locus = locusDict[key_locus]
+        plt.subplot(6, 1, locus.dye.plot_index)
+        plt.plot([locus.lower, locus.upper], [0, 0], color = locus.dye.plot_color, marker = "s")
+        for key_allele in locus.alleles:
+            allele = locus.alleles[key_allele]
+            start = allele.mid - allele.left
+            end = allele.mid + allele.right
+            plt.plot([start, end], [1,1])
+    plt.show()
