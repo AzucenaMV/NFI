@@ -7,21 +7,21 @@ def txt_read_data(filename: str):
     """ Function to read data files\
     Returns a list of sample names, colors, \
     and the data itself as matrix."""
-    textfile = open(filename, "r")
-    texts = textfile.read()
-    texts = texts.split("\n")
+    textfile = open(filename, "r")  # open text file
+    texts = textfile.read()         # read entire content
+    texts = texts.split("\n")       # split into lines
     # lines 1 and 2 are not interesting
     titles = texts[2].split('\t')                       # get titles of files
     titles = [item for item in titles if item != '']    # remove empty entries after splitting
     colors = texts[3].split('\t')                       # only needed for width of lines
     data = np.zeros((len(texts[4:]), len(colors)))
-    counter = 0
+    counter = 0         # counter is needed for line number
     for elt in texts[4:]:
-        new = np.array(elt.split('\t'))
-        new[new == ''] = 0
-        data[counter, :] = new
+        new = np.array(elt.split('\t'))     # split into words
+        new[new == ''] = 0                  # if empty, make zero
+        data[counter, :] = new              # store into data array
         counter += 1
-
+    # now pour contents into separate sample dataclasses
     sample_list = []
     for i in range(len(titles)):
         new_sample = Sample(titles[i].split('_')[0], data[:, 6*i:6*i+6])
@@ -103,8 +103,8 @@ def make_mixture(personlist, mixturename: str, locus_dict):
     # ############## COULD DO THIS IN SEPARATE FUNCTION #####################
     letter_to_number = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4}
     mixrow = letter_to_number[mixture_type]
-    parts = picograms[mixrow]
-    total = total_picograms[mixrow, number_of_donors-2]
+    parts = PICOGRAMS[mixrow]
+    total = TOTAL_PICOGRAMS[mixrow, number_of_donors-2]
 
     for i in range(number_of_donors):
         allele_list = personlist[i].alleles
