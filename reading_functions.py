@@ -1,6 +1,6 @@
 import pandas as pd
 import xml.etree.ElementTree as eT
-from GLOBALS import *
+from classes import *
 
 
 def txt_read_data(filename: str):
@@ -29,18 +29,9 @@ def txt_read_data(filename: str):
     return sample_list
 
 
-# def xml_read_bins(filename: str) -> Locus:
 def xml_read_bins(filename: str):
     """Read xml file for bins of each allele, \
     returns dictionary of horizontal values"""
-
-    # Only want to define each color once, maybe in GLOBALS.py?
-    blue = Dye('FL-6C', 'b', 1)
-    green = Dye('JOE-6C', 'g', 2)
-    yellow = Dye('TMR-6C', 'y', 3)
-    red = Dye('CXR-6C', 'r', 4)
-    purple = Dye('TOM-6C', 'm', 5)
-    ladder = Dye('WEN-6C', 'k', 6)
 
     thetreefile = eT.parse(filename)
     root = thetreefile.getroot()
@@ -49,7 +40,7 @@ def xml_read_bins(filename: str):
     for locus in root[5]:
         locus_name = locus.find('MarkerTitle').text
         # to translate the numbers in xml file to colors
-        temp_dict = {1: blue, 2: green, 3: yellow, 4: red, 5: ladder, 6: purple}
+        temp_dict = {1: BLUE, 2: GREEN, 3: YELLOW, 4: RED, 5: LADDER, 6: PURPLE}
         dye = int(locus.find('DyeIndex').text)
         lower = float(locus.find('LowerBoundary').text)
         upper = float(locus.find('UpperBoundary').text)
@@ -62,7 +53,7 @@ def xml_read_bins(filename: str):
             left = float(allele.get('Left_Binning'))
             right = float(allele.get('Right_Binning'))
             # store in Allele dataclass
-            new_allele = Allele(allele_name, mid, left, right, 0)
+            new_allele = Allele(allele_name, mid, left, right)
             # add to alleles dict of locus
             new_locus.alleles[allele_name] = new_allele
         # add created locus to locus dict
@@ -70,9 +61,9 @@ def xml_read_bins(filename: str):
     return locus_dict
 
 
-def csv_read_persons(donorset, locus_dict):
-    """reads all profiles from donorset"""
-    filename = 'donor_profiles/Refs_dataset' + str(donorset) + '.csv'
+def csv_read_persons(donor_set):
+    """reads all profiles from given donorset (1,2,3,4,5,6)"""
+    filename = 'donor_profiles/Refs_dataset' + str(donor_set) + '.csv'
     donor_peaks = pd.read_csv(filename, dtype=str, delimiter=";")
     person_list = []
     alleles = []
@@ -92,59 +83,68 @@ def csv_read_persons(donorset, locus_dict):
     return person_list
 
 
-def make_mixture(personlist, mixturename: str, locus_dict):
-    """ Uses Persons and mixturename to combine into expected relative peakheights"""
-    # mixturename can be 1A2 for example
-    # expected string of length 3, so unpack each character
-    donor_set, mixture_type, number_of_donors = mixturename
-    number_of_donors = int(number_of_donors)
-    # mixture_type decides which row of picogram matrix to use
-    # number_of_donors decides which column in picogram total matrix
-    # ############## COULD DO THIS IN SEPARATE FUNCTION #####################
+def person_contributions(person_list, number_of_donors: int, mixture_type: str):
     letter_to_number = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4}
-    mixrow = letter_to_number[mixture_type]
-    parts = PICOGRAMS[mixrow]
-    total = TOTAL_PICOGRAMS[mixrow, number_of_donors-2]
-
+    mixture_row = letter_to_number[mixture_type]    # type of mixture determines the row
+    person_dict = {}
+    persons = []
+    parts = PICOGRAMS[mixture_row]
+    total = TOTAL_PICOGRAMS[mixture_row, number_of_donors - 2]
     for i in range(number_of_donors):
-        allele_list = personlist[i].alleles
-        for allele in allele_list:
-            loc, allel = allele.split("_")
-            relative = parts[i]/total/2
-            locus_dict[loc].alleles[allel].height += relative
+        frac = parts[i]/total/2     # divide by 2 because 2 alleles per locus
+        person_dict[person_list[i].name] = frac   # should I already divide by 2 here?
+        persons.append(person_list[i])
+    return person_dict, persons
 
-    allele_list = []
-    height_list = []
-    for key in locus_dict:
-        allele_dict = locus_dict[key].alleles
-        for key2 in allele_dict:
-            value2 = allele_dict[key2]
-            if value2.height != 0:
-                allele_list.append(key+"_"+key2)
-                height_list.append(value2.height)
+# def make_mixture(personlist, mixturename: str, locus_dict):
+#     """ Uses Persons and mixturename to combine into expected relative peakheights"""
+#     # mixturename can be 1A2 for example
+#     # expected string of length 3, so unpack each character
+#     donor_set, mixture_type, number_of_donors = mixturename
+#     number_of_donors = int(number_of_donors)
+#     # mixture_type decides which row of picogram matrix to use
+#     # number_of_donors decides which column in picogram total matrix
+#     # ############## COULD DO THIS IN SEPARATE FUNCTION #####################
+#     letter_to_number = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4}
+#     mixrow = letter_to_number[mixture_type]
+#     parts = PICOGRAMS[mixrow]
+#     total = TOTAL_PICOGRAMS[mixrow, number_of_donors-2]
+#
+#     for i in range(number_of_donors):
+#         allele_list = personlist[i].alleles
+#         for allele in allele_list:
+#             loc, allel = allele.split("_")
+#             relative = parts[i]/total/2
+#             locus_dict[loc].alleles[allel].height += relative
+#
+#     allele_list = []
+#     height_list = []
+#     for key in locus_dict:
+#         allele_dict = locus_dict[key].alleles
+#         for key2 in allele_dict:
+#             value2 = allele_dict[key2]
+#             if value2.height != 0:
+#                 allele_list.append(key+"_"+key2)
+#                 height_list.append(value2.height)
+#
+#     new_mixture = Mixture(mixturename, allele_list, height_list)
+#     return new_mixture
 
-    new_mixture = Mixture(mixturename, allele_list, height_list)
-    return new_mixture
 
-
-def csv_read_analyst(filename):
-    """"Read csv file of identified alleles\
-    returns list of alleles and corresponding peaks
-    allele list is nested list per sample"""
-    # I can use output of xml_read_bins to find colors of alleles
-    # there may be more than one sample in one file
+def csv_read_analyst(filename, locus_dict):
+    """Read csv file of identified alleles\
+    returns list of corresponding peaks"""
     results = pd.read_csv(filename)
     name = results['Sample Name'][0]    # to start iteration
     mixture_list = []                   # initialize big lists
-    allele_list = []                    # initialize small lists
-    height_list = []
+    peak_list = []                    # initialize small lists
     for index, row in results.iterrows():
         # iterate over all rows, because each row contains
-        # the peaks for one locus
+        # the peaks for one allele
         if name != row[0]:                      # then start new sample
-            mixture_list.append(Mixture(name, allele_list, height_list))    # store current sample data
-            allele_list = []                    # empty lists
-            height_list = []
+            name, replicate = name.split('.')
+            mixture_list.append(AnalystMixture(name, replicate, peak_list))    # store current sample data
+            peak_list = []                      # empty list
         name = row[0]                           # then set name to current sample name
         for i in range(2, 12):
             # go over the 10 possible locations of peak identification
@@ -152,9 +152,17 @@ def csv_read_analyst(filename):
                 # append value only if non-empty
                 # empty entries are converted to (float-type) NaN's by pandas
                 # so str(row[i]) == row[i] filters out empty entries
-                allele_list.append(row[1]+"_"+row[i])
-                # heights are 10 indices further than
-                # their corresponding allele names
-                height_list.append(row[i+10])
-    mixture_list.append(Mixture(name, allele_list, height_list))
+                locus = locus_dict[row[1]]
+                allele = locus.alleles[row[i]]
+                x_value = allele.mid
+                height = row[i+10]  # heights are 10 indices further than
+                dye = locus.dye     # their corresponding allele names
+                new_peak = Peak(locus.name+"_"+allele.name, x_value, height, dye)
+                peak_list.append(new_peak)
+    mixture_list.append(AnalystMixture(name, replicate, peak_list))
     return mixture_list
+
+
+# beginnen aan window-maker voor neuraal netwerk, 201 variabel
+# label maker twee opties (analyst/actual).
+# Y-STR's voor nu laten, AMEL zelf toevoegen

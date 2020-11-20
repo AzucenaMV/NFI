@@ -1,18 +1,13 @@
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
-from GLOBALS import *
-
-# list of colors in the order they appear in (sized) trace data files
-color_list = ['FL-6C', 'JOE-6C', 'TMR-6C', 'CXR-6C', 'TOM-6C', 'WEN-6C']
-# dict of color names to colors to be plotted
-color_dict = {'FL-6C': 'b', 'JOE-6C': 'g', 'TMR-6C': 'y', 'CXR-6C': 'r', 'WEN-6C': 'k', 'TOM-6C': 'm'}
+from classes import *
 
 
 def plot_data(sample: Sample):
     """"Simple plot of all colors of one sample in the same figure"""
     plt.figure()
     for i in range(6):
-        plt.plot(sample.data[:, i], label=str(color_list[i]))
+        plt.plot(sample.data[:, i], label=str(sample.color_list[i]))
     plt.legend()
     plt.title(sample.name)
     plt.show()
@@ -26,34 +21,33 @@ def plot_6C(sample: Sample):
     for i in range(6):
         plt.subplot(6, 1, i + 1)
         plt.plot(sample.data[:, i])
-        plt.title(color_list[i])
+        plt.title(sample.color_list[i])
     plt.show()
     return None
 
 
-def plot_compare(name: str, mixture: Mixture, locus_dict: dict, comparison: Sample):
+def plot_analyst(name: str, peaks: list, sample: Sample):
     """uses both the analysts identified peaks and sized data \
-    for comparison to plot both in one image"""
+    for comparison to plot both in one image for each color"""
     for j in range(6):
         plt.figure()
-        plt.title(str('filename: '+name+', dye: ' + str(color_list[j])))
+        plt.title(str('filename: '+name+', dye: ' + str(sample.color_list[j])))
         plt.xlim([50, 500])     # to cut off primer dimer
-        current_plot = comparison.data[:, j]
+        current_plot = sample.data[:, j]
         # plot measured data
-        plt.plot(np.linspace(0, len(current_plot)/10, len(current_plot)), comparison.data[:, j])
+        plt.plot(np.linspace(0, len(current_plot)/10, len(current_plot)), current_plot)
         # to scale y-axis somewhat close to data
         plt.ylim([-50, max(current_plot[1000:])*1.5])
         # iterate through all alleles in mixture
-        for i in range(len(mixture.alleles)):
-            locus, allele = mixture.alleles[i].split("_")
-            dye = locus_dict[locus].dye
+        for peak in peaks:
+            dye = peak.dye
             dye_name = dye.name
             color = dye.plot_color
             # this is not very efficient
             # iterates entire mixture every time, then checks the color
             # does 6 times as much work as needed...
-            if dye_name == color_list[j]:
-                plt.plot([locus_dict[locus].alleles[allele].mid], [mixture.heights[i]], str(color + "*"))  # add colour
+            if dye_name == sample.color_list[j]:
+                plt.plot([peak.x], [peak.height], str(color + "*"))  # add colour
         plt.show()
     pass
 
@@ -71,18 +65,15 @@ def plot_sizestd_peaks(sizestd):
     return peaks
 
 
-def plot_actual(name: str, mix: Mixture, locus_dict: dict, comparison: Sample):
+def plot_expected(name: str, peaks: list, sample: Sample):
     """uses both the theoretical actual relative peaks and \
     sized data for comparison to plot both in one image"""
-
-    # problem: uses heights from locus_dict, even though dataclass is not\
-    # meant for that... Should be stored in mix...?
 
     for j in range(6):
         # makes one separate figure per dye
         plt.figure()
-        plt.title(str('filename: '+name+', dye: ' + str(color_list[j])))
-        current_plot = comparison.data[:, j]
+        plt.title(str('filename: '+name+', dye: ' + str(sample.color_list[j])))
+        current_plot = sample.data[:, j]
         # cut off primer dimer
         plt.xlim([50, 500])
         # amount to multiply relative peak height with
@@ -92,14 +83,13 @@ def plot_actual(name: str, mix: Mixture, locus_dict: dict, comparison: Sample):
         # plot max height relative points
         plt.hlines(max_rel, 0, 500)
         # plot measured data
-        plt.plot(np.linspace(0, len(current_plot)/10, len(current_plot)), comparison.data[:, j])
+        plt.plot(np.linspace(0, len(current_plot)/10, len(current_plot)), current_plot)
         # iterate through dict to plot all peaks as *
-        for locus, value in locus_dict.items():
-            for allele_name, allele in value.alleles.items():
-                dye = value.dye
-                if allele.height != 0 and dye.name == color_list[j]:
-                    color = dye.plot_color
-                    plt.plot([allele.mid], [allele.height*max_rel], str(color + "*"))  # add colour
+        for peak in peaks:
+            dye = peak.dye
+            if dye.name == sample.color_list[j]:
+                color = dye.plot_color
+                plt.plot([peak.x], [peak.height * max_rel], str(color + "*"))  # add colour
         plt.show()
     pass
 
@@ -118,6 +108,5 @@ def plot_markers(locusDict):
             allele = locus.alleles[key_allele]  # get allele class object
             start = allele.mid - allele.left    # calculate where it starts
             end = allele.mid + allele.right     # calculate where it ends
-            plt.plot([start, end], [1,1])       # plot allele bin at level 1
+            plt.plot([start, end], [1, 1])       # plot allele bin at level 1
     plt.show()
-
