@@ -12,6 +12,14 @@ class Dye:
                         # are plotted in the same image
 
 
+BLUE = Dye('FL-6C', 'b', 1)
+GREEN = Dye('JOE-6C', 'g', 2)
+YELLOW = Dye('TMR-6C', 'y', 3)
+RED = Dye('CXR-6C', 'r', 4)
+PURPLE = Dye('TOM-6C', 'm', 5)
+LADDER = Dye('WEN-6C', 'k', 6)
+
+
 @dataclass
 class Allele:
     """Class for each allele that can be identified."""
@@ -43,7 +51,6 @@ class Peak:
     # allele: Optional[Allele] Could also just add the allele for all info. allele+dye is enough, right?
 
 
-
 @dataclass
 class Sample:
     """
@@ -53,8 +60,8 @@ class Sample:
     """
     name: str       # example: '1A2'
     data: List      #
-    color_list = ['FL-6C', 'JOE-6C', 'TMR-6C', 'CXR-6C', 'TOM-6C', 'WEN-6C']
-
+    # color_list = ['FL-6C', 'JOE-6C', 'TMR-6C', 'CXR-6C', 'TOM-6C', 'WEN-6C']
+    color_list = [BLUE, GREEN, YELLOW, RED, PURPLE, LADDER]
 
 @dataclass
 class Person:
@@ -137,9 +144,4 @@ TOTAL_PICOGRAMS = np.array([[450, 600, 750, 900],
                             [180, 240, 270, 300],
                             [630, 690, 720, 750]])
 
-BLUE = Dye('FL-6C', 'b', 1)
-GREEN = Dye('JOE-6C', 'g', 2)
-YELLOW = Dye('TMR-6C', 'y', 3)
-RED = Dye('CXR-6C', 'r', 4)
-PURPLE = Dye('TOM-6C', 'm', 5)
-LADDER = Dye('WEN-6C', 'k', 6)
+

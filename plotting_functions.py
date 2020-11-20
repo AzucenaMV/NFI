@@ -3,6 +3,28 @@ from scipy.signal import find_peaks
 from classes import *
 
 
+def plot_sample_markers(sample: Sample, locus_dict: dict):
+    """Plots sample and markers in 6C plot"""
+    fig = plt.figure()
+    # iterate through all loci to plot markers
+    for key_locus in locus_dict:
+        locus = locus_dict[key_locus]               # get locus class object
+        plt.subplot(6, 1, locus.dye.plot_index)     # plot in correct color location
+        # plot bar at level 0 with squares as endpoints to show marker
+        # might want to change style of endpoints
+        plt.annotate(s='', xy=(locus.lower,0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
+        # plt.plot([locus.lower, locus.upper], [0, 0], color = locus.dye.plot_color, marker = "s")
+    for i in range(6):
+        plt.subplot(6, 1, i + 1)
+        current = sample.data[:, i]
+        plt.plot(np.linspace(0, len(current)/10, len(current)), current, str(sample.color_list[i].plot_color))
+        plt.xlim([50,500])
+    plt.suptitle(sample.name)
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.9)
+    plt.show()
+
+### UNDERNEATH ARE MOSTLY UNUSED ###
 def plot_data(sample: Sample):
     """"Simple plot of all colors of one sample in the same figure"""
     plt.figure()
@@ -15,7 +37,7 @@ def plot_data(sample: Sample):
 
 
 def plot_6C(sample: Sample):
-    """"Plots one combined plot of all 6 colors of one hid file"""
+    """"Plots one combined plot of all 6 colors of one sample"""
     plt.figure()
     plt.suptitle(sample.name)
     for i in range(6):
@@ -26,12 +48,12 @@ def plot_6C(sample: Sample):
     return None
 
 
-def plot_analyst(name: str, peaks: list, sample: Sample):
+def plot_analyst(peaks: list, sample: Sample):
     """uses both the analysts identified peaks and sized data \
     for comparison to plot both in one image for each color"""
     for j in range(6):
         plt.figure()
-        plt.title(str('filename: '+name+', dye: ' + str(sample.color_list[j])))
+        plt.title(str('filename: '+sample.name+', dye: ' + str(sample.color_list[j])))
         plt.xlim([50, 500])     # to cut off primer dimer
         current_plot = sample.data[:, j]
         # plot measured data
@@ -65,14 +87,14 @@ def plot_sizestd_peaks(sizestd):
     return peaks
 
 
-def plot_expected(name: str, peaks: list, sample: Sample):
+def plot_expected(peaks: list, sample: Sample):
     """uses both the theoretical actual relative peaks and \
     sized data for comparison to plot both in one image"""
 
     for j in range(6):
         # makes one separate figure per dye
         plt.figure()
-        plt.title(str('filename: '+name+', dye: ' + str(sample.color_list[j])))
+        plt.title(str('filename: '+sample.name+', dye: ' + str(sample.color_list[j])))
         current_plot = sample.data[:, j]
         # cut off primer dimer
         plt.xlim([50, 500])
