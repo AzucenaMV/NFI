@@ -29,11 +29,11 @@ def txt_read_data(filename: str):
     return sample_list
 
 
-def xml_read_bins(filename: str):
+def xml_read_bins():
     """Read xml file for bins of each allele, \
     returns dictionary of horizontal values"""
 
-    thetreefile = eT.parse(filename)
+    thetreefile = eT.parse("PPF6C_SPOOR.xml")
     root = thetreefile.getroot()
     locus_dict = {}
     # root[5] is the loci
@@ -96,48 +96,27 @@ def person_contributions(person_list, number_of_donors: int, mixture_type: str):
         persons.append(person_list[i])
     return person_dict, persons
 
-# def make_mixture(personlist, mixturename: str, locus_dict):
-#     """ Uses Persons and mixturename to combine into expected relative peakheights"""
-#     # mixturename can be 1A2 for example
-#     # expected string of length 3, so unpack each character
-#     donor_set, mixture_type, number_of_donors = mixturename
-#     number_of_donors = int(number_of_donors)
-#     # mixture_type decides which row of picogram matrix to use
-#     # number_of_donors decides which column in picogram total matrix
-#     # ############## COULD DO THIS IN SEPARATE FUNCTION #####################
-#     letter_to_number = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4}
-#     mixrow = letter_to_number[mixture_type]
-#     parts = PICOGRAMS[mixrow]
-#     total = TOTAL_PICOGRAMS[mixrow, number_of_donors-2]
-#
-#     for i in range(number_of_donors):
-#         allele_list = personlist[i].alleles
-#         for allele in allele_list:
-#             loc, allel = allele.split("_")
-#             relative = parts[i]/total/2
-#             locus_dict[loc].alleles[allel].height += relative
-#
-#     allele_list = []
-#     height_list = []
-#     for key in locus_dict:
-#         allele_dict = locus_dict[key].alleles
-#         for key2 in allele_dict:
-#             value2 = allele_dict[key2]
-#             if value2.height != 0:
-#                 allele_list.append(key+"_"+key2)
-#                 height_list.append(value2.height)
-#
-#     new_mixture = Mixture(mixturename, allele_list, height_list)
-#     return new_mixture
+
+def make_person_mixture(mixture_name, locus_dict):
+    donor_set, mixture_type, donor_amount = mixture_name
+    # just a small thing, but always need to convert this one to int, \
+    # better to do in function or outside of function and specify it needs
+    # to be an int in the function?
+    donor_amount = int(donor_amount)
+    person_list = csv_read_persons(donor_set)
+    person_fracs, persons = person_contributions(person_list, donor_amount, mixture_type)
+    person_mix = PersonMixture(mixture_name, persons, person_fracs)
+    peaks = person_mix.create_peaks(locus_dict)
+    return peaks
 
 
-def csv_read_analyst(filename, locus_dict):
+def csv_read_analyst(sample_name, locus_dict):
     """Read csv file of identified alleles\
     returns list of corresponding peaks"""
-    results = pd.read_csv(filename)
+    results = pd.read_csv("analysts_data_filtered/"+str(sample_name)+"_New.csv")
     name = results['Sample Name'][0]    # to start iteration
     mixture_list = []                   # initialize big lists
-    peak_list = []                    # initialize small lists
+    peak_list = []                      # initialize small lists
     for index, row in results.iterrows():
         # iterate over all rows, because each row contains
         # the peaks for one allele
