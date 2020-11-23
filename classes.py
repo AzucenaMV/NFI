@@ -12,6 +12,7 @@ class Dye:
                         # are plotted in the same image
 
 
+# Currently between classes so it can be used within classes
 BLUE = Dye('FL-6C', 'b', 1)
 GREEN = Dye('JOE-6C', 'g', 2)
 YELLOW = Dye('TMR-6C', 'y', 3)
@@ -63,6 +64,7 @@ class Sample:
     # color_list = ['FL-6C', 'JOE-6C', 'TMR-6C', 'CXR-6C', 'TOM-6C', 'WEN-6C']
     color_list = [BLUE, GREEN, YELLOW, RED, PURPLE, LADDER]
 
+
 @dataclass
 class Person:
     """ Class to store alleles a Person has. """
@@ -70,9 +72,6 @@ class Person:
     alleles: List[str]   # list of 'locus_allele' names
 
 
-### PROBLEM: need to add together same peaks
-### Instead of constantly adding new peaks
-# Can't hash user-defined classes
 @dataclass
 class PersonMixture:
     name: str                       # for example: "1A2"
@@ -108,7 +107,7 @@ class PersonMixture:
             x = allele.mid                          # store x_location
             height = peak_dict[locus_allele]        # store rel. height
             dye = locus.dye                         # store dye
-            new_peak = Peak(locus_allele,x,height,dye)
+            new_peak = Peak(locus_allele, x, height, dye)
             peak_list.append(new_peak)               # append peak to list
         return peak_list
 
@@ -121,14 +120,25 @@ class AnalystMixture:
     peaks: List[Peak]       # list of peaks
 
 
-# misschien uiteindelijk:
-# output class/geanalyseerd profiel, welke pieken zijn aangewezen door CNN
+# TBD ############################################################################
+@dataclass
+class TrainInput:
+    """Class for input with labels to train on."""
+    name: str
+    data: List
+    # center: to store pixel to classify?
+
+
+@dataclass
+class TestInput:
+    """Class for input without labels to test on."""
+    name: str
+
+
 @dataclass
 class Result:
     """ TBD """
     name: str
-    peaks: Dict[Locus, float]
-    thresholds: List[float]
 
 
 # Global variables
@@ -143,5 +153,3 @@ TOTAL_PICOGRAMS = np.array([[450, 600, 750, 900],
                             [300, 360, 420, 480],
                             [180, 240, 270, 300],
                             [630, 690, 720, 750]])
-
-

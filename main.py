@@ -1,8 +1,14 @@
 import reading_functions as rf
 import plotting_functions as pf
-from classes import *
+import data_prep_functions as df
 
 if __name__ == '__main__':
+    samples = rf.txt_read_data("trace_data/TraceData1.txt")
+    windows200 = df.window_maker_200(samples[30])
+    windows80 = df.window_maker_80(samples[2])
+
+
+def test_read_plot():
     # first create a list of all samples
     sample_list_1 = rf.txt_read_data("trace_data/TraceData1.txt")
     sample_list_2 = rf.txt_read_data("trace_data/TraceData2.txt")
@@ -23,3 +29,4 @@ if __name__ == '__main__':
         # now plot with actual peaks
         peaks = rf.make_person_mixture(current_name, locus_dict)
         pf.plot_expected_6C(peaks, current, locus_dict)
+    pass

@@ -12,13 +12,13 @@ def plot_sample_markers_6C(sample: Sample, locus_dict: dict):
         plt.subplot(6, 1, locus.dye.plot_index)     # plot in correct color location
         # plot bar at level 0 with squares as endpoints to show marker
         # might want to change style of endpoints
-        plt.annotate(s='', xy=(locus.lower,0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
+        plt.annotate(s='', xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
         # plt.plot([locus.lower, locus.upper], [0, 0], color = locus.dye.plot_color, marker = "s")
     for i in range(6):
         plt.subplot(6, 1, i + 1)
         current = sample.data[:, i]
         plt.plot(np.linspace(0, len(current)/10, len(current)), current, str(sample.color_list[i].plot_color))
-        plt.xlim([50,500])
+        plt.xlim([50, 500])
     plt.suptitle(sample.name)
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
@@ -130,14 +130,14 @@ def plot_expected_6C(peaks: list, sample: Sample, locus_dict):
         # plot marker bins
         plt.annotate(s='', xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
         # plot peaks
-        plt.plot([peak.x], [peak.height* max_rel], "k*")  # add black colour
+        plt.plot([peak.x], [peak.height * max_rel], "k*")  # add black colour
     plt.suptitle(sample.name)       # set title
     plt.tight_layout()              # ensures subplots don't overlap
     plt.subplots_adjust(top=0.9)    # ensures title doesn't overlap plots
     plt.show()
 
 
-### UNDERNEATH ARE MOSTLY UNUSED ###
+# ## UNDERNEATH ARE MOSTLY UNUSED ###
 def plot_data(sample: Sample):
     """"Simple plot of all colors of one sample in the same figure"""
     plt.figure()
@@ -174,15 +174,15 @@ def plot_sizestd_peaks(sizestd):
     return peaks
 
 
-def plot_markers(locusDict):
+def plot_markers(locus_dict):
     """Just a quick function to test marker boundaries"""
     plt.figure()
     # iterate through all loci
-    for key_locus in locusDict:
-        locus = locusDict[key_locus]            # get locus class object
+    for key_locus in locus_dict:
+        locus = locus_dict[key_locus]            # get locus class object
         plt.subplot(6, 1, locus.dye.plot_index)     # plot in correct color location
         # plot bar at level 0 with squares as endpoints to show marker
-        plt.plot([locus.lower, locus.upper], [0, 0], color = locus.dye.plot_color, marker = "s")
+        plt.plot([locus.lower, locus.upper], [0, 0], color=locus.dye.plot_color, marker="s")
         # iterate through all alleles
         for key_allele in locus.alleles:
             allele = locus.alleles[key_allele]  # get allele class object
