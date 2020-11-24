@@ -45,6 +45,7 @@ class Locus:
 class Peak:
     """Class for an identified or expected allele peak.
     Has everything needed for plotting."""
+    # should I add the left and right boundary of each bin?
     name: str       # Using "locus_allele" for now because it makes dict access easy
     x: float        # denk na over eenheid/naam
     height: float   # height of peak
@@ -124,14 +125,19 @@ class AnalystMixture:
 @dataclass
 class TrainInput:
     """Class for input with labels to train on."""
-    name: str
-    data: List
-    # center: to store pixel to classify?
+    # I'm not sure what shape the input data is supposed to be
+    # it might be logical to have a class for one set of center, window, label
+    # but the convnet takes a 3D input (list of images)
+    name: str       # name of sample
+    data: List      # list of windows (nx81x6)
+    center: float   # to store pixel horizontal location? to classify?
+    label: str      # labels of each window center (n)
 
 
 @dataclass
 class TestInput:
     """Class for input without labels to test on."""
+    # turns out the convnet also takes the labels of the test set as input
     name: str
 
 

@@ -4,8 +4,7 @@ import data_prep_functions as df
 
 if __name__ == '__main__':
     samples = rf.txt_read_data("trace_data/TraceData1.txt")
-    windows200 = df.window_maker_200(samples[30])
-    windows80 = df.window_maker_80(samples[2])
+    windows80 = df.window_maker(samples[2], 80)
 
 
 def test_read_plot():

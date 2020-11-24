@@ -115,14 +115,15 @@ def csv_read_analyst(sample_name, locus_dict):
     returns list of corresponding peaks"""
     results = pd.read_csv("analysts_data_filtered/"+str(sample_name)+"_New.csv")
     name = results['Sample Name'][0]    # to start iteration
+    sample_name, replicate = name.split('.') # is it okay to add a useless statement to get rid of a pycharm warning?
     mixture_list = []                   # initialize big lists
     peak_list = []                      # initialize small lists
     for index, row in results.iterrows():
         # iterate over all rows, because each row contains
         # the peaks for one allele
         if name != row[0]:                      # then start new sample
-            name, replicate = name.split('.')
-            mixture_list.append(AnalystMixture(name, replicate, peak_list))    # store current sample data
+            sample_name, replicate = name.split('.')
+            mixture_list.append(AnalystMixture(sample_name, replicate, peak_list))    # store current sample data
             peak_list = []                      # empty list
         name = row[0]                           # then set name to current sample name
         for i in range(2, 12):
@@ -140,8 +141,3 @@ def csv_read_analyst(sample_name, locus_dict):
                 peak_list.append(new_peak)
     mixture_list.append(AnalystMixture(name, replicate, peak_list))
     return mixture_list
-
-
-# beginnen aan window-maker voor neuraal netwerk, 201 variabel
-# label maker twee opties (analyst/actual).
-# Y-STR's voor nu laten, AMEL zelf toevoegen
