@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
-from classes import *
+from src.classes import *
 
 
 def plot_sample_markers_6C(sample: Sample, locus_dict: dict):

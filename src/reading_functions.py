@@ -1,6 +1,6 @@
 import pandas as pd
 import xml.etree.ElementTree as eT
-from classes import *
+from src.classes import *
 
 
 def txt_read_data(filename: str):
@@ -33,7 +33,7 @@ def xml_read_bins():
     """Read xml file for bins of each allele, \
     returns dictionary of horizontal values"""
 
-    thetreefile = eT.parse("PPF6C_SPOOR.xml")
+    thetreefile = eT.parse("../data/PPF6C_SPOOR.xml")
     root = thetreefile.getroot()
     locus_dict = {}
     # root[5] is the loci

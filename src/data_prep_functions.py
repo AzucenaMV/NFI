@@ -1,4 +1,4 @@
-from classes import *
+from src.classes import *
 
 
 def window_maker(sample: Sample, width: int):

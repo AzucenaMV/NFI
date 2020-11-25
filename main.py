@@ -1,16 +1,14 @@
-import reading_functions as rf
-import plotting_functions as pf
-import data_prep_functions as df
+from src import data_prep_functions as df, plotting_functions as pf, reading_functions as rf
 
 if __name__ == '__main__':
-    samples = rf.txt_read_data("trace_data/TraceData1.txt")
+    samples = rf.txt_read_data("data/trace_data/TraceData1.txt")
     windows80 = df.window_maker(samples[2], 80)
 
 
 def test_read_plot():
     # first create a list of all samples
-    sample_list_1 = rf.txt_read_data("trace_data/TraceData1.txt")
-    sample_list_2 = rf.txt_read_data("trace_data/TraceData2.txt")
+    sample_list_1 = rf.txt_read_data("data/trace_data/TraceData1.txt")
+    sample_list_2 = rf.txt_read_data("data/trace_data/TraceData2.txt")
     sample_list = sample_list_1 + sample_list_2
     # now we get all panel information from the Genemarker file
     locus_dict = rf.xml_read_bins()
