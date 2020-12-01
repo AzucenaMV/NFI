@@ -19,6 +19,7 @@ class Dyes:
     RED = Dye('CXR-6C', 'r', 4)
     PURPLE = Dye('TOM-6C', 'm', 5)
     LADDER = Dye('WEN-6C', 'orange', 6)
+    color_list = [BLUE, GREEN, YELLOW, RED, PURPLE, LADDER]
 
 
 @dataclass
@@ -28,12 +29,12 @@ class Allele:
     mid: float      # horizontal position, example: '87.32'
     left: float     # left side of bin from mid (0.4 or 0.5)
     right: float    # right side of bin from mid (0.4 or 0.5)
-
+    dye: Dye
 
 @dataclass
 class Locus:
     """Class for locus, stores Alleles per locus in dict."""
-    alleles: Dict[str, Allele]      # example of entry: '18': Allele()
+    alleles: Dict[str, Allele]      # example of entry: '18': Allele
     name: str                       # example: 'AMEL'
     dye: Dye                        # dye that locus is on
     lower: float                    # lower boundary of marker
@@ -45,6 +46,7 @@ class Peak:
     """Class for an identified or expected allele peak.
     Has everything needed for plotting."""
     name: str       # Using "locus_allele" because it makes dict access easy
+
     x: float        # horizontal location of peak
     height: float   # height of peak
     dye: Dye        # dye of peak
@@ -57,7 +59,6 @@ class Sample:
     """
     name: str       # example: '1A2'
     data: List
-    color_list = [Dyes.BLUE, Dyes.GREEN, Dyes.YELLOW, Dyes.RED, Dyes.PURPLE, Dyes.LADDER]
 
 
 @dataclass
@@ -115,15 +116,22 @@ class AnalystMixture:
 
 # TBD ############################################################################
 @dataclass
+class Center:
+    """class to store center of input to be labeled"""
+    index: float    # nucleotide location
+    dye: Dye        # dye in which center is present
+
+
+@dataclass
 class TrainInput:
     """Class for input with labels to train on."""
     # I'm not sure what shape the input data is supposed to be
     # it might be logical to have a class for one set of center, window, label
     # but the convnet takes a 3D input (list of images)
     name: str       # name of sample
-    data: List      # list of windows (nx81x6)
-    center: float   # to store pixel horizontal location? to classify?
-    label: str      # labels of each window center (n)
+    data: List      # window (81x6)
+    center: Center  # center pixel
+    label: int      # label of window center, maybe add to Center?
 
 
 @dataclass
@@ -131,9 +139,6 @@ class TestInput:
     """Class for input without labels to test on."""
     # turns out the convnet also takes the labels of the test set as input
     name: str
-
-    def dumdum(self, getal):
-        return 0+getal
 
 
 @dataclass
@@ -143,6 +148,8 @@ class Result:
 
 
 # Global variables
+DYES = Dyes()
+
 PICOGRAMS = np.array([[300, 150, 150, 150, 150],
                       [300, 30,  30,  30,  30],
                       [150, 150, 60,  60,  60],

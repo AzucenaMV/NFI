@@ -52,7 +52,7 @@ def xml_read_bins():
             left = float(allele.get('Left_Binning'))
             right = float(allele.get('Right_Binning'))
             # store in Allele dataclass
-            new_allele = Allele(allele_name, mid, left, right)
+            new_allele = Allele(allele_name, mid, left, right, temp_dict[dye])
             # add to alleles dict of locus
             new_locus.alleles[allele_name] = new_allele
         # add created locus to locus dict
