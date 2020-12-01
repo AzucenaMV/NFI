@@ -184,9 +184,12 @@ def plot_markers(locus_dict):
         # plot bar at level 0 with squares as endpoints to show marker
         plt.plot([locus.lower, locus.upper], [0, 0], color=locus.dye.plot_color, marker="s")
         # iterate through all alleles
+        end = 0
         for key_allele in locus.alleles:
             allele = locus.alleles[key_allele]  # get allele class object
             start = allele.mid - allele.left    # calculate where it starts
+            if start < end:
+                print(key_locus+": "+key_allele+" starts at "+str(start)+", previous ends at "+str(end))
             end = allele.mid + allele.right     # calculate where it ends
-            plt.plot([start, end], [1, 1])       # plot allele bin at level 1
+            plt.plot([start, end], [1, 1])      # plot allele bin at level 1
     plt.show()

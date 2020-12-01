@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Dict, Optional
+from typing import List, Dict
 import numpy as np
 
 
@@ -11,14 +11,14 @@ class Dye:
     plot_index: int     # index of which of 6 subplots when all dyes\
                         # are plotted in the same image
 
-
-# Currently between classes so it can be used within classes
-BLUE = Dye('FL-6C', 'b', 1)
-GREEN = Dye('JOE-6C', 'g', 2)
-YELLOW = Dye('TMR-6C', 'y', 3)
-RED = Dye('CXR-6C', 'r', 4)
-PURPLE = Dye('TOM-6C', 'm', 5)
-LADDER = Dye('WEN-6C', 'k', 6)
+@dataclass
+class Dyes:
+    BLUE = Dye('FL-6C', 'b', 1)
+    GREEN = Dye('JOE-6C', 'g', 2)
+    YELLOW = Dye('TMR-6C', 'k', 3)      # usually plotted in black for visibility
+    RED = Dye('CXR-6C', 'r', 4)
+    PURPLE = Dye('TOM-6C', 'm', 5)
+    LADDER = Dye('WEN-6C', 'orange', 6)
 
 
 @dataclass
@@ -28,7 +28,6 @@ class Allele:
     mid: float      # horizontal position, example: '87.32'
     left: float     # left side of bin from mid (0.4 or 0.5)
     right: float    # right side of bin from mid (0.4 or 0.5)
-    # locus: "Locus"    # note: left_binning is not always equal to right_binning
 
 
 @dataclass
@@ -36,7 +35,7 @@ class Locus:
     """Class for locus, stores Alleles per locus in dict."""
     alleles: Dict[str, Allele]      # example of entry: '18': Allele()
     name: str                       # example: 'AMEL'
-    dye: Dye                        #
+    dye: Dye                        # dye that locus is on
     lower: float                    # lower boundary of marker
     upper: float                    # upper boundary of marker
 
@@ -45,25 +44,20 @@ class Locus:
 class Peak:
     """Class for an identified or expected allele peak.
     Has everything needed for plotting."""
-    # should I add the left and right boundary of each bin?
-    name: str       # Using "locus_allele" for now because it makes dict access easy
-    x: float        # denk na over eenheid/naam
+    name: str       # Using "locus_allele" because it makes dict access easy
+    x: float        # horizontal location of peak
     height: float   # height of peak
     dye: Dye        # dye of peak
-    # allele: Optional[Allele] Could also just add the allele for all info. allele+dye is enough, right?
 
 
 @dataclass
 class Sample:
     """
     Class for samples, data is (nx6) matrix of all 6 colours
-    Should I split this into a list per color attribute?
-    Should I add the color_list here instead of in pf? Only used icw Samples for ordering
     """
     name: str       # example: '1A2'
-    data: List      #
-    # color_list = ['FL-6C', 'JOE-6C', 'TMR-6C', 'CXR-6C', 'TOM-6C', 'WEN-6C']
-    color_list = [BLUE, GREEN, YELLOW, RED, PURPLE, LADDER]
+    data: List
+    color_list = [Dyes.BLUE, Dyes.GREEN, Dyes.YELLOW, Dyes.RED, Dyes.PURPLE, Dyes.LADDER]
 
 
 @dataclass
@@ -78,7 +72,7 @@ class PersonMixture:
     name: str                       # for example: "1A2"
     persons: List[Person]           # list of Persons present in mix
     fractions: Dict[str, float]     # fractional contribution of each person in mixture
-    # why was this supposed to be a class function?
+
     def create_peaks(self, locus_dict):
         """Returns list of peaks expected in mixture and their relative heights"""
         peak_list = []
@@ -87,21 +81,19 @@ class PersonMixture:
         X_and_Y = locus_dict['AMEL'].alleles
         X = X_and_Y['X']
         Y = X_and_Y['Y']
-        peak_list.append(Peak("AMEL_X", X.mid, 0.5, BLUE))
-        peak_list.append(Peak("AMEL_Y", Y.mid, 0.5, BLUE))
+        peak_list.append(Peak("AMEL_X", X.mid, 0.5, Dyes.BLUE))
+        peak_list.append(Peak("AMEL_Y", Y.mid, 0.5, Dyes.BLUE))
         # iterate through persons in mix
         for person in self.persons:
             # iterate over their alleles
             for locus_allele in person.alleles:
-                try:
+                if locus_allele in peak_dict:
                     peak_dict[locus_allele] += self.fractions[person.name]
-                except:     # What is the difference between except and else?
+                else:
                     peak_dict[locus_allele] = self.fractions[person.name]
         # now we have a dictionary of the height of the alleles
         # all that's left is to store corresponding peaks in list
         for locus_allele in peak_dict:
-            # I keep storing locus_allele names to access dye color
-            # and also to access locus dictionary
             locus_name, allele_name = locus_allele.split("_")
             locus = locus_dict[locus_name]
             allele = locus.alleles[allele_name]
@@ -115,7 +107,7 @@ class PersonMixture:
 
 @dataclass
 class AnalystMixture:
-    """ Class to store peaks identified/expected in mixture. """
+    """ Class to store peaks identified in mixture. """
     name: str               # name of mixture, '1A2' for example
     replicate: str          # where 1 is donor set, 2 is #donors, A is mixture type and 3 is replicate
     peaks: List[Peak]       # list of peaks
@@ -139,6 +131,9 @@ class TestInput:
     """Class for input without labels to test on."""
     # turns out the convnet also takes the labels of the test set as input
     name: str
+
+    def dumdum(self, getal):
+        return 0+getal
 
 
 @dataclass
