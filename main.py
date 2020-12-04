@@ -1,6 +1,6 @@
 from src import data_prep_functions as df, plotting_functions as pf, reading_functions as rf
 from src import classes as c
-
+import pandas as pd
 
 def some_examples():
     # first create a list of all samples
@@ -13,7 +13,7 @@ def some_examples():
     for i in range(10, 11):
         current = sample_list[i]
         current_name = current.name
-        pf.plot_sample_markers_6C(current, locus_dict, labels)
+        pf.plot_sample_markers_6C(current, locus_dict)
         # Everything underneath
         # plot samples with analyst's identified peaks
         replicas = rf.csv_read_analyst(current_name, locus_dict)
@@ -21,17 +21,16 @@ def some_examples():
         # currently always picks first replica
         pf.plot_analyst_6C(replicas[0].peaks, current, locus_dict)
         # now plot with actual peaks
-        person_mixture = rf.make_person_mixture(current_name, locus_dict)
+        person_mixture = rf.make_person_mixture(current_name)
         peaks = person_mixture.create_peaks(locus_dict)
-        pf.plot_expected_6C(peaks, current, locus_dict)
-    pass
+        #pf.plot_expected_6C(peaks, current, locus_dict)
 
 
 if __name__ == '__main__':
     samp = rf.txt_read_data("data/trace_data/TraceData1.txt")[30]
     locus_dict = rf.xml_read_bins()
-    person_mix = rf.make_person_mixture(samp.name, locus_dict)
+    person_mix = rf.make_person_mixture(samp.name)
     inputs = df.input_maker(samp, 80)
     labels = df.label_maker(person_mix, locus_dict)
     labeled_inputs = df.labeler(inputs, labels)
-    pf.plot_sample_markers_6C(samp, locus_dict, labels)
+    some_examples()

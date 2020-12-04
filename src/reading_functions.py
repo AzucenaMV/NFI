@@ -7,8 +7,8 @@ def txt_read_data(filename: str):
     """ Function to read data files\
     Returns a list of sample names, colors, \
     and the data itself as matrix."""
-    textfile = open(filename, "r")  # open text file
-    texts = textfile.read()         # read entire content
+    with open(filename, "r") as text_file:
+        texts = text_file.read()
     texts = texts.split("\n")       # split into lines
     # lines 1 and 2 are not interesting
     titles = texts[2].split('\t')                       # get titles of files
@@ -39,7 +39,7 @@ def xml_read_bins():
     for locus in root[5]:
         locus_name = locus.find('MarkerTitle').text
         # to translate the numbers in xml file to dyes
-        temp_dict = {1: Dyes.BLUE, 2: Dyes.GREEN, 3: Dyes.YELLOW, 4: Dyes.RED, 5: Dyes.LADDER, 6: Dyes.PURPLE}
+        temp_dict = {1: Dyes.BLUE, 2: Dyes.GREEN, 3: Dyes.YELLOW, 4: Dyes.RED, 5: Dyes.SIZESTD, 6: Dyes.PURPLE}
         dye = int(locus.find('DyeIndex').text)
         lower = float(locus.find('LowerBoundary').text)
         upper = float(locus.find('UpperBoundary').text)
@@ -97,7 +97,7 @@ def person_contributions(person_list, number_of_donors: int, mixture_type: str):
     return person_dict, persons
 
 
-def make_person_mixture(mixture_name, locus_dict):
+def make_person_mixture(mixture_name):
     """Uses person_contributions and csv_read_persons to create expected peaks in person mixture"""
     donor_set, mixture_type, donor_amount = mixture_name        # can be "1A2" for example
     donor_amount = int(donor_amount)
@@ -109,7 +109,7 @@ def make_person_mixture(mixture_name, locus_dict):
 
 def csv_read_analyst(sample_name, locus_dict):
     """Read csv file of analyst's identified alleles returns list of corresponding peaks"""
-    results = pd.read_csv("data/analysts_data_filtered/"+str(sample_name)+"_New.csv")
+    results = pd.read_csv("data/analysts_data_filtered/"+str(sample_name)+"_New.csv", dtype = str)
     name = results['Sample Name'][0]    # to start iteration
     sample_name, replicate = name.split('.')
     mixture_list = []                   # initialize big lists
@@ -129,10 +129,8 @@ def csv_read_analyst(sample_name, locus_dict):
                 # so str(row[i]) == row[i] filters out empty entries
                 locus = locus_dict[row[1]]
                 allele = locus.alleles[row[i]]
-                x_value = allele.mid    # location on x_axis
-                height = row[i+10]      # heights are 10 indices further than
-                dye = locus.dye         # their corresponding allele names
-                new_peak = Peak(locus.name+"_"+allele.name, x_value, height, dye)
+                height = float(row[i+10])      # heights are 10 indices further than
+                new_peak = Peak(allele,  height)
                 peak_list.append(new_peak)
     mixture_list.append(AnalystMixture(name, replicate, peak_list))
     return mixture_list

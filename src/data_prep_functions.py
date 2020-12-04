@@ -22,14 +22,13 @@ def label_maker(person_mix, locus_dict):
     # cannot find precise index, since "size" of bins is accurate to 2 decimals, measurements to 1
     for peak in peaks:
         # should i also add approximate height in some way?
-        x_val = round(peak.x*10)      # approximate index of peak
-        dye_index = peak.dye.plot_index - 1
+        x_val = round(peak.allele.mid*10)      # approximate index of peak
+        dye_index = peak.allele.dye.plot_index - 1
         # intervals are all about 1 nucleotide wide at most, 0.8 at least
         label_list[dye_index].append(x_val)
         # now assumes bin size of 0.4 in both directions, actually wrong...
         for i in range(4):
             label_list[dye_index].append(x_val-i-1)
-        for i in range(4):
             label_list[dye_index].append(x_val+i+1)
     return label_list   # has indices of peaks per dye -> Why indices?
 

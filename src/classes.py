@@ -9,7 +9,8 @@ class Dye:
     name: str           # example: 'FL-6C'
     plot_color: str     # example: 'b'
     plot_index: int     # index of which of 6 subplots when all dyes\
-                        # are plotted in the same image
+                        # are plotted in the same image\
+
 
 @dataclass
 class Dyes:
@@ -18,8 +19,8 @@ class Dyes:
     YELLOW = Dye('TMR-6C', 'k', 3)      # usually plotted in black for visibility
     RED = Dye('CXR-6C', 'r', 4)
     PURPLE = Dye('TOM-6C', 'm', 5)
-    LADDER = Dye('WEN-6C', 'orange', 6)
-    color_list = [BLUE, GREEN, YELLOW, RED, PURPLE, LADDER]
+    SIZESTD = Dye('WEN-6C', 'orange', 6)
+    color_list = [BLUE, GREEN, YELLOW, RED, PURPLE, SIZESTD]
 
 
 @dataclass
@@ -29,7 +30,7 @@ class Allele:
     mid: float      # horizontal position, example: '87.32'
     left: float     # left side of bin from mid (0.4 or 0.5)
     right: float    # right side of bin from mid (0.4 or 0.5)
-    dye: Dye
+    dye: Dye        # or add locus?
 
 @dataclass
 class Locus:
@@ -45,11 +46,8 @@ class Locus:
 class Peak:
     """Class for an identified or expected allele peak.
     Has everything needed for plotting."""
-    name: str       # Using "locus_allele" because it makes dict access easy
-
-    x: float        # horizontal location of peak
+    allele: Allele
     height: float   # height of peak
-    dye: Dye        # dye of peak
 
 
 @dataclass
@@ -79,11 +77,11 @@ class PersonMixture:
         peak_list = []
         peak_dict = {}
         # add X and Y by hand (all samples are male)
-        X_and_Y = locus_dict['AMEL'].alleles
-        X = X_and_Y['X']
-        Y = X_and_Y['Y']
-        peak_list.append(Peak("AMEL_X", X.mid, 0.5, Dyes.BLUE))
-        peak_list.append(Peak("AMEL_Y", Y.mid, 0.5, Dyes.BLUE))
+        X_and_Y = locus_dict['AMEL']
+        X = X_and_Y.alleles['X']
+        Y = X_and_Y.alleles['Y']
+        peak_list.append(Peak(X, 0.5))
+        peak_list.append(Peak(Y, 0.5))
         # iterate through persons in mix
         for person in self.persons:
             # iterate over their alleles
@@ -98,10 +96,8 @@ class PersonMixture:
             locus_name, allele_name = locus_allele.split("_")
             locus = locus_dict[locus_name]
             allele = locus.alleles[allele_name]
-            x = allele.mid                          # store x_location
             height = peak_dict[locus_allele]        # store rel. height
-            dye = locus.dye                         # store dye
-            new_peak = Peak(locus_allele, x, height, dye)
+            new_peak = Peak(allele, height)
             peak_list.append(new_peak)               # append peak to list
         return peak_list
 
@@ -148,8 +144,6 @@ class Result:
 
 
 # Global variables
-DYES = Dyes()
-
 PICOGRAMS = np.array([[300, 150, 150, 150, 150],
                       [300, 30,  30,  30,  30],
                       [150, 150, 60,  60,  60],
