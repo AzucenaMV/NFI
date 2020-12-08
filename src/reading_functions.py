@@ -23,10 +23,18 @@ def txt_read_data(filename: str):
         counter += 1
     # now pour contents into separate sample dataclasses
     sample_list = []
+    prevname = ""
+    replica = 1
     for i in range(len(titles)):
-        new_sample = Sample(titles[i].split('_')[0], data[:, 6*i:6*i+6])
+        name = titles[i].split('_')[0]
+        if prevname == name:
+            replica += 1
+        else:
+            replica = 1
+        new_sample = Sample(name, replica, data[:, 6*i:6*i+6])
         sample_list.append(new_sample)
-    return sample_list
+        prevname = name
+    return sample_list, titles
 
 
 def xml_read_bins():

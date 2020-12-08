@@ -2,35 +2,49 @@ from src import data_prep_functions as df, plotting_functions as pf, reading_fun
 from src import classes as c
 import pandas as pd
 
+tracedata = ['TraceDataSet11.txt', 'TraceDataSet12.txt', 'TraceDataSet21.txt', 'TraceDataSet22.txt',
+             'TraceDataSet31.txt', 'TraceDataSet32.txt', 'TraceDataSet33.txt', 'TraceDataSet41.txt',
+             'TraceDataSet42.txt', 'TraceDataSet51.txt', 'TraceDataSet52.txt', 'TraceDataSet61.txt',
+             'TraceDataSet62.txt']
+
+
 def some_examples():
     # first create a list of all samples
-    sample_list_1 = rf.txt_read_data("data/trace_data/TraceData1.txt")
-    sample_list_2 = rf.txt_read_data("data/trace_data/TraceData2.txt")
-    sample_list = sample_list_1 + sample_list_2
-    # now we get all panel information from the Genemarker file
+    samples_cis = []
+    samples_mine = []
+    samples, names_cis = rf.txt_read_data("data/trace_data/TraceData1.txt")
+    samples_cis += samples
+    set_names_cis = set(names_cis)
+    samples, names = rf.txt_read_data("data/trace_data/TraceData2.txt")
+    samples_cis += samples
+    set_names_cis.update(set(names))
+    names_cis += names
+    samples, names_mine = rf.txt_read_data("data/trace_data/" + tracedata[0])
+    samples_mine += samples
+    set_names_mine = set(names_mine)
+    samples, names = rf.txt_read_data("data/trace_data/" + tracedata[1])
+    samples_mine += samples
+    set_names_mine.update(set(names))
+    names_mine += names
+    print("Names of your dataset (in order): ", names_cis)
+    print("Names of my dataset (in order): ", names_mine)
+    print("What is in yours, but not in mine", set_names_cis - set_names_mine)
+    print("What is in mine but not in yours", set_names_mine - set_names_cis)
     locus_dict = rf.xml_read_bins()
-    # plot some samples with marker bins
-    for i in range(10, 11):
-        current = sample_list[i]
-        current_name = current.name
-        pf.plot_sample_markers_6C(current, locus_dict)
-        # Everything underneath
-        # plot samples with analyst's identified peaks
-        replicas = rf.csv_read_analyst(current_name, locus_dict)
-        # now have a list of the analyst's identified peaks + heights for all replicates
-        # currently always picks first replica
-        pf.plot_analyst_6C(replicas[0].peaks, current, locus_dict)
-        # now plot with actual peaks
-        person_mixture = rf.make_person_mixture(current_name)
-        peaks = person_mixture.create_peaks(locus_dict)
-        #pf.plot_expected_6C(peaks, current, locus_dict)
+    # for i in range(10, 11):
+    #     cis = samples_cis[i]
+    #     mine = samples_mine[i]
+    #     current_name = cis.name
+    #     pf.plot_sample_markers_6C(cis, locus_dict)
+    #     pf.plot_sample_markers_6C(mine, locus_dict)
+    #     replicas = rf.csv_read_analyst(current_name, locus_dict)
+    #     pf.plot_analyst_6C(replicas[cis.replica - 1].peaks, cis, locus_dict)
+    #     pf.plot_analyst_6C(replicas[mine.replica - 1].peaks, mine, locus_dict)
+    #     person_mixture = rf.make_person_mixture(current_name)
+    #     peaks = person_mixture.create_peaks(locus_dict)
+    #     pf.plot_expected_6C(peaks, cis, locus_dict)
+    #     pf.plot_expected_6C(peaks, mine, locus_dict)
+
 
 
 if __name__ == '__main__':
-    samp = rf.txt_read_data("data/trace_data/TraceData1.txt")[30]
-    locus_dict = rf.xml_read_bins()
-    person_mix = rf.make_person_mixture(samp.name)
-    inputs = df.input_maker(samp, 80)
-    labels = df.label_maker(person_mix, locus_dict)
-    labeled_inputs = df.labeler(inputs, labels)
-    some_examples()

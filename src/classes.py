@@ -56,6 +56,7 @@ class Sample:
     Class for samples, data is (nx6) matrix of all 6 colours
     """
     name: str       # example: '1A2'
+    replica: int
     data: List
 
 
@@ -106,7 +107,7 @@ class PersonMixture:
 class AnalystMixture:
     """ Class to store peaks identified in mixture. """
     name: str               # name of mixture, '1A2' for example
-    replicate: str          # where 1 is donor set, 2 is #donors, A is mixture type and 3 is replicate
+    replica: int            # where 1 is donor set, 2 is #donors, A is mixture type and 3 is replica
     peaks: List[Peak]       # list of peaks
 
 

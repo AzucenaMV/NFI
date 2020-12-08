@@ -16,6 +16,21 @@ def input_maker(sample: Sample, width: int):
     return input_list
 
 
+def find_peaks():
+    peaks, rest = find_peaks(sizestd, distance=200)
+    plt.figure()
+    plt.plot(sizestd)
+    print(peaks)
+    plt.plot(peaks, sizestd[peaks], "*")
+    plt.show()
+    return peaks
+
+
+def find_curves():
+    pass
+
+
+#####################PROBABLY WONT BE USED ANYMORE
 def label_maker(person_mix, locus_dict):
     peaks = person_mix.create_peaks(locus_dict)
     label_list = [[], [], [], [], [], []]

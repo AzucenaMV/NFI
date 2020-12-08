@@ -5,21 +5,17 @@ from src.classes import *
 
 def plot_sample_markers_6C(sample: Sample, locus_dict: dict):
     """Plots sample and markers in 6C plot"""
-    plt.figure(figsize = (10,10))
+    plt.figure() #figsize = (10,10))
     # iterate through all loci to plot markers
     for key_locus in locus_dict:
         locus = locus_dict[key_locus]               # get locus class object
         plt.subplot(6, 1, locus.dye.plot_index)     # plot in correct color location
-        # plot bar at level 0 with squares as endpoints to show marker
-        # might want to change style of endpoints
-        plt.annotate(text=locus.name, xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->', relpos=(0,0)))
-        # plt.plot([locus.lower, locus.upper], [0, 0], color = locus.dye.plot_color, marker = "s")
+        plt.annotate(text="", xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
     for i in range(6):
         plt.subplot(6, 1, i + 1)
         current = sample.data[:, i]
         plt.plot(np.linspace(0, len(current)/10, len(current)), current, str(Dyes.color_list[i].plot_color))
         plt.xlim([50, 500])
-    plt.suptitle(sample.name)
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
     plt.show()
@@ -30,19 +26,22 @@ def plot_analyst(peaks: list, sample: Sample, locus_dict):
     for comparison to plot both in one image for each color"""
     for j in range(6):
         plt.figure()
-        plt.title(str('filename: '+sample.name+', dye: ' + str(Dyes.color_list[j].name)))
+        #plt.title(str('filename: '+sample.name+', dye: ' + str(Dyes.color_list[j].name)))
         plt.xlim([50, 500])     # to cut off primer dimer
         current_plot = sample.data[:, j]
         # plot measured data
         plt.plot(np.linspace(0, len(current_plot)/10, len(current_plot)), current_plot)
         # to scale y-axis somewhat close to data
-        #plt.ylim([-50, max(current_plot[1000:])*1.5])
+        plt.ylim([-50, max(current_plot[1000:])*1.5])
         # iterate through all alleles in mixture
         for peak in peaks:
             dye = peak.allele.dye
-            if dye.plot_index == j+1:
-                #plt.annotate(text='', xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
-                plt.plot([peak.allele.mid], [peak.height], str(dye.plot_color + "*"))  # add colour
+            if dye.plot_index == j + 1:
+                plt.plot([peak.allele.mid], [peak.height], str(dye.plot_color + "*"))
+        for locus_key in locus_dict:
+            locus = locus_dict[locus_key]
+            if locus.dye.plot_index == j + 1:
+                plt.annotate(text='', xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
         plt.show()
 
 
@@ -62,12 +61,12 @@ def plot_analyst_6C(peaks: list, sample: Sample, locus_dict):
     for peak in peaks:
         dye = peak.allele.dye
         plt.subplot(6, 1, dye.plot_index)
-        # get locus bins
-        # plot locus bins
-        #plt.annotate(text='', xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
-        # plot peaks
         plt.plot([peak.allele.mid], [peak.height], "k*")
-    plt.suptitle(sample.name)       # set title
+    for key_locus in locus_dict:
+        locus = locus_dict[key_locus]               # get locus class object
+        plt.subplot(6, 1, locus.dye.plot_index)     # plot in correct color location
+        plt.annotate(text="", xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
+    #plt.suptitle(sample.name)       # set title
     plt.tight_layout()              # ensures subplots don't overlap
     plt.subplots_adjust(top=0.9)    # ensures title doesn't overlap plots
     plt.show()
@@ -80,7 +79,7 @@ def plot_expected(peaks: list, sample: Sample, locus_dict: dict):
     for j in range(6):
         # makes one separate figure per dye
         plt.figure()
-        plt.title(str('filename: '+sample.name+', dye: ' + Dyes.color_list[j].name))
+        #plt.title(str('filename: '+sample.name+', dye: ' + Dyes.color_list[j].name))
         current_plot = sample.data[:, j]
         # cut off primer dimer
         plt.xlim([50, 500])
@@ -97,9 +96,10 @@ def plot_expected(peaks: list, sample: Sample, locus_dict: dict):
             dye = peak.allele.dye
             if dye.plot_index == j + 1:
                 color = dye.plot_color
-                #locus = locus_dict[peak.name.split("_")[0]]
-                #plt.annotate(text='', xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
                 plt.plot([peak.allele.mid], [peak.height * max_rel], str(color + "*"))  # add colour
+        for locus in locus_dict:
+            if locus.dye.plot_index == j + 1:
+                plt.annotate(text='', xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
         plt.show()
 
 
@@ -125,13 +125,12 @@ def plot_expected_6C(peaks: list, sample: Sample, locus_dict):
     for peak in peaks:
         dye = peak.allele.dye
         plt.subplot(6, 1, dye.plot_index)
-        # get marker bins
-        locus = locus_dict[peak.name.split("_")[0]]
-        # plot marker bins
-        # plt.annotate(text='', xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
-        # plot peaks
         plt.plot([peak.allele.mid], [peak.height * max_rel_list[dye.plot_index-1]], "k*")  # add black colour
-    plt.suptitle(sample.name)       # set title
+    for key_locus in locus_dict:
+        locus = locus_dict[key_locus]               # get locus class object
+        plt.subplot(6, 1, locus.dye.plot_index)     # plot in correct color location
+        plt.annotate(text="", xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
+    #plt.suptitle(sample.name)       # set title
     plt.tight_layout()              # ensures subplots don't overlap
     plt.subplots_adjust(top=0.9)    # ensures title doesn't overlap plots
     plt.show()
