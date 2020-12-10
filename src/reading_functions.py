@@ -1,13 +1,12 @@
 import pandas as pd
-import xml.etree.ElementTree as eT
 from src.classes import *
 
 
-def txt_read_data(filename: str):
+def txt_read_sample(filename: str):
     """ Function to read data files\
     Returns a list of sample names, colors, \
     and the data itself as matrix."""
-    with open(filename, "r") as text_file:
+    with open("data/trace_data/"+filename, "r") as text_file:
         texts = text_file.read()
     texts = texts.split("\n")       # split into lines
     # lines 1 and 2 are not interesting
@@ -34,38 +33,7 @@ def txt_read_data(filename: str):
         new_sample = Sample(name, replica, data[:, 6*i:6*i+6])
         sample_list.append(new_sample)
         prevname = name
-    return sample_list, titles
-
-
-def xml_read_bins():
-    """Read xml file for bins of each allele, \
-    returns dictionary of information"""
-    tree_file = eT.parse("data/PPF6C_SPOOR.xml")
-    root = tree_file.getroot()
-    locus_dict = {}
-    # root[5] is the node with loci, rest is panel info
-    for locus in root[5]:
-        locus_name = locus.find('MarkerTitle').text
-        # to translate the numbers in xml file to dyes
-        temp_dict = {1: Dyes.BLUE, 2: Dyes.GREEN, 3: Dyes.YELLOW, 4: Dyes.RED, 5: Dyes.SIZESTD, 6: Dyes.PURPLE}
-        dye = int(locus.find('DyeIndex').text)
-        lower = float(locus.find('LowerBoundary').text)
-        upper = float(locus.find('UpperBoundary').text)
-        # store info so far in Locus dataclass
-        new_locus = Locus({}, locus_name, temp_dict[dye], lower, upper)
-        # add all alleles to locus
-        for allele in locus.findall('Allele'):
-            allele_name = allele.get('Label')
-            mid = float(allele.get('Size'))
-            left = float(allele.get('Left_Binning'))
-            right = float(allele.get('Right_Binning'))
-            # store in Allele dataclass
-            new_allele = Allele(allele_name, mid, left, right, temp_dict[dye])
-            # add to alleles dict of locus
-            new_locus.alleles[allele_name] = new_allele
-        # add created locus to locus dict
-        locus_dict[locus_name] = new_locus
-    return locus_dict
+    return sample_list
 
 
 def csv_read_persons(donor_set):
@@ -86,6 +54,7 @@ def csv_read_persons(donor_set):
         allele2 = locus + "_" + row[3]          # fourth entry is second allele
         alleles.append(allele1)
         alleles.append(allele2)
+    person_list.append(Person(person_name, alleles))
     return person_list
 
 
@@ -115,7 +84,7 @@ def make_person_mixture(mixture_name):
     return person_mix
 
 
-def csv_read_analyst(sample_name, locus_dict):
+def csv_read_analyst(sample_name):
     """Read csv file of analyst's identified alleles returns list of corresponding peaks"""
     results = pd.read_csv("data/analysts_data_filtered/"+str(sample_name)+"_New.csv", dtype = str)
     name = results['Sample Name'][0]    # to start iteration

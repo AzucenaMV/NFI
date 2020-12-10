@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Dict
 import numpy as np
+import xml.etree.ElementTree as eT
 
 
 @dataclass
@@ -32,6 +33,7 @@ class Allele:
     right: float    # right side of bin from mid (0.4 or 0.5)
     dye: Dye        # or add locus?
 
+
 @dataclass
 class Locus:
     """Class for locus, stores Alleles per locus in dict."""
@@ -40,6 +42,43 @@ class Locus:
     dye: Dye                        # dye that locus is on
     lower: float                    # lower boundary of marker
     upper: float                    # upper boundary of marker
+
+
+@dataclass
+class Loci:
+    def create_dict():
+        """Read xml file for bins of each allele, \
+        returns dictionary of information"""
+        tree_file = eT.parse("data/PPF6C_SPOOR.xml")
+        root = tree_file.getroot()
+        locus_dict = {}
+        # root[5] is the node with loci, rest is panel info
+        for locus in root[5]:
+            locus_name = locus.find('MarkerTitle').text
+            # to translate the numbers in xml file to dyes
+            temp_dict = {1: Dyes.BLUE, 2: Dyes.GREEN, 3: Dyes.YELLOW, 4: Dyes.RED, 5: Dyes.SIZESTD, 6: Dyes.PURPLE}
+            dye = int(locus.find('DyeIndex').text)
+            lower = float(locus.find('LowerBoundary').text)
+            upper = float(locus.find('UpperBoundary').text)
+            # store info so far in Locus dataclass
+            new_locus = Locus({}, locus_name, temp_dict[dye], lower, upper)
+            # add all alleles to locus
+            for allele in locus.findall('Allele'):
+                allele_name = allele.get('Label')
+                mid = float(allele.get('Size'))
+                left = float(allele.get('Left_Binning'))
+                right = float(allele.get('Right_Binning'))
+                # store in Allele dataclass
+                new_allele = Allele(allele_name, mid, left, right, temp_dict[dye])
+                # add to alleles dict of locus
+                new_locus.alleles[allele_name] = new_allele
+            # add created locus to locus dict
+            locus_dict[locus_name] = new_locus
+        return locus_dict
+    dict = create_dict()
+
+
+locus_dict = Loci.dict
 
 
 @dataclass
@@ -70,10 +109,13 @@ class Person:
 @dataclass
 class PersonMixture:
     name: str                       # for example: "1A2"
+    # donor_set: str                  # "1"
+    # mixture_type: str               # "A"
+    # number_of_donors: int           # 2
     persons: List[Person]           # list of Persons present in mix
     fractions: Dict[str, float]     # fractional contribution of each person in mixture
 
-    def create_peaks(self, locus_dict):
+    def create_peaks(self):
         """Returns list of peaks expected in mixture and their relative heights"""
         peak_list = []
         peak_dict = {}
@@ -121,6 +163,13 @@ class Center:
 
 @dataclass
 class TrainInput:
+    input_sample: Sample    # sample used to create input
+    data: List              # list of input nodes/data to be fed to nn
+    labels: List            # list of labels corresponding to data
+
+
+@dataclass
+class WrongInput:
     """Class for input with labels to train on."""
     # I'm not sure what shape the input data is supposed to be
     # it might be logical to have a class for one set of center, window, label
@@ -156,3 +205,4 @@ TOTAL_PICOGRAMS = np.array([[450, 600, 750, 900],
                             [300, 360, 420, 480],
                             [180, 240, 270, 300],
                             [630, 690, 720, 750]])
+
