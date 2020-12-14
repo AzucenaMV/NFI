@@ -4,6 +4,59 @@ from src.classes import *
 import matplotlib.collections as collections
 
 
+def initialise_figure(fig_size = (15,5)):
+    fig, ax = plt.subplots(figsize = fig_size)
+    plt.xlim([50,500])
+    return fig, ax
+
+
+def initialise_6C_figure(fig_size = (20,30)):
+    fig, axes = plt.subplots(nrows = 6, figsize = fig_size)
+    plt.xlim([50,500])
+    return fig, axes
+
+
+def plot_sample_array(sample_array, plot_color = "k"):
+    plt.plot(np.linspace(0, len(sample_array) / 10, len(sample_array)), sample_array, plot_color)
+    plt.ylim([0, max(sample_array[1000:]) * 1.5])
+
+
+def plot_locus_bins(dye_color: Dye):
+    # make dict of loci present in chosen dye
+    loci_on_dye = {locus_name: locus for (locus_name, locus) in locus_dict.items() if locus.dye == dye_color}
+    for (locus_name, locus) in loci_on_dye.items():
+        plt.annotate(text="", xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
+
+
+def plot_peaks_analyst(peak_list: list, dye_color: Dye):
+    for peak in peak_list:
+        dye = peak.allele.dye
+        if dye == dye_color:
+            plt.plot([peak.allele.mid], [peak.height], str(dye.plot_color + "*"))
+
+
+def plot_peaks_expected(peak_list, max_rel, dye_color):
+    # amount to multiply relative peak height with
+    plt.ylim([-50, max_rel])
+    # plot max height relative points
+    plt.hlines(max_rel, 0, 500)
+    for peak in peak_list:
+        dye = peak.allele.dye
+        if dye == dye_color:
+            color = dye.plot_color
+            plt.plot([peak.allele.mid], [peak.height * max_rel], str(color + "*"))
+
+
+def finish_plot(show_or_title = "show"):
+    if show_or_title == "show":
+        print("helllo")
+        plt.show()
+    else:
+        print("hiiii")
+        plt.savefig(show_or_title+".png")
+        plt.close()
+
+
 def plot_sample_markers_6C(sample: Sample):
     """Plots sample and markers in 6C plot"""
     plt.figure()  # figsize = (10,10))
@@ -27,24 +80,14 @@ def plot_analyst(peaks: list, sample: Sample):
     """uses both the analysts identified peaks and sized data \
     for comparison to plot both in one image for each color"""
     for j in range(6):
-        plt.figure()
-        # plt.title(str('filename: '+sample.name+', dye: ' + str(Dyes.color_list[j].name)))
-        plt.xlim([50, 500])  # to cut off primer dimer
         current_plot = sample.data[:, j]
-        # plot measured data
-        plt.plot(np.linspace(0, len(current_plot) / 10, len(current_plot)), current_plot)
-        # to scale y-axis somewhat close to data
-        plt.ylim([-50, max(current_plot[1000:]) * 1.5])
-        # iterate through all alleles in mixture
-        for peak in peaks:
-            dye = peak.allele.dye
-            if dye.plot_index == j + 1:
-                plt.plot([peak.allele.mid], [peak.height], str(dye.plot_color + "*"))
-        for locus_key in locus_dict:
-            locus = locus_dict[locus_key]
-            if locus.dye.plot_index == j + 1:
-                plt.annotate(text='', xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
-        plt.show()
+        current_dye = Dyes.color_list[j]
+        initialise_figure()
+        # plt.title(str('filename: '+sample.name+', dye: ' + str(Dyes.color_list[j].name)))
+        plot_sample_array(current_plot)
+        plot_locus_bins(current_dye)
+        plot_peaks_analyst(peaks, current_dye)
+        finish_plot("Sample_"+sample.name+"_"+str(sample.replica)+"_analyst_peaks_"+current_dye.name)
 
 
 def plot_analyst_6C(peaks: list, sample: Sample):
@@ -77,32 +120,17 @@ def plot_analyst_6C(peaks: list, sample: Sample):
 def plot_expected(peaks: list, sample: Sample):
     """uses both the theoretical actual relative peaks and \
     sized data for comparison to plot both in one image"""
-
     for j in range(6):
         # makes one separate figure per dye
-        plt.figure()
+        initialise_figure()
         # plt.title(str('filename: '+sample.name+', dye: ' + Dyes.color_list[j].name))
         current_plot = sample.data[:, j]
-        # cut off primer dimer
-        plt.xlim([50, 500])
-        # amount to multiply relative peak height with
-        max_rel = max(current_plot[1000:]) * 1.5
-        # set y_max at 1.5 times max peak
-        plt.ylim([-50, max_rel])
-        # plot max height relative points
-        plt.hlines(max_rel, 0, 500)
-        # plot measured data
-        plt.plot(np.linspace(0, len(current_plot) / 10, len(current_plot)), current_plot)
-        # iterate through dict to plot all peaks as *
-        for peak in peaks:
-            dye = peak.allele.dye
-            if dye.plot_index == j + 1:
-                color = dye.plot_color
-                plt.plot([peak.allele.mid], [peak.height * max_rel], str(color + "*"))  # add colour
-        for locus in locus_dict:
-            if locus.dye.plot_index == j + 1:
-                plt.annotate(text='', xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
-        plt.show()
+        current_dye = Dyes.color_list[j]
+        plot_sample_array(current_plot, current_dye)
+        max_relative = max(current_plot[1000:]) * 1.5
+        plot_peaks_expected(peaks, max_relative, current_dye)
+        plot_locus_bins(current_dye)
+        finish_plot()
 
 
 def plot_expected_6C(peaks: list, sample: Sample):
@@ -166,8 +194,6 @@ def plot_markers():
         for key_allele in locus.alleles:
             allele = locus.alleles[key_allele]  # get allele class object
             start = allele.mid - allele.left  # calculate where it starts
-            if start < end:
-                print(key_locus + ": " + key_allele + " starts at " + str(start) + ", previous ends at " + str(end))
             end = allele.mid + allele.right  # calculate where it ends
             plt.plot([start, end], [1, 1])  # plot allele bin at level 1
     plt.show()
@@ -176,19 +202,23 @@ def plot_markers():
 def plot_labeled_sample(blue_data, peak_bools):
     peaks = [blue_data[i] if peak_bools[i] else 0 for i in range(len(blue_data))]
     not_peaks = blue_data - peaks
-    plt.figure()
-    plt.plot(peaks)
-    plt.plot(not_peaks)
+    initialise_figure()
+    plot_sample_array(peaks, 'b')
+    plot_sample_array(not_peaks, 'r')
+    plot_locus_bins(Dyes.BLUE)
     plt.show()
 
-    # example from the internet
-    x = np.linspace(0, len(blue_data) / 10, len(blue_data))
-    y = np.array(blue_data)
-    fig, ax = plt.subplots(figsize=(10,10))
-    ax.set_title('using span_where')
-    ax.plot(x, y, color='black')
-    collection = collections.BrokenBarHCollection.span_where(x, ymin=0, ymax=max(blue_data), where=peak_bools, facecolor='green', alpha=0.5)
+
+def plot_background(sample_array, peak_bools):
+    # note that sample_array and peak_bools have the same shape
+    fig, ax = initialise_figure()
+    plot_sample_array(sample_array)
+    x = np.linspace(0, len(sample_array) / 10, len(sample_array))
+    # plot background of peaks in green
+    collection = collections.BrokenBarHCollection.span_where(x, ymin=0, ymax=max(sample_array), where=peak_bools, facecolor='green', alpha=0.5)
     ax.add_collection(collection)
-    collection = collections.BrokenBarHCollection.span_where(x, ymin=0, ymax=max(blue_data), where=~peak_bools, facecolor='red', alpha=0.5)
+    # plot non-peaks in red
+    collection = collections.BrokenBarHCollection.span_where(x, ymin=0, ymax=max(sample_array), where=~peak_bools, facecolor='red', alpha=0.5)
     ax.add_collection(collection)
+    plot_locus_bins(Dyes.BLUE)
     plt.show()

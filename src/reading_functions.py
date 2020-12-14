@@ -38,8 +38,14 @@ def txt_read_sample(filename: str):
 
 def csv_read_persons(donor_set):
     """reads all profiles from given donor set (1,2,3,4,5 or 6)"""
-    filename = 'data/donor_profiles/Refs_dataset' + str(donor_set) + '.csv'
-    donor_peaks = pd.read_csv(filename, dtype=str, delimiter=";")
+    file_name = 'data/donor_profiles/Refs_dataset' + str(donor_set) + '.csv'
+    with open(file_name) as f:
+        first_line = f.readline()
+    if "," in first_line:
+        file_delimiter = ","
+    if ";" in first_line:
+        file_delimiter = ";"
+    donor_peaks = pd.read_csv(file_name, dtype=str, delimiter=file_delimiter)
     person_list = []                            # initialize lists
     alleles = []
     person_name = donor_peaks['SampleName'][0]  # get first donor name
@@ -86,11 +92,19 @@ def make_person_mixture(mixture_name):
 
 def csv_read_analyst(sample_name):
     """Read csv file of analyst's identified alleles returns list of corresponding peaks"""
-    results = pd.read_csv("data/analysts_data_filtered/"+str(sample_name)+"_New.csv", dtype = str)
+    file_name = "data/analysts_data_filtered/"+str(sample_name)+"_New.csv"
+    with open(file_name) as f:
+        first_line = f.readline()
+    if "," in first_line:
+        file_delimiter = ","
+    if ";" in first_line:
+        file_delimiter = ";"
+    results = pd.read_csv(file_name, dtype = str, delimiter = file_delimiter)
     name = results['Sample Name'][0]    # to start iteration
     sample_name, replicate = name.split('.')
     mixture_list = []                   # initialize big lists
     peak_list = []                      # initialize small lists
+    number_of_columns = int((len(results.columns)-2)/2)
     for index, row in results.iterrows():
         # iterate over all rows, because each row contains the peaks for one allele
         if name != row[0]:                      # then start new sample
@@ -98,15 +112,15 @@ def csv_read_analyst(sample_name):
             mixture_list.append(AnalystMixture(sample_name, replicate, peak_list))
             peak_list = []                      # empty list
         name = row[0]                           # then set name to current sample name
-        for i in range(2, 12):
-            # go over the 10 possible locations of peak identification
+        for i in range(2, 2+number_of_columns):
+            # go over the 8-10 possible locations of peak identification
             if str(row[i]) == row[i]:
                 # append value only if non-empty
                 # empty entries are converted to (float-type) NaN's by pandas
                 # so str(row[i]) == row[i] filters out empty entries
                 locus = locus_dict[row[1]]
                 allele = locus.alleles[row[i]]
-                height = float(row[i+10])      # heights are 10 indices further than
+                height = float(row[i+number_of_columns])      # heights are 10 indices further than
                 new_peak = Peak(allele,  height)
                 peak_list.append(new_peak)
     mixture_list.append(AnalystMixture(name, replicate, peak_list))

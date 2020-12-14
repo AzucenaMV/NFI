@@ -46,7 +46,7 @@ class Locus:
 
 @dataclass
 class Loci:
-    def create_dict():
+    def create_dict(self):
         """Read xml file for bins of each allele, \
         returns dictionary of information"""
         tree_file = eT.parse("data/PPF6C_SPOOR.xml")
@@ -75,10 +75,10 @@ class Loci:
             # add created locus to locus dict
             locus_dict[locus_name] = new_locus
         return locus_dict
-    dict = create_dict()
 
 
-locus_dict = Loci.dict
+# global variable
+locus_dict = Loci().create_dict()
 
 
 @dataclass

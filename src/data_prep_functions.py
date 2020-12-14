@@ -34,8 +34,7 @@ def create_input_from_sample(sample: Sample, width: int):
     return input_from_sample
 
 
-
-def find_peak_locations(sample):
+def find_peak_locations(sample: Sample):
     one_array = sample.data[:,0]
     # peaks_indices, rest = find_peaks(one_array, width = 10, prominence = 80)
     # peak_bools = [True if i in peaks_indices else False for i in range(len(one_array))]
@@ -47,7 +46,7 @@ def find_peak_locations(sample):
     return one_array, peak_bools
 
 
-def find_curves():
+def find_curves(sample: Sample, ):
     pass
 
 

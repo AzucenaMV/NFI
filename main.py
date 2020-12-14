@@ -12,28 +12,30 @@ def some_examples():
     samples = []
     for elt in tracedata:
         samples += rf.txt_read_sample(elt)
-    for sample in samples:
+    for sample in samples[0:2]:
         current_name = sample.name
-        pf.plot_sample_markers_6C(sample)
-        if len(current_name) == 3:
+        #pf.plot_sample_markers_6C(sample)
+        if len(current_name) == 3 and current_name != "3E2":
             replicas = rf.csv_read_analyst(current_name)
-            pf.plot_analyst_6C(replicas[sample.replica - 1].peaks, sample, locus_dict)
+            # pf.plot_analyst(replicas[sample.replica - 1].peaks, sample)
             person_mixture = rf.make_person_mixture(current_name)
             peaks = person_mixture.create_peaks()
-            pf.plot_expected_6C(peaks, sample)
+            print(current_name)
+            pf.plot_expected(peaks, sample)
 
 
 if __name__ == '__main__':
-    # some_examples()
-    samples = rf.txt_read_sample(tracedata[0])
-    for sample in samples:
-        if len(sample.name) == 3:
-            person_mix = rf.make_person_mixture(sample.name)
-            peaks = person_mix.create_peaks()
-            number_of_peaks = len(peaks)
-        else:
-            number_of_peaks = 100
-            peaks = []
-        only_blue, peak_bools = df.find_peak_locations(sample)
-        pf.plot_labeled_sample(only_blue, peak_bools)
+    some_examples()
+    # samples = rf.txt_read_sample(tracedata[0])
+    # for i in range(2):
+    #     sample = samples[i]
+    #     if len(sample.name) == 3:
+    #         person_mix = rf.make_person_mixture(sample.name)
+    #         peaks = person_mix.create_peaks()
+    #         number_of_peaks = len(peaks)
+    #     else:
+    #         peaks = []
+    #     only_blue, peak_bools = df.find_peak_locations(sample)
+    #     pf.plot_background(only_blue, peak_bools)
+    #     pf.plot_labeled_sample(only_blue, peak_bools)
 
