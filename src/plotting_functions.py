@@ -35,7 +35,7 @@ def plot_peaks_analyst(peak_list: list, dye_color: Dye):
             plt.plot([peak.allele.mid], [peak.height], str(dye.plot_color + "*"))
 
 
-def plot_peaks_expected(peak_list, max_rel, dye_color):
+def plot_peaks_expected(peak_list: list, max_rel, dye_color: Dye):
     # amount to multiply relative peak height with
     plt.ylim([-50, max_rel])
     # plot max height relative points
@@ -49,10 +49,8 @@ def plot_peaks_expected(peak_list, max_rel, dye_color):
 
 def finish_plot(show_or_title = "show"):
     if show_or_title == "show":
-        print("helllo")
         plt.show()
     else:
-        print("hiiii")
         plt.savefig(show_or_title+".png")
         plt.close()
 
@@ -126,11 +124,12 @@ def plot_expected(peaks: list, sample: Sample):
         # plt.title(str('filename: '+sample.name+', dye: ' + Dyes.color_list[j].name))
         current_plot = sample.data[:, j]
         current_dye = Dyes.color_list[j]
-        plot_sample_array(current_plot, current_dye)
         max_relative = max(current_plot[1000:]) * 1.5
+        plt.hlines(max_relative, 0, 500)
+        plot_sample_array(current_plot)
         plot_peaks_expected(peaks, max_relative, current_dye)
         plot_locus_bins(current_dye)
-        finish_plot()
+        finish_plot()  # "Sample_"+sample.name+"_"+str(sample.replica)+"_expected_peaks_"+current_dye.name)
 
 
 def plot_expected_6C(peaks: list, sample: Sample):

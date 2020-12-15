@@ -12,7 +12,7 @@ def some_examples():
     samples = []
     for elt in tracedata:
         samples += rf.txt_read_sample(elt)
-    for sample in samples[0:2]:
+    for sample in samples[20:21]:
         current_name = sample.name
         #pf.plot_sample_markers_6C(sample)
         if len(current_name) == 3 and current_name != "3E2":
@@ -20,7 +20,6 @@ def some_examples():
             # pf.plot_analyst(replicas[sample.replica - 1].peaks, sample)
             person_mixture = rf.make_person_mixture(current_name)
             peaks = person_mixture.create_peaks()
-            print(current_name)
             pf.plot_expected(peaks, sample)
 
 
