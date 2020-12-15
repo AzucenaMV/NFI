@@ -18,7 +18,7 @@ def initialise_6C_figure(fig_size = (20,30)):
 
 def plot_sample_array(sample_array, plot_color = "k"):
     plt.plot(np.linspace(0, len(sample_array) / 10, len(sample_array)), sample_array, plot_color)
-    plt.ylim([0, max(sample_array[1000:]) * 1.5])
+    plt.ylim([0, max(sample_array[1000:]) * 1.2])
 
 
 def plot_locus_bins(dye_color: Dye):
@@ -57,7 +57,7 @@ def finish_plot(show_or_title = "show"):
 
 def plot_sample_markers_6C(sample: Sample):
     """Plots sample and markers in 6C plot"""
-    plt.figure()  # figsize = (10,10))
+    plt.figure()
     # iterate through all loci to plot markers
     for key_locus in locus_dict:
         locus = locus_dict[key_locus]  # get locus class object
