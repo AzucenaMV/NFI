@@ -29,50 +29,59 @@ def create_input_from_sample(sample: Sample, width: int):
         window = sample_data[i: i + width+1, :].copy()
         center_location = i + width + 1
         window_list.append(window)
-    labels = labeler(sample)
-    input_from_sample = TrainInput(sample, window_list, labels)
+    label_list = labeler(sample)
+    input_from_sample = TrainInput(sample, window_list, label_list)
     return input_from_sample
 
 
-def find_peak_locations(sample: Sample):
-    one_array = sample.data[:,0]
-    # peaks_indices, rest = find_peaks(one_array, width = 10, prominence = 80)
-    # peak_bools = [True if i in peaks_indices else False for i in range(len(one_array))]
-    # other interesting keywords: prominence (distance to baseline), wlen/width can give maximum too,
-    # plateau size might be interesting on inverted image if it can handle noise
-    # peak_bools = peak_local_max(one_array, min_distance = 100, indices = False)
-    peak_bools = one_array > 100
-    # also interesting: min_distance, num_peaks, chooses highest peaks if exceeded
-    return one_array, peak_bools
-
-
-def find_curves(sample: Sample, ):
-    pass
-
-
-#####################PROBABLY WONT BE USED ANYMORE
-def label_maker(person_mix, locus_dict):
-    peaks = person_mix.create_peaks(locus_dict)
-    label_list = [[], [], [], [], [], []]
+def bin_indices_maker(person_mix):
+    peaks = person_mix.create_peaks()
+    bin_indices = [[], [], [], [], [], []]
     # cannot find precise index, since "size" of bins is accurate to 2 decimals, measurements to 1
     for peak in peaks:
-        # should i also add approximate height in some way?
-        x_val = round(peak.allele.mid*10)      # approximate index of peak
+        left_index = round((peak.allele.mid - peak.allele.left)*10)
+        right_index = round((peak.allele.mid + peak.allele.right)*10)
         dye_index = peak.allele.dye.plot_index - 1
         # intervals are all about 1 nucleotide wide at most, 0.8 at least
-        label_list[dye_index].append(x_val)
-        # now assumes bin size of 0.4 in both directions, actually wrong...
-        for i in range(4):
-            label_list[dye_index].append(x_val-i-1)
-            label_list[dye_index].append(x_val+i+1)
-    return label_list   # has indices of peaks per dye -> Why indices?
+        bin_indices[dye_index] += list(np.arange(left_index, right_index))
+    return bin_indices   # has indices of left to right side of each bin
 
-########NEEDS TO BE REVISED
-def labeler(input_list, label_list):
-    """Combines input list with label list for labeled entries"""
-    for i in range(len(input_list)):
-        if i + 41 in label_list[i % 6]:         # 41 steps from start is midpoint to be labeled
-            input_list[i].label = 1             # always set to 1?
-        else:
-            input_list[i].label = 0
-    return input_list
+
+def find_peaks_in_bins(sample: Sample, list_of_bins: list):
+    only_blue = list_of_bins[0]
+    blue_sample = sample.data[:,0]
+    indices = [True if blue_sample[ind] > 80 and ind in only_blue else False for ind in range(len(blue_sample))]
+    return np.array(indices)
+
+
+def bin_finder(person_mix):
+    peaks = person_mix.create_peaks()
+    bin_edges = [[], [], [], [], [], []]
+    # cannot find precise index, since "size" of bins is accurate to 2 decimals, measurements to 1
+    for peak in peaks:
+        left_index = round((peak.allele.mid - peak.allele.left)*10)
+        right_index = round((peak.allele.mid + peak.allele.right)*10)
+        dye_index = peak.allele.dye.plot_index - 1
+        # intervals are all about 1 nucleotide wide at most, 0.8 at least
+        bin_edges[dye_index].append((left_index, right_index))
+    return bin_edges   # has indices of left to right side of each bin
+
+
+def find_peaks_flowing_out_of_bins(sample: Sample, list_of_bins: list):
+    blue_bins = list_of_bins[0]
+    blue_sample = sample.data[:, 0]
+    bin_bool = [False]*len(blue_sample)
+    for left, right in blue_bins:
+        max_index = left + np.argmax(blue_sample[left:right+1])
+        bin_bool[max_index] = True
+        left_end = max_index
+        right_end = max_index
+        while blue_sample[left_end] - blue_sample[left_end-1] > 0:
+            left_end -= 1
+            bin_bool[left_end] = True
+        while blue_sample[right_end] - blue_sample[right_end+1] > 0:
+            right_end += 1
+            bin_bool[right_end] = True
+    return np.array(bin_bool)
+
+

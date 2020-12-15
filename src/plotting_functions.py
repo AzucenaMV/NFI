@@ -85,7 +85,8 @@ def plot_analyst(peaks: list, sample: Sample):
         plot_sample_array(current_plot)
         plot_locus_bins(current_dye)
         plot_peaks_analyst(peaks, current_dye)
-        finish_plot("Sample_"+sample.name+"_"+str(sample.replica)+"_analyst_peaks_"+current_dye.name)
+        title = "Sample_"+sample.name+"_"+str(sample.replica)+"_analyst_peaks_"+current_dye.name
+        finish_plot()
 
 
 def plot_analyst_6C(peaks: list, sample: Sample):
@@ -201,16 +202,16 @@ def plot_markers():
 def plot_labeled_sample(blue_data, peak_bools):
     peaks = [blue_data[i] if peak_bools[i] else 0 for i in range(len(blue_data))]
     not_peaks = blue_data - peaks
-    initialise_figure()
-    plot_sample_array(peaks, 'b')
+    initialise_figure(fig_size=(30,5))
     plot_sample_array(not_peaks, 'r')
+    plot_sample_array(peaks, 'b')
     plot_locus_bins(Dyes.BLUE)
     plt.show()
 
 
 def plot_background(sample_array, peak_bools):
     # note that sample_array and peak_bools have the same shape
-    fig, ax = initialise_figure()
+    fig, ax = initialise_figure(fig_size = (30,5))
     plot_sample_array(sample_array)
     x = np.linspace(0, len(sample_array) / 10, len(sample_array))
     # plot background of peaks in green
