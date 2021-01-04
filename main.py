@@ -6,14 +6,14 @@ tracedata = ['TraceDataSet11.txt', 'TraceDataSet12.txt', 'TraceDataSet21.txt', '
              'TraceDataSet31.txt', 'TraceDataSet32.txt', 'TraceDataSet41.txt', 'TraceDataSet42.txt',
              'TraceDataSet51.txt', 'TraceDataSet52.txt', 'TraceDataSet61.txt', 'TraceDataSet62.txt']
 # to speed up tests, only do first dataset
-tracedata = ["TraceDataSet11.txt"]
+tracedata = ["TraceDataSet51.txt"]
 
 def some_examples():
     # first create a list of all samples
     samples = []
     for elt in tracedata:
         samples += rf.txt_read_sample(elt)
-    for sample in samples[20:21]:
+    for sample in samples:
         current_name = sample.name
         #pf.plot_sample_markers_6C(sample)
         if len(current_name) == 3 and current_name != "3E2":

@@ -1,14 +1,10 @@
 from src.classes import *
-from scipy.signal import find_peaks
-import matplotlib.pyplot as plt
-from skimage.feature import peak_local_max
-from skimage.segmentation import watershed
 
 
 #NEEDS TO BE REVISED OR REPLACED
 def create_input_list(sample: Sample, width: int):
     """Takes Sample, returns list of Inputs"""
-    # width is 80 or 200
+    # width is 160 or 200
     sample_data = sample.data
     input_list = []
     for i in range(len(sample_data)-width):
@@ -23,6 +19,7 @@ def create_input_list(sample: Sample, width: int):
 
 # should have approximately that shape, but need to decide what to do about other colours.
 def create_input_from_sample(sample: Sample, width: int):
+    """For one electropherogram, creates all input (node) images and their labels."""
     sample_data = sample.data
     window_list = []
     for i in range(len(sample_data)-width):
@@ -35,6 +32,7 @@ def create_input_from_sample(sample: Sample, width: int):
 
 
 def bin_indices_maker(person_mix):
+    """Makes array of indices where a peak is expected based on the bins."""
     peaks = person_mix.create_peaks()
     bin_indices = [[], [], [], [], [], []]
     # cannot find precise index, since "size" of bins is accurate to 2 decimals, measurements to 1
@@ -48,6 +46,8 @@ def bin_indices_maker(person_mix):
 
 
 def find_peaks_in_bins(sample: Sample, list_of_bins: list):
+    """Makes array of True/False of same size as data. True if a peak should theoretically be visible\
+    based on the composition and the bin locations, False otherwise."""
     only_blue = list_of_bins[0]
     blue_sample = sample.data[:,0]
     indices = [True if blue_sample[ind] > 80 and ind in only_blue else False for ind in range(len(blue_sample))]
@@ -59,6 +59,7 @@ def bin_finder(person_mix):
     bin_edges = [[], [], [], [], [], []]
     # cannot find precise index, since "size" of bins is accurate to 2 decimals, measurements to 1
     for peak in peaks:
+        # maybe always round left down and right up to enlarge interval a little?
         left_index = round((peak.allele.mid - peak.allele.left)*10)
         right_index = round((peak.allele.mid + peak.allele.right)*10)
         dye_index = peak.allele.dye.plot_index - 1
@@ -68,11 +69,19 @@ def bin_finder(person_mix):
 
 
 def find_peaks_flowing_out_of_bins(sample: Sample, list_of_bins: list):
+    """Makes array of same size as data with True/False values if peak should be visible.
+    Uses maximum within bin and follows whatever part of peak is visible to entire peak."""
     blue_bins = list_of_bins[0]
     blue_sample = sample.data[:, 0]
     bin_bool = [False]*len(blue_sample)
     for left, right in blue_bins:
         max_index = left + np.argmax(blue_sample[left:right+1])
+        if blue_sample[max_index - 1] > blue_sample[max_index]:
+            while blue_sample[max_index - 1] - blue_sample[max_index] > 1e-10:
+                max_index -= 1
+        elif blue_sample[max_index + 1] > blue_sample[max_index]:
+            while blue_sample[max_index + 1] - blue_sample[max_index] > 1e-10:
+                max_index += 1
         bin_bool[max_index] = True
         left_end = max_index
         right_end = max_index
