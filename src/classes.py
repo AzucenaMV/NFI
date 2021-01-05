@@ -169,16 +169,9 @@ class TrainInput:
 
 
 @dataclass
-class WrongInput:
-    """Class for input with labels to train on."""
-    # I'm not sure what shape the input data is supposed to be
-    # it might be logical to have a class for one set of center, window, label
-    # but the convnet takes a 3D input (list of images)
-    name: str       # name of sample
-    data: List      # window (81x6)
-    center: Center  # center pixel
-    label: int      # label of window center, maybe add to Center?
-
+class TrainOutput:
+    input_sample: Sample
+    labels: List
 
 @dataclass
 class TestInput:

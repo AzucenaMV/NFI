@@ -199,7 +199,7 @@ def plot_markers():
     plt.show()
 
 
-def plot_labeled_sample(blue_data, peak_bools):
+def plot_labeled_line(blue_data, peak_bools):
     peaks = [blue_data[i] if peak_bools[i] else 0 for i in range(len(blue_data))]
     not_peaks = blue_data - peaks
     fig, ax = initialise_figure(fig_size=(30,5))
@@ -210,7 +210,7 @@ def plot_labeled_sample(blue_data, peak_bools):
     plt.close(fig)
 
 
-def plot_background(sample_array, peak_bools):
+def plot_labeled_background(sample_array, peak_bools, dye_index):
     # note that sample_array and peak_bools have the same shape
     fig, ax = initialise_figure(fig_size = (30,5))
     plot_sample_array(sample_array)
@@ -221,6 +221,10 @@ def plot_background(sample_array, peak_bools):
     # plot non-peaks in red
     collection = collections.BrokenBarHCollection.span_where(x, ymin=0, ymax=max(sample_array), where=~peak_bools, facecolor='red', alpha=0.5)
     ax.add_collection(collection)
-    plot_locus_bins(Dyes.BLUE)
+    plot_locus_bins(Dyes.color_list[dye_index])
     plt.show()
     plt.close(fig)
+
+
+def plot_labeled_input(train_input: TrainInput):
+    pass

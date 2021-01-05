@@ -18,11 +18,11 @@ def some_examples():
         #pf.plot_sample_markers_6C(sample)
         if len(current_name) == 3 and current_name != "3E2":
             person_mixture = rf.make_person_mixture(current_name)
-            peaks = person_mixture.create_peaks()
-            peak_booleans = df.find_peaks_flowing_out_of_bins(sample, df.bin_finder(person_mixture))
-            peak_booleans_alt = df.find_peaks_in_bins(sample, df.bin_indices_maker(person_mixture))
-            pf.plot_background(sample.data[:,0], peak_booleans)
-            pf.plot_background(sample.data[:,0], peak_booleans_alt)
+            peak_booleans = df.find_peaks_flowing_out_of_bins(sample, df.bin_lefts_rights(person_mixture))
+            peak_booleans_alt = df.find_peaks_in_bins(sample, df.bin_all_indices(person_mixture))
+            for dye_index in range(6):
+                pf.plot_labeled_background(sample.data[:, dye_index], peak_booleans, dye_index)
+                pf.plot_labeled_background(sample.data[:, dye_index], peak_booleans_alt[dye_index], dye_index)
 
 if __name__ == '__main__':
     some_examples()
