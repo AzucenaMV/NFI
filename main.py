@@ -20,9 +20,9 @@ def some_examples():
             person_mixture = rf.make_person_mixture(current_name)
             peaks = person_mixture.create_peaks()
             peak_booleans = df.find_peaks_flowing_out_of_bins(sample, df.bin_finder(person_mixture))
-            # peak_booleans = df.find_peaks_in_bins(sample, df.bin_indices_maker(person_mixture))
+            peak_booleans_alt = df.find_peaks_in_bins(sample, df.bin_indices_maker(person_mixture))
             pf.plot_background(sample.data[:,0], peak_booleans)
-            pf.plot_labeled_sample(sample.data[:,0], peak_booleans)
+            pf.plot_background(sample.data[:,0], peak_booleans_alt)
 
 if __name__ == '__main__':
     some_examples()

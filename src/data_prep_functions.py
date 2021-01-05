@@ -2,37 +2,39 @@ from src.classes import *
 
 
 #NEEDS TO BE REVISED OR REPLACED
-def create_input_list(sample: Sample, width: int):
-    """Takes Sample, returns list of Inputs"""
-    # width is 160 or 200
-    sample_data = sample.data
-    input_list = []
-    for i in range(len(sample_data)-width):
-        window = sample_data[i: i + width+1, :].copy()
-        center_location = (i + width + 1) / 10
-        for index in range(6):
-            new_center = Center(center_location, Dyes().color_list[index])
-            new_input = WrongInput(sample.name + "_" + str(i) + "_" + str(index), window, new_center, 0)
-            input_list.append(new_input)
-    return input_list
+# def create_input_list(sample: Sample, width: int = 160):
+#     """Takes Sample, returns list of Inputs"""
+#     # width is 160 or 200
+#     sample_data = sample.data
+#     input_list = []
+#     for i in range(len(sample_data)-width):
+#         window = sample_data[i: i + width+1, :].copy()
+#         center_location = (i + width + 1) / 10
+#         for index in range(6):
+#             new_center = Center(center_location, Dyes().color_list[index])
+#             new_input = WrongInput(sample.name + "_" + str(i) + "_" + str(index), window, new_center, 0)
+#             input_list.append(new_input)
+#     return input_list
 
 
 # should have approximately that shape, but need to decide what to do about other colours.
-def create_input_from_sample(sample: Sample, width: int):
+def create_input_from_sample(sample: Sample, width: int, person_mix):
     """For one electropherogram, creates all input (node) images and their labels."""
+    # width is amount of steps in each direction, either 80 or 100
     sample_data = sample.data
     window_list = []
-    for i in range(len(sample_data)-width):
-        window = sample_data[i: i + width+1, :].copy()
+    for i in range(len(sample_data)-2*width):
+        window = sample_data[i: i + 2*width+1, :].copy()
         center_location = i + width + 1
         window_list.append(window)
-    label_list = labeler(sample)
+    # labeler is yet to be defined
+    label_list = labeler(width, sample, person_mix)
     input_from_sample = TrainInput(sample, window_list, label_list)
     return input_from_sample
 
 
 def bin_indices_maker(person_mix):
-    """Makes array of indices where a peak is expected based on the bins."""
+    """Makes array of indices between where a peak is expected based on the bins."""
     peaks = person_mix.create_peaks()
     bin_indices = [[], [], [], [], [], []]
     # cannot find precise index, since "size" of bins is accurate to 2 decimals, measurements to 1
@@ -94,3 +96,7 @@ def find_peaks_flowing_out_of_bins(sample: Sample, list_of_bins: list):
     return np.array(bin_bool)
 
 
+def labeler(width, sample, person_mix):
+    """Creates list of 6x1 arrays of labels per window"""
+    # width is amount of pixels to left and right of pixel to be labeled
+    return []
