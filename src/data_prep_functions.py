@@ -63,27 +63,30 @@ def find_peaks_in_bins(sample: Sample, list_of_bins: list):
 def find_peaks_flowing_out_of_bins(sample: Sample, list_of_bins: list):
     """Makes array of same size as data with True/False values if peak should be visible.
     Uses maximum within bin and follows whatever part of peak is visible to entire peak."""
-    blue_bins = list_of_bins[0]
-    blue_sample = sample.data[:, 0]
-    bin_bool = [False]*len(blue_sample)
-    for left, right in blue_bins:
-        max_index = left + np.argmax(blue_sample[left:right+1])
-        if blue_sample[max_index - 1] > blue_sample[max_index]:
-            while blue_sample[max_index - 1] - blue_sample[max_index] > 1e-10:
-                max_index -= 1
-        elif blue_sample[max_index + 1] > blue_sample[max_index]:
-            while blue_sample[max_index + 1] - blue_sample[max_index] > 1e-10:
-                max_index += 1
-        bin_bool[max_index] = True
-        left_end = max_index
-        right_end = max_index
-        while blue_sample[left_end] - blue_sample[left_end-1] > 0:
-            left_end -= 1
-            bin_bool[left_end] = True
-        while blue_sample[right_end] - blue_sample[right_end+1] > 0:
-            right_end += 1
-            bin_bool[right_end] = True
-    return np.array(bin_bool)
+    indices  = []
+    for color in range(6):
+        color_bins = list_of_bins[color]
+        color_sample = sample.data[:, color]
+        bin_bool = [False]*len(color_sample)
+        for left, right in color_bins:
+            max_index = left + np.argmax(color_sample[left:right + 1])
+            if color_sample[max_index - 1] > color_sample[max_index]:
+                while color_sample[max_index - 1] - color_sample[max_index] > 1e-10:
+                    max_index -= 1
+            elif color_sample[max_index + 1] > color_sample[max_index]:
+                while color_sample[max_index + 1] - color_sample[max_index] > 1e-10:
+                    max_index += 1
+            bin_bool[max_index] = True
+            left_end = max_index
+            right_end = max_index
+            while color_sample[left_end] - color_sample[left_end - 1] > 0:
+                left_end -= 1
+                bin_bool[left_end] = True
+            while color_sample[right_end] - color_sample[right_end + 1] > 0:
+                right_end += 1
+                bin_bool[right_end] = True
+        indices.append(bin_bool)
+    return np.array(indices)
 
 
 def labeler(width, sample, person_mix):

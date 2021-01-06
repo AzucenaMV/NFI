@@ -21,7 +21,7 @@ def some_examples():
             peak_booleans = df.find_peaks_flowing_out_of_bins(sample, df.bin_lefts_rights(person_mixture))
             peak_booleans_alt = df.find_peaks_in_bins(sample, df.bin_all_indices(person_mixture))
             for dye_index in range(6):
-                pf.plot_labeled_background(sample.data[:, dye_index], peak_booleans, dye_index)
+                pf.plot_labeled_background(sample.data[:, dye_index], peak_booleans[dye_index], dye_index)
                 pf.plot_labeled_background(sample.data[:, dye_index], peak_booleans_alt[dye_index], dye_index)
 
 if __name__ == '__main__':
