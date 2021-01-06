@@ -25,5 +25,11 @@ def some_examples():
                 pf.plot_labeled_background(sample.data[:, dye_index], peak_booleans_alt[dye_index], dye_index)
 
 if __name__ == '__main__':
-    some_examples()
+    samples = rf.txt_read_sample(tracedata[0])
+    first_sample = samples[6]
+    first_name = first_sample.name
+    person_mixture = rf.make_person_mixture(first_name)
+    first_input = df.create_input_from_sample(first_sample, 80, person_mixture)
+    pf.plot_labeled_background(first_sample.data[:,0], df.find_peaks_flowing_out_of_bins(first_sample, df.bin_lefts_rights(person_mixture))[0], 0)
+    print(first_sample.name)
 

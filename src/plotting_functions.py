@@ -21,11 +21,12 @@ def plot_sample_array(sample_array, plot_color = "k"):
     plt.ylim([0, max(sample_array[1000:]) * 1.2])
 
 
-def plot_locus_bins(dye_color: Dye):
+def plot_markers(dye_color: Dye, vertical):
     # make dict of loci present in chosen dye
     loci_on_dye = {locus_name: locus for (locus_name, locus) in locus_dict.items() if locus.dye == dye_color}
     for (locus_name, locus) in loci_on_dye.items():
-        plt.annotate(text="", xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
+        plt.annotate(text="", xy=(locus.lower, vertical), xytext=(locus.upper, vertical), arrowprops=dict(arrowstyle='<->', color = 'b'))
+        plt.text((locus.lower+locus.upper)/2, vertical -1500, locus_name, fontsize=10, horizontalalignment='center', color = 'b')
 
 
 def plot_peaks_analyst(peak_list: list, dye_color: Dye):
@@ -83,7 +84,7 @@ def plot_analyst(peaks: list, sample: Sample):
         initialise_figure()
         # plt.title(str('filename: '+sample.name+', dye: ' + str(Dyes.color_list[j].name)))
         plot_sample_array(current_plot)
-        plot_locus_bins(current_dye)
+        plot_markers(current_dye)
         plot_peaks_analyst(peaks, current_dye)
         title = "Sample_"+sample.name+"_"+str(sample.replica)+"_analyst_peaks_"+current_dye.name
         finish_plot()
@@ -110,7 +111,6 @@ def plot_analyst_6C(peaks: list, sample: Sample):
         locus = locus_dict[key_locus]  # get locus class object
         plt.subplot(6, 1, locus.dye.plot_index)  # plot in correct color location
         plt.annotate(text="", xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
-    # plt.suptitle(sample.name)       # set title
     plt.tight_layout()  # ensures subplots don't overlap
     plt.subplots_adjust(top=0.9)  # ensures title doesn't overlap plots
     plt.show()
@@ -129,7 +129,7 @@ def plot_expected(peaks: list, sample: Sample):
         plt.hlines(max_relative, 0, 500)
         plot_sample_array(current_plot)
         plot_peaks_expected(peaks, max_relative, current_dye)
-        plot_locus_bins(current_dye)
+        plot_markers(current_dye)
         finish_plot()  # "Sample_"+sample.name+"_"+str(sample.replica)+"_expected_peaks_"+current_dye.name)
 
 
@@ -159,8 +159,7 @@ def plot_expected_6C(peaks: list, sample: Sample):
     for key_locus in locus_dict:
         locus = locus_dict[key_locus]  # get locus class object
         plt.subplot(6, 1, locus.dye.plot_index)  # plot in correct color location
-        plt.annotate(text="", xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(arrowstyle='<->'))
-    # plt.suptitle(sample.name)       # set title
+        plt.annotate(text="", xy=(locus.lower, 0), xytext=(locus.upper, 0), arrowprops=dict(color='b', arrowstyle='<->'))
     plt.tight_layout()  # ensures subplots don't overlap
     plt.subplots_adjust(top=0.9)  # ensures title doesn't overlap plots
     plt.show()
@@ -180,7 +179,7 @@ def plot_sizestd_peaks(sizestd):
     return peaks
 
 
-def plot_markers():
+def plot_all_markers_and_bins():
     """Just a quick function to test marker boundaries"""
     plt.figure()
     # iterate through all loci
@@ -199,29 +198,33 @@ def plot_markers():
     plt.show()
 
 
-def plot_labeled_line(blue_data, peak_bools):
-    peaks = [blue_data[i] if peak_bools[i] else 0 for i in range(len(blue_data))]
-    not_peaks = blue_data - peaks
-    fig, ax = initialise_figure(fig_size=(30,5))
+def plot_labeled_line(sample_array, peak_bools):
+    peaks = [sample_array[i] if peak_bools[i] else 0 for i in range(len(sample_array))]
+    not_peaks = sample_array - peaks
+    fig, ax = initialise_figure(fig_size=(20,4))
     plot_sample_array(not_peaks, 'r')
     plot_sample_array(peaks, 'b')
-    plot_locus_bins(Dyes.BLUE)
+    bottom, top = ax.get_ylim()
+    plot_markers(Dyes.BLUE, bottom)
     plt.show()
     plt.close(fig)
 
 
 def plot_labeled_background(sample_array, peak_bools, dye_index):
     # note that sample_array and peak_bools have the same shape
-    fig, ax = initialise_figure(fig_size = (30,5))
+    fig, ax = initialise_figure(fig_size = (20,4))
     plot_sample_array(sample_array)
     x = np.linspace(0, len(sample_array) / 10, len(sample_array))
     # plot background of peaks in green
-    collection = collections.BrokenBarHCollection.span_where(x, ymin=0, ymax=max(sample_array), where=peak_bools, facecolor='green', alpha=0.5)
+    collection = collections.BrokenBarHCollection.span_where(x, ymin=-500, ymax=max(sample_array), where=peak_bools, facecolor='green', alpha=0.5)
     ax.add_collection(collection)
     # plot non-peaks in red
-    collection = collections.BrokenBarHCollection.span_where(x, ymin=0, ymax=max(sample_array), where=~peak_bools, facecolor='red', alpha=0.5)
+    collection = collections.BrokenBarHCollection.span_where(x, ymin=-500, ymax=max(sample_array), where=~peak_bools, facecolor='red', alpha=0.5)
     ax.add_collection(collection)
-    plot_locus_bins(Dyes.color_list[dye_index])
+    # plot markers
+    y_min = -500
+    plt.ylim([y_min, max(sample_array)])
+    plot_markers(Dyes.color_list[dye_index], y_min)
     plt.show()
     plt.close(fig)
 
