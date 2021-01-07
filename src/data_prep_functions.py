@@ -7,6 +7,7 @@ def create_input_from_sample(sample: Sample, width: int, person_mix):
     # width is amount of steps in each direction, either 80 or 100
     sample_data = sample.data
     window_list = []
+    # apparently, this works?
     labels = find_peaks_flowing_out_of_bins(sample, bin_lefts_rights(person_mix))
     label_list = []
     for i in range(len(sample_data) - 2 * width):

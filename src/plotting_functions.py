@@ -26,7 +26,7 @@ def plot_markers(dye_color: Dye, vertical):
     loci_on_dye = {locus_name: locus for (locus_name, locus) in locus_dict.items() if locus.dye == dye_color}
     for (locus_name, locus) in loci_on_dye.items():
         plt.annotate(text="", xy=(locus.lower, vertical), xytext=(locus.upper, vertical), arrowprops=dict(arrowstyle='<->', color = 'b'))
-        plt.text((locus.lower+locus.upper)/2, vertical -1500, locus_name, fontsize=10, horizontalalignment='center', color = 'b')
+        plt.text((locus.lower+locus.upper)/2, vertical -500, locus_name, fontsize=10, horizontalalignment='center', color = 'b')
 
 
 def plot_peaks_analyst(peak_list: list, dye_color: Dye):
@@ -196,12 +196,13 @@ def plot_all_markers_and_bins():
             end = allele.mid + allele.right  # calculate where it ends
             plt.plot([start, end], [1, 1])  # plot allele bin at level 1
     plt.show()
+    plt.close()
 
 
 def plot_labeled_line(sample_array, peak_bools):
     peaks = [sample_array[i] if peak_bools[i] else 0 for i in range(len(sample_array))]
     not_peaks = sample_array - peaks
-    fig, ax = initialise_figure(fig_size=(20,4))
+    fig, ax = initialise_figure(fig_size=(25,5))
     plot_sample_array(not_peaks, 'r')
     plot_sample_array(peaks, 'b')
     bottom, top = ax.get_ylim()
@@ -212,22 +213,25 @@ def plot_labeled_line(sample_array, peak_bools):
 
 def plot_labeled_background(sample_array, peak_bools, dye_index):
     # note that sample_array and peak_bools have the same shape
-    fig, ax = initialise_figure(fig_size = (20,4))
+    fig, ax = initialise_figure(fig_size = (25,2))
     plot_sample_array(sample_array)
     x = np.linspace(0, len(sample_array) / 10, len(sample_array))
     # plot background of peaks in green
-    collection = collections.BrokenBarHCollection.span_where(x, ymin=-500, ymax=max(sample_array), where=peak_bools, facecolor='green', alpha=0.5)
+    y_min = -500
+    y_max = 0.3*max(sample_array[1000:])
+    collection = collections.BrokenBarHCollection.span_where(x, ymin=y_min, ymax=y_max, where=peak_bools, facecolor='green', alpha=0.5)
     ax.add_collection(collection)
     # plot non-peaks in red
-    collection = collections.BrokenBarHCollection.span_where(x, ymin=-500, ymax=max(sample_array), where=~peak_bools, facecolor='red', alpha=0.5)
+    collection = collections.BrokenBarHCollection.span_where(x, ymin=y_min, ymax=y_max, where=~peak_bools, facecolor='red', alpha=0.5)
     ax.add_collection(collection)
     # plot markers
-    y_min = -500
-    plt.ylim([y_min, max(sample_array)])
+    plt.ylim([y_min, y_max])
     plot_markers(Dyes.color_list[dye_index], y_min)
     plt.show()
     plt.close(fig)
 
 
 def plot_labeled_input(train_input: TrainInput):
+    initialise_6C_figure(fig_size = (20,20))
+
     pass
