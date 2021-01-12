@@ -1,5 +1,5 @@
 from src.classes import *
-
+import numpy as np
 
 # should have approximately that shape, but need to decide what to do about other colours.
 def create_input_from_sample(sample: Sample, width: int, person_mix):
@@ -13,11 +13,10 @@ def create_input_from_sample(sample: Sample, width: int, person_mix):
     for i in range(len(sample_data) - 2 * width):
         window = sample_data[i: i + 2 * width + 1, :].copy()
         center_location = i + width + 1
-        window = window.reshape(1,1,161,6)
         window_list.append(window)
-        label = labels[:, center_location].reshape(1,6)
+        label = labels[:, center_location]
         label_list.append(label)
-    input_from_sample = TrainInput(sample, window_list, label_list)
+    input_from_sample = TrainInput(sample, np.array(window_list), np.array(label_list))
     return input_from_sample
 
 
