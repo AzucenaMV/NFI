@@ -24,10 +24,13 @@ def plot_sample_array(sample_array, plot_color = "k"):
 def plot_markers(dye_color: Dye, vertical):
     # make dict of loci present in chosen dye
     loci_on_dye = {locus_name: locus for (locus_name, locus) in locus_dict.items() if locus.dye == dye_color}
+    newloclist = []
+    newlabellist = []
     for (locus_name, locus) in loci_on_dye.items():
         plt.annotate(text="", xy=(locus.lower, vertical), xytext=(locus.upper, vertical), arrowprops=dict(arrowstyle='<->', color = 'b'))
-        plt.text((locus.lower+locus.upper)/2, vertical -500, locus_name, fontsize=10, horizontalalignment='center', color = 'b')
-
+        newloclist.append((locus.lower+locus.upper)/2)
+        newlabellist.append(locus_name)
+    plt.xticks(newloclist, newlabellist)
 
 def plot_peaks_analyst(peak_list: list, dye_color: Dye):
     for peak in peak_list:
