@@ -2,7 +2,7 @@ from src.classes import *
 import numpy as np
 
 # should have approximately that shape, but need to decide what to do about other colours.
-def create_input_from_sample(sample: Sample, width: int, person_mix):
+def create_input_from_sample(sample: Sample, width: int, person_mix, number_of_dyes):
     """For one electropherogram, creates all input (node) images and their labels."""
     # width is amount of steps in each direction, either 80 or 100
     sample_data = sample.data
@@ -11,12 +11,24 @@ def create_input_from_sample(sample: Sample, width: int, person_mix):
     labels = find_peaks_flowing_out_of_bins(sample, bin_lefts_rights(person_mix))
     label_list = []
     for i in range(len(sample_data) - 2 * width):
-        window = sample_data[i: i + 2 * width + 1, :].copy()
+        window = sample_data[i: i + 2 * width + 1, :number_of_dyes].copy()
         center_location = i + width + 1
         window_list.append(window)
-        label = labels[:, center_location]
+        label = labels[:number_of_dyes, center_location]
         label_list.append(label)
     input_from_sample = TrainInput(sample, np.array(window_list), np.array(label_list))
+    return input_from_sample
+
+
+def convolutional_input_from_sample(sample: Sample, width: int, person_mix):
+    """For one electropherogram, creates all input (node) images and their labels."""
+    # width is amount of steps in each direction, either 80 or 100
+    sample_data = sample.data[:,:4]
+    window_list = []
+    # apparently, this works?
+    labels = find_peaks_flowing_out_of_bins(sample, bin_lefts_rights(person_mix))
+    label_list = labels[:4]
+    input_from_sample = TrainInput(sample, sample_data, np.array(label_list)[:,0])
     return input_from_sample
 
 

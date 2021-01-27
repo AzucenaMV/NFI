@@ -163,9 +163,9 @@ class Center:
 
 @dataclass
 class TrainInput:
-    input_sample: Sample    # sample used to create input
-    data: List              # list of input nodes/data to be fed to nn
-    labels: List            # list of labels corresponding to data
+    input_sample: Sample          # sample used to create input
+    data: np.ndarray              # list of input nodes/data to be fed to nn
+    labels: np.ndarray            # list of labels corresponding to data
 
 
 @dataclass
