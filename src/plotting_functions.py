@@ -32,6 +32,7 @@ def plot_markers(dye_color: Dye, vertical):
         newlabellist.append(locus_name)
     plt.xticks(newloclist, newlabellist)
 
+
 def plot_peaks_analyst(peak_list: list, dye_color: Dye):
     for peak in peak_list:
         dye = peak.allele.dye

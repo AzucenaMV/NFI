@@ -33,36 +33,39 @@ def conv_model(n_labels):
     poolsize = (3, 1)
     # can also flatten within layers
     model = tf.keras.models.Sequential()
-    # model.add(tf.keras.layers.Conv2D(6, kernelsize, activation=tf.nn.relu))
-    # model.add(tf.keras.layers.Conv2D(6, kernelsize, activation=tf.nn.relu))
-    # model.add(tf.keras.layers.MaxPool2D(poolsize))
-    # model.add(tf.keras.layers.Conv2D(6, kernelsize, activation=tf.nn.relu))
-    # model.add(tf.keras.layers.Conv2D(6, kernelsize, activation=tf.nn.relu))
-    # model.add(tf.keras.layers.MaxPool2D(poolsize))
+    model.add(tf.keras.layers.Conv2D(6, (3, 1), activation=tf.nn.relu))
+    model.add(tf.keras.layers.Conv2D(6, kernelsize, activation=tf.nn.relu))
+    model.add(tf.keras.layers.MaxPool2D(poolsize))
+    model.add(tf.keras.layers.Conv2D(6, kernelsize, activation=tf.nn.relu))
+    model.add(tf.keras.layers.Conv2D(6, kernelsize, activation=tf.nn.relu))
+    model.add(tf.keras.layers.MaxPool2D(poolsize))
     model.add(tf.keras.layers.Flatten())
-    # model.add(tf.keras.layers.Dense(100, activation=tf.nn.relu))
-    # model.add(tf.keras.layers.Dropout(rate=0.5))
-    # model.add(tf.keras.layers.Dense(100, activation=tf.nn.relu))
+    model.add(tf.keras.layers.Dense(50, activation=tf.nn.relu))
+    model.add(tf.keras.layers.Dropout(rate=0.5))
+    model.add(tf.keras.layers.Dense(20, activation=tf.nn.relu))
     model.add(tf.keras.layers.Dense(n_labels, activation='sigmoid'))
     return model
 
 
 def simplest_nn(train_input: TrainInput):
     number_of_dyes = 5
+    # maybe use np.tile to get same data multiple times
     all_images = train_input.data
+    print(all_images.shape)
     #all_images = all_images.reshape(-1, width, number_of_dyes, 1)
     all_labels = train_input.labels
+    print(all_labels.shape)
     train_images, test_images, train_labels, test_labels = train_test_split(all_images, all_labels, test_size=0.33, random_state=42)
 
     model = dense_model(number_of_dyes)
     # model.summary()
     batch_size = 10  # number of samples processed before the model is updated
-    num_epochs = 200  # number of complete passes through the training dataset before the training stops
+    num_epochs = 20  # number of complete passes through the training dataset before the training stops
 
     # Compiling the model adds a loss function, optimiser and metrics to track during training
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
                   loss=tf.keras.losses.BinaryCrossentropy(),
-                  metrics=['accuracy'])
+                  metrics=['accuracy', 'AUC'])
     # history is optional for plotting
     history = model.fit(x=train_images,
               y=train_labels,
@@ -70,14 +73,14 @@ def simplest_nn(train_input: TrainInput):
               epochs=num_epochs,
               validation_split = 0.33)
 
+
     metric_values = model.evaluate(x=test_images, y=test_labels)
     print('Final TEST performance')
     for metric_value, metric_name in zip(metric_values, model.metrics_names):
         print('{}: {}'.format(metric_name, metric_value))
 
-    for row in all_images:
-        print(model.predict(row.reshape(1,161,5)))
-        lastrow = row.copy()
+    # for row in all_images:
+    #     print(model.predict(row.reshape(1,161,5)))
     return model
 
 
@@ -106,7 +109,7 @@ def example_from_rolf():
     # Compile the model
     model.compile(loss=binary_crossentropy,
                   optimizer=Adam(),
-                  metrics=['AUC'])
+                  metrics=['accuracy', 'AUC'])
     # Fit data to model
     model.fit(X_train, y_train,
               batch_size=batch_size,
@@ -116,4 +119,10 @@ def example_from_rolf():
     # Generate generalization metrics
     score = model.evaluate(X_test, y_test, verbose=0)
     print(f'Test loss: {score[0]} / Test accuracy: {score[1]}')
+
+    metric_values = model.evaluate(x=X_test, y=y_test)
+    print('Final TEST performance')
+    for metric_value, metric_name in zip(metric_values, model.metrics_names):
+        print('{}: {}'.format(metric_name, metric_value))
+
     print(model.predict(X_test), y_test)

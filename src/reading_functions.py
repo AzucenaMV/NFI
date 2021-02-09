@@ -38,7 +38,7 @@ def txt_read_sample(filename: str):
 
 def csv_read_persons(donor_set):
     """reads all profiles from given donor set (1,2,3,4,5 or 6)"""
-    file_name = 'data/donor_profiles/Refs_dataset' + str(donor_set) + '.csv'
+    file_name = 'data/donor_profiles/Refs_dataset' + str(donor_set) + '_metYstr.csv'
     with open(file_name) as f:
         first_line = f.readline()
     if "," in first_line:
@@ -57,9 +57,11 @@ def csv_read_persons(donor_set):
         person_name = row[0]                    # first entry is person name
         locus = row[1]                          # second entry is locus name
         allele1 = locus + "_" + row[2]          # third entry is first allele
-        allele2 = locus + "_" + row[3]          # fourth entry is second allele
         alleles.append(allele1)
-        alleles.append(allele2)
+        if not row[3] == "YSTR":
+            # Y-STR's are only on Y chromosome, so occur only once
+            allele2 = locus + "_" + row[3]          # fourth entry is second allele
+            alleles.append(allele2)
     person_list.append(Person(person_name, alleles))
     return person_list
 
