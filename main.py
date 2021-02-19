@@ -32,8 +32,7 @@ if __name__ == '__main__':
     first_sample = samples[6]
     first_name = first_sample.name
     person_mixture = rf.make_person_mixture(first_name)
-    pf.plot_all_markers_and_bins()
-    # first_input = dpf.create_input_from_sample(first_sample, 80, person_mixture, 5)
-    # print((np.sum(first_input.labels,axis=0))/len(first_input.labels[:,0]))
-    # print(trf.simplest_nn(first_input))
+    first_input = dpf.create_input_from_sample(first_sample, 80, person_mixture, 5)
+    print((np.sum(first_input.labels,axis=0))/len(first_input.labels[:,0]))
+    print(trf.simplest_nn(first_input))
 

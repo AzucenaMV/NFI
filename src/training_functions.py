@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from src.classes import *
+from src.models import *
 import matplotlib.pyplot as plt
 
 # Imports
@@ -10,41 +11,6 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten, Dropout
 from tensorflow.keras.losses import binary_crossentropy
 from tensorflow.keras.optimizers import Adam
-
-
-def dense_model(n_classes):
-    model = Sequential()
-    model.add(Flatten())
-    model.add(Dense(64, activation='relu'))
-    model.add(Dropout(0.3))
-    model.add(Dense(32, activation='relu'))
-    model.add(Dropout(0.3))
-    model.add(Dense(16, activation='relu'))
-    model.add(Dropout(0.3))
-    model.add(Dense(8, activation='relu'))
-    model.add(Dense(n_classes, activation='sigmoid'))
-    return model
-
-
-def conv_model(n_labels):
-    # should probably add more filters, but not sure how to choose it
-    filter_s = 3
-    kernelsize = (3, 4)
-    poolsize = (3, 1)
-    # can also flatten within layers
-    model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.Conv2D(6, (3, 1), activation=tf.nn.relu))
-    model.add(tf.keras.layers.Conv2D(6, kernelsize, activation=tf.nn.relu))
-    model.add(tf.keras.layers.MaxPool2D(poolsize))
-    model.add(tf.keras.layers.Conv2D(6, kernelsize, activation=tf.nn.relu))
-    model.add(tf.keras.layers.Conv2D(6, kernelsize, activation=tf.nn.relu))
-    model.add(tf.keras.layers.MaxPool2D(poolsize))
-    model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(50, activation=tf.nn.relu))
-    model.add(tf.keras.layers.Dropout(rate=0.5))
-    model.add(tf.keras.layers.Dense(20, activation=tf.nn.relu))
-    model.add(tf.keras.layers.Dense(n_labels, activation='sigmoid'))
-    return model
 
 
 def simplest_nn(train_input: TrainInput):
@@ -101,11 +67,8 @@ def example_from_rolf():
     # Split into training and testing data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=random_state)
     # Create the model
-    model = Sequential()
-    model.add(Dense(32, activation='relu', input_dim=n_features))
-    model.add(Dense(16, activation='relu'))
-    model.add(Dense(8, activation='relu'))
-    model.add(Dense(n_classes, activation='sigmoid'))
+    model = model_for_example(n_features, n_classes)
+
     # Compile the model
     model.compile(loss=binary_crossentropy,
                   optimizer=Adam(),
