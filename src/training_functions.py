@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 # Imports
 from sklearn.datasets import make_multilabel_classification
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Flatten, Dropout
 from tensorflow.keras.losses import binary_crossentropy
 from tensorflow.keras.optimizers import Adam
 
