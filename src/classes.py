@@ -163,9 +163,16 @@ class Center:
 
 @dataclass
 class TrainInput:
+    """The one with windows"""
     input_sample: Sample          # sample used to create input
     data: np.ndarray              # list of input nodes/data to be fed to nn
     labels: np.ndarray            # list of labels corresponding to data
+
+
+@dataclass
+class NewTrainInput:
+    data: np.ndarray
+    labels: np.ndarray
 
 
 @dataclass

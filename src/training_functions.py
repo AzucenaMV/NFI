@@ -11,6 +11,10 @@ from tensorflow.keras.losses import binary_crossentropy
 from tensorflow.keras.optimizers import Adam
 
 
+def unet():
+    pass
+
+
 def simplest_nn(train_input: TrainInput):
     number_of_dyes = 5
     # maybe use np.tile to get same data multiple times
@@ -23,8 +27,8 @@ def simplest_nn(train_input: TrainInput):
 
     model = dense_model(number_of_dyes)
     # model.summary()
-    batch_size = 10  # number of samples processed before the model is updated
-    num_epochs = 20  # number of complete passes through the training dataset before the training stops
+    batch_size = 50  # number of samples processed before the model is updated
+    num_epochs = 10  # number of complete passes through the training dataset before the training stops
 
     # Compiling the model adds a loss function, optimiser and metrics to track during training
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),

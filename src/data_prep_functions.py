@@ -1,5 +1,6 @@
 from src.classes import *
 import numpy as np
+from src import reading_functions as rf
 
 # should have approximately that shape, but need to decide what to do about other colours.
 def create_input_from_sample(sample: Sample, width: int, person_mix, number_of_dyes):
@@ -20,16 +21,20 @@ def create_input_from_sample(sample: Sample, width: int, person_mix, number_of_d
     return input_from_sample
 
 
-def convolutional_input_from_sample(sample: Sample, width: int, person_mix):
+def input_from_multiple_samples(samplelist: List[Sample], width: int):
     """For one electropherogram, creates all input (node) images and their labels."""
     # width is amount of steps in each direction, either 80 or 100
-    sample_data = sample.data[:,:4]
-    window_list = []
-    # apparently, this works?
-    labels = find_peaks_flowing_out_of_bins(sample, bin_lefts_rights(person_mix))
-    label_list = labels[:4]
-    input_from_sample = TrainInput(sample, sample_data, np.array(label_list)[:,0])
-    return input_from_sample
+    all_data = []
+    all_labels = []
+    # big assumption here, cut off data 50-6000
+    for sample in samplelist:
+        if len(sample.name) == 3:
+            all_data.append(sample.data[41:6000, :width])
+            person_mix = rf.make_person_mixture(sample.name)
+            labels = find_peaks_flowing_out_of_bins(sample, bin_lefts_rights(person_mix))
+            all_labels.append(labels[41:6000, :width])
+    input_from_samples = NewTrainInput(np.array(all_data), np.array(all_labels))
+    return input_from_samples
 
 
 def bin_all_indices(person_mix):
@@ -101,4 +106,6 @@ def find_peaks_flowing_out_of_bins(sample: Sample, list_of_bin_sides: list):
                 bin_booleans[right_end] = True
         indices.append(bin_booleans)
     # array returned has same dimensions as sample array
-    return np.array(indices)
+    # correction: not same shape as array, but transposed
+    # this will probably cause trouble in some other functions
+    return np.array(indices).transpose()
