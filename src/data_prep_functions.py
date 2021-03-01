@@ -29,10 +29,10 @@ def input_from_multiple_samples(samplelist: List[Sample], width: int):
     # big assumption here, cut off data 50-6000
     for sample in samplelist:
         if len(sample.name) == 3:
-            all_data.append(sample.data[41:6000, :width])
+            all_data.append(sample.data[:6000, :width])
             person_mix = rf.make_person_mixture(sample.name)
             labels = find_peaks_flowing_out_of_bins(sample, bin_lefts_rights(person_mix))
-            all_labels.append(labels[41:6000, :width])
+            all_labels.append(labels[:6000, :width])
     input_from_samples = NewTrainInput(np.array(all_data), np.array(all_labels))
     return input_from_samples
 
