@@ -14,10 +14,11 @@ def some_examples():
     samples = []
     for elt in tracedata:
         samples += rf.txt_read_sample(elt)
-    inputs_for_unet = dpf.input_from_multiple_samples(samples, 5)
-    trf.unet(inputs_for_unet)
-    # for sample in samples:
-    #     current_name = sample.name
+    cutoff = 5120
+    inputs_for_unet = dpf.input_from_multiple_samples(samples, 5, cutoff)
+    trf.unet(inputs_for_unet, cutoff)
+    for sample in samples:
+        current_name = sample.name
         # still contains pocons and ladders, so next loop filters this
         # if len(current_name) == 3 and current_name != "3E2":
         #     person_mixture = rf.make_person_mixture(current_name)

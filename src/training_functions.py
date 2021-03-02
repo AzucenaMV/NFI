@@ -11,21 +11,21 @@ from tensorflow.keras.losses import binary_crossentropy
 from tensorflow.keras.optimizers import Adam
 
 
-def unet(train_input):
+def unet(train_input, cutoff):
     number_of_dyes = 5
     all_images = train_input.data
     all_labels = train_input.labels
     print(all_images.shape, all_labels.shape)
     train_images, test_images, train_labels, test_labels = train_test_split(all_images, all_labels, test_size=0.5, random_state=42)
-    model = unet_from_aml()
+    model = unet_from_aml((cutoff, number_of_dyes, 1))
     model.summary()
-    batch_size = 50  # number of samples processed before the model is updated
+    batch_size = 10  # number of samples processed before the model is updated
     num_epochs = 10  # number of complete passes through the training dataset before the training stops
 
     # Compiling the model adds a loss function, optimiser and metrics to track during training
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
                   loss=tf.keras.losses.BinaryCrossentropy(),
-                  metrics=['accuracy', 'AUC'])
+                  metrics=['AUC'])
     # history is optional for plotting
     history = model.fit(x=train_images,
                         y=train_labels,

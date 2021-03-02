@@ -48,106 +48,106 @@ def model_for_example(n_features, n_classes):
     return model
 
 
-def unet_from_aml(input_size=(5, 6000, 1)):
+def unet_from_aml(input_size=(5120, 5, 1)):
     inputs = Input(input_size)
     # Convolution 1
-    kernel_size = (5,3)
-    kernel_size_up = (5,2)
-    pool_size = (1,2)
-    conv1 = Conv2D(64, kernel_size, activation='relu', padding='same',
+    kernelsize = (3, 5)
+    kernelsize_up = (2, 5)
+    poolsize = (4, 1)
+    conv1 = Conv2D(64, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(inputs)
-    conv1 = Conv2D(64, kernel_size, activation='relu', padding='same',
+    conv1 = Conv2D(64, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(conv1)
     # Pooling 1
-    pool1 = MaxPooling2D(pool_size=pool_size)(conv1)
+    pool1 = MaxPooling2D(poolsize)(conv1)
     # Convolution 2
-    conv2 = Conv2D(128, kernel_size, activation='relu', padding='same',
+    conv2 = Conv2D(128, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(pool1)
-    conv2 = Conv2D(128, kernel_size, activation='relu', padding='same',
+    conv2 = Conv2D(128, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(conv2)
     # Pooling 2
-    pool2 = MaxPooling2D(pool_size=pool_size)(conv2)
+    pool2 = MaxPooling2D(poolsize)(conv2)
     # Convolution 3
-    conv3 = Conv2D(256, kernel_size, activation='relu', padding='same',
+    conv3 = Conv2D(256, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(pool2)
-    conv3 = Conv2D(256, kernel_size, activation='relu', padding='same',
+    conv3 = Conv2D(256, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(conv3)
     # Pooling 3
-    pool3 = MaxPooling2D(pool_size=pool_size)(conv3)
+    pool3 = MaxPooling2D(poolsize)(conv3)
     # Convolution 3
-    conv4 = Conv2D(512, kernel_size, activation='relu', padding='same',
+    conv4 = Conv2D(512, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(pool3)
-    conv4 = Conv2D(512, kernel_size, activation='relu', padding='same',
+    conv4 = Conv2D(512, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(conv4)
     # Dropout
     drop4 = Dropout(0.5)(conv4)
     # Pooling 4
-    pool4 = MaxPooling2D(pool_size=pool_size)(drop4)
+    pool4 = MaxPooling2D(poolsize)(drop4)
     # Convolution 5
-    conv5 = Conv2D(1024, kernel_size, activation='relu', padding='same',
+    conv5 = Conv2D(1024, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(pool4)
-    conv5 = Conv2D(1024, kernel_size, activation='relu', padding='same',
+    conv5 = Conv2D(1024, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(conv5)
     # Dropout
     drop5 = Dropout(0.5)(conv5)
     # Upward Convolution 6
-    up6 = Conv2D(512, kernel_size_up, activation='relu', padding='same',
+    up6 = Conv2D(512, kernelsize_up, activation='relu', padding='same',
                  kernel_initializer='he_normal'
-                 )(UpSampling2D(size=pool_size)(drop5))
+                 )(UpSampling2D(poolsize)(drop5))
     # Here we copy the input from the upward convolution and contraction path
     merge6 = concatenate([drop4, up6])
-    conv6 = Conv2D(512, kernel_size, activation='relu', padding='same',
+    conv6 = Conv2D(512, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(merge6)
-    conv6 = Conv2D(512, kernel_size, activation='relu', padding='same',
+    conv6 = Conv2D(512, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(conv6)
     # Upward Convolution 7
-    up7 = Conv2D(256, kernel_size_up, activation='relu', padding='same',
+    up7 = Conv2D(256, kernelsize_up, activation='relu', padding='same',
                  kernel_initializer='he_normal'
-                 )(UpSampling2D(size=pool_size)(conv6))
+                 )(UpSampling2D(poolsize)(conv6))
     # Here we copy the input from the upward convolution and contraction path
     merge7 = concatenate([conv3, up7])
-    conv7 = Conv2D(256, kernel_size, activation='relu', padding='same',
+    conv7 = Conv2D(256, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(merge7)
-    conv7 = Conv2D(256, kernel_size, activation='relu', padding='same', kernel_initializer='he_normal'
+    conv7 = Conv2D(256, kernelsize, activation='relu', padding='same', kernel_initializer='he_normal'
                    )(conv7)
     # Upward Convolution 8
-    up8 = Conv2D(128, kernel_size_up, activation='relu', padding='same',
+    up8 = Conv2D(128, kernelsize_up, activation='relu', padding='same',
                  kernel_initializer='he_normal'
-                 )(UpSampling2D(size=(1, 2))(conv7))
+                 )(UpSampling2D(poolsize)(conv7))
     # Here we copy the input from the upward convolution and contraction path
     merge8 = concatenate([conv2, up8])
-    conv8 = Conv2D(128, kernel_size, activation='relu', padding='same',
+    conv8 = Conv2D(128, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(merge8)
-    conv8 = Conv2D(128, kernel_size, activation='relu', padding='same',
+    conv8 = Conv2D(128, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(conv8)
     # Upward Convolution 9
-    up9 = Conv2D(64, kernel_size, activation='relu', padding='same',
+    up9 = Conv2D(64, kernelsize, activation='relu', padding='same',
                  kernel_initializer='he_normal'
-                 )(UpSampling2D(size=(1, 2))(conv8))
+                 )(UpSampling2D(poolsize)(conv8))
     # Here we copy the input from the upward convolution and contraction path
     merge9 = concatenate([conv1, up9])
-    conv9 = Conv2D(64, kernel_size, activation='relu', padding='same',
+    conv9 = Conv2D(64, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(merge9)
-    conv9 = Conv2D(64, kernel_size, activation='relu', padding='same',
+    conv9 = Conv2D(64, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(conv9)
-    conv9 = Conv2D(2, kernel_size, activation='relu', padding='same',
+    conv9 = Conv2D(2, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(conv9)
     # not sure what to do with this shape

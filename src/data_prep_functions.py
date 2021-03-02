@@ -21,18 +21,16 @@ def create_input_from_sample(sample: Sample, width: int, person_mix, number_of_d
     return input_from_sample
 
 
-def input_from_multiple_samples(samplelist: List[Sample], width: int):
+def input_from_multiple_samples(samplelist: List[Sample], width: int, cutoff):
     """For one electropherogram, creates all input (node) images and their labels."""
-    # width is amount of steps in each direction, either 80 or 100
     all_data = []
     all_labels = []
-    # big assumption here, cut off data 50-6000
     for sample in samplelist:
         if len(sample.name) == 3:
-            all_data.append(sample.data[:6000, :width])
+            all_data.append(sample.data[:cutoff, :width])
             person_mix = rf.make_person_mixture(sample.name)
             labels = find_peaks_flowing_out_of_bins(sample, bin_lefts_rights(person_mix))
-            all_labels.append(labels[:6000, :width])
+            all_labels.append(labels[:cutoff, :width])
     input_from_samples = NewTrainInput(np.array(all_data), np.array(all_labels))
     return input_from_samples
 
