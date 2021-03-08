@@ -7,14 +7,14 @@ tracedata = ['TraceDataSet11.txt', 'TraceDataSet12.txt', 'TraceDataSet21.txt', '
              'TraceDataSet31.txt', 'TraceDataSet32.txt', 'TraceDataSet41.txt', 'TraceDataSet42.txt',
              'TraceDataSet51.txt', 'TraceDataSet52.txt', 'TraceDataSet61.txt', 'TraceDataSet62.txt']
 # to speed up tests, only do first dataset
-# tracedata = ["TraceDataSet42.txt"]
+# tracedata = ["TraceDataSet11.txt"]
 
 def some_examples():
     # first create a list of all samples
     samples = []
     for elt in tracedata:
         samples += rf.txt_read_sample(elt)
-    cutoff = 5120
+    cutoff = 6000
     inputs_for_unet = dpf.input_from_multiple_samples(samples, 5, cutoff)
     trf.unet(inputs_for_unet, cutoff)
     for sample in samples:

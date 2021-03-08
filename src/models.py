@@ -48,12 +48,13 @@ def model_for_example(n_features, n_classes):
     return model
 
 
-def unet_from_aml(input_size=(5120, 5, 1)):
+def unet_from_aml(input_size=(6000, 5, 1)):
     inputs = Input(input_size)
     # Convolution 1
-    kernelsize = (3, 5)
-    kernelsize_up = (2, 5)
-    poolsize = (4, 1)
+    kernelsize = (3, 5)     # all 5 dyes
+    kernelsize_up = (2, 5)  # one less because concatenated
+    poolsize = (2, 1)       # pooling
+
     conv1 = Conv2D(64, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(inputs)
@@ -154,7 +155,7 @@ def unet_from_aml(input_size=(5120, 5, 1)):
     # want to end up with 1 filter right?
     conv10 = Conv2D(1, 1, activation='sigmoid')(conv9)
     model = Model(inputs=inputs, outputs=conv10)
-    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=['AUC'])
 
     return model
 
