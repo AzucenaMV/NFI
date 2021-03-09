@@ -7,7 +7,7 @@ tracedata = ['TraceDataSet11.txt', 'TraceDataSet12.txt', 'TraceDataSet21.txt', '
              'TraceDataSet31.txt', 'TraceDataSet32.txt', 'TraceDataSet41.txt', 'TraceDataSet42.txt',
              'TraceDataSet51.txt', 'TraceDataSet52.txt', 'TraceDataSet61.txt', 'TraceDataSet62.txt']
 # to speed up tests, only do first dataset
-# tracedata = ["TraceDataSet11.txt"]
+tracedata = ["TraceDataSet11.txt"]
 
 def some_examples():
     # first create a list of all samples
@@ -16,7 +16,13 @@ def some_examples():
         samples += rf.txt_read_sample(elt)
     cutoff = 6000
     inputs_for_unet = dpf.input_from_multiple_samples(samples, 5, cutoff)
-    trf.unet(inputs_for_unet, cutoff)
+    unet_model = trf.unet(inputs_for_unet, cutoff)
+    output_example = unet_model.predict(inputs_for_unet.data[1,:,:])
+    # print(output_example)
+    # person_mixture = rf.make_person_mixture(samples[0].name)
+    # peak_booleans = dpf.find_peaks_flowing_out_of_bins(samples[0], dpf.bin_lefts_rights(person_mixture))
+
+
     for sample in samples:
         current_name = sample.name
         # still contains pocons and ladders, so next loop filters this

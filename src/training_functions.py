@@ -19,20 +19,20 @@ def unet(train_input, cutoff):
     train_images, test_images, train_labels, test_labels = train_test_split(all_images, all_labels, test_size=0.5, random_state=42)
     model = unet_from_aml((cutoff, number_of_dyes, 1))
     model.summary()
-    batch_size = 30  # number of samples processed before the model is updated
+    batch_size = 10  # number of samples processed before the model is updated
     num_epochs = 10  # number of complete passes through the training dataset before the training stops
 
     # model_checkpoint = ModelCheckpoint('weights.h5', monitor='val_loss', save_best_only=True)
 
     # history is optional for plotting
-    history = model.fit(train_images, train_labels, batch_size=32, epochs=20, verbose=1, shuffle=True,
+    history = model.fit(train_images, train_labels, batch_size=batch_size, epochs=num_epochs, verbose=1, shuffle=True,
                         validation_split=0.2)#, callbacks=[model_checkpoint])
 
     metric_values = model.evaluate(x=test_images, y=test_labels)
     print('Final TEST performance')
     for metric_value, metric_name in zip(metric_values, model.metrics_names):
         print('{}: {}'.format(metric_name, metric_value))
-    pass
+    return model
 
 
 def simplest_nn(train_input: TrainInput):
