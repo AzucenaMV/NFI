@@ -20,7 +20,7 @@ def unet(train_input, cutoff):
     model = unet_from_aml((cutoff, number_of_dyes, 1))
     model.summary()
     batch_size = 10  # number of samples processed before the model is updated
-    num_epochs = 10  # number of complete passes through the training dataset before the training stops
+    num_epochs = 3  # number of complete passes through the training dataset before the training stops
 
     # model_checkpoint = ModelCheckpoint('weights.h5', monitor='val_loss', save_best_only=True)
 
