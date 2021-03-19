@@ -41,10 +41,12 @@ def smaller_input_from_multiple_samples(samplelist: List[Sample], width: int, cu
     all_labels = []
     for sample in samplelist:
         if len(sample.name) == 3:
-            all_data.append(sample.data[:cutoff, :width])
+
             person_mix = rf.make_person_mixture(sample.name)
             labels = find_peaks_flowing_out_of_bins(sample, bin_lefts_rights(person_mix))
-            all_labels.append(labels[:cutoff, :width])
+            for i in range(50):
+                all_data.append(sample.data[120 * i:120 * i + 120, :width])
+                all_labels.append(labels[120 * i:120 * i + 120, :width])
     input_from_samples = NewTrainInput(np.array(all_data), np.array(all_labels))
     return input_from_samples
 

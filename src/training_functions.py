@@ -1,6 +1,6 @@
 import tensorflow as tf
 from src.classes import *
-from src.models import dense_model, unet_from_aml, unet_tiny, model_for_example
+from src.models import dense_model, unet_from_aml, unet_small, unet_tiny, model_for_example
 import matplotlib.pyplot as plt
 
 # Imports
@@ -17,7 +17,7 @@ def unet(train_input, cutoff):
 
     print(all_images.shape, all_labels.shape)
     train_images, test_images, train_labels, test_labels = train_test_split(all_images, all_labels, test_size=0.5, random_state=42)
-    model = unet_tiny((cutoff, number_of_dyes, 1))
+    model = unet_small((cutoff, number_of_dyes, 1))
     model.summary()
     batch_size = 10  # number of samples processed before the model is updated
     num_epochs = 10  # number of complete passes through the training dataset before the training stops
