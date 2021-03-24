@@ -9,6 +9,18 @@ def initialise_6C_figure(fig_size=(20, 30)):
     return fig, axes
 
 
+def plot_results_unet(input, result, fig_size = (20,30)):
+    fig, axes = plt.subplots(nrows=6, figsize=fig_size)
+    input = input.squeeze()
+    result = result.squeeze()
+    number_of_dyes = result.shape[1]
+    for dye in range(number_of_dyes):
+        axes[dye].plot(30000*result[:,dye])
+        axes[dye].plot(input[:, dye])
+    fig.show()
+    fig.close()
+
+
 def plot_sample_markers_6C(sample: Sample):
     """Plots sample and markers in 6C plot"""
     plt.figure()

@@ -1,4 +1,4 @@
-from src import data_prep_functions as dpf, plotting_functions as pf, reading_functions as rf, training_functions as trf
+from src import data_prep_functions as dpf, plotting_functions as pf, reading_functions as rf, training_functions as trf, plotting_6C_functions as pf6
 from src import classes as c
 import pandas as pd
 import numpy as np
@@ -15,14 +15,14 @@ def some_examples():
     for elt in tracedata:
         samples += rf.txt_read_sample(elt)
     cutoff = 6000
-    inputs_for_unet = dpf.input_from_multiple_samples(samples, 5, cutoff)
+    number_of_dyes = 6
+    inputs_for_unet = dpf.input_from_multiple_samples(samples, number_of_dyes, cutoff)
     unet_model = trf.unet(inputs_for_unet, cutoff)
-    output_example = unet_model.predict(inputs_for_unet.data[20,:,:].reshape(1,cutoff,5,1))
-    for elt in output_example:
-        for i in elt:
-            print(np.max(i))
-    # TODO: Make image of smaller parts to see where peaks are
-    # TODO: I forgot, something to do with the larger network
+    input_example = inputs_for_unet.data[20,:,:].reshape(1,cutoff,number_of_dyes,1)
+    output_example = unet_model.predict(input_example)
+    pf6.plot_results_unet(input_example, output_example)
+    # I think the order is wrong
+
     # person_mixture = rf.make_person_mixture(samples[0].name)
     # peak_booleans = dpf.find_peaks_flowing_out_of_bins(samples[0], dpf.bin_lefts_rights(person_mixture))
 

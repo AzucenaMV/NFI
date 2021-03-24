@@ -48,11 +48,11 @@ def model_for_example(n_features, n_classes):
     return model
 
 
-def unet_from_aml(input_size=(6000, 5, 1)):
+def unet_from_aml(input_size=(6000, 6, 1)):
     inputs = Input(input_size)
     # Convolution 1
-    kernelsize = (3, 5)     # all 5 dyes
-    kernelsize_up = (2, 5)  # one less because concatenated
+    kernelsize = (3, 6)     # all 6 dyes
+    kernelsize_up = (2, 6)  # one less because concatenated
     poolsize = (2, 1)       # pooling
 
     conv1 = Conv2D(64, kernelsize, activation='relu', padding='same',
@@ -160,11 +160,11 @@ def unet_from_aml(input_size=(6000, 5, 1)):
     return model
 
 
-def unet_small(input_size=(6000, 5, 1)):
+def unet_small(input_size=(6000, 6, 1)):
     inputs = Input(input_size)
     # Convolution 1
-    kernelsize = (3, 5)     # all 5 dyes
-    kernelsize_up = (2, 5)  # one less because concatenated
+    kernelsize = (3, 6)     # all 5 dyes
+    kernelsize_up = (2, 6)  # one less because concatenated
     poolsize = (2, 1)       # pooling
 
     conv1 = Conv2D(2, kernelsize, activation='relu', padding='same',
@@ -250,11 +250,11 @@ def unet_small(input_size=(6000, 5, 1)):
     return model
 
 
-def unet_tiny(input_size=(120, 5, 1)):
+def unet_tiny(input_size=(120, 6, 1)):
     inputs = Input(input_size)
     # Convolution 1
-    kernelsize = (3, 5)     # all 5 dyes
-    kernelsize_up = (2, 5)  # one less because concatenated
+    kernelsize = (3, 6)     # all 5 dyes
+    kernelsize_up = (2, 6)  # one less because concatenated
     poolsize = (2, 1)       # pooling
 
     conv1 = Conv2D(2, kernelsize, activation='relu', padding='same',

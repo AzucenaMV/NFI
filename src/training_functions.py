@@ -11,7 +11,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint
 
 def unet(train_input, cutoff):
-    number_of_dyes = 5
+    number_of_dyes = 6
     all_images = train_input.data
     all_labels = train_input.labels
 
