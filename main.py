@@ -14,14 +14,13 @@ def some_examples():
     samples = []
     for elt in tracedata:
         samples += rf.txt_read_sample(elt)
-    cutoff = 6000
+    cutoff = 5988
     number_of_dyes = 6
     inputs_for_unet = dpf.input_from_multiple_samples(samples, number_of_dyes, cutoff)
     unet_model = trf.unet(inputs_for_unet, cutoff)
-    input_example = inputs_for_unet.data[20,:,:].reshape(1,cutoff,number_of_dyes,1)
+    input_example = inputs_for_unet.data[20,:,:].reshape(1,cutoff-500,number_of_dyes,1)
     output_example = unet_model.predict(input_example)
     pf6.plot_results_unet(input_example, output_example)
-    # I think the order is wrong
 
     # person_mixture = rf.make_person_mixture(samples[0].name)
     # peak_booleans = dpf.find_peaks_flowing_out_of_bins(samples[0], dpf.bin_lefts_rights(person_mixture))

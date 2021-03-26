@@ -27,26 +27,26 @@ def input_from_multiple_samples(samplelist: List[Sample], width: int, cutoff):
     all_labels = []
     for sample in samplelist:
         if len(sample.name) == 3:
-            all_data.append(sample.data[:cutoff, :width])
+            all_data.append(sample.data[500:cutoff, :width])
             person_mix = rf.make_person_mixture(sample.name)
             labels = find_peaks_flowing_out_of_bins(sample, bin_lefts_rights(person_mix))
-            all_labels.append(labels[:cutoff, :width])
+            all_labels.append(labels[500:cutoff, :width])
     input_from_samples = NewTrainInput(np.array(all_data), np.array(all_labels))
     return input_from_samples
 
 
-def bin_all_indices(person_mix):
-    """Makes array of indices where a peak is expected based on the bins."""
-    peaks = person_mix.create_peaks()
-    bin_indices = [[], [], [], [], [], []]
-    # cannot find precise index, since "size" of bins is accurate to 2 decimals, measurements to 1
-    for peak in peaks:
-        left_index = round((peak.allele.mid - peak.allele.left) * 10)
-        right_index = round((peak.allele.mid + peak.allele.right) * 10)
-        dye_index = peak.allele.dye.plot_index - 1
-        # intervals are all about 1 nucleotide wide at most, 0.8 at least
-        bin_indices[dye_index] += list(np.arange(left_index, right_index))
-    return bin_indices  # has indices of left to right side of each bin
+# def bin_all_indices(person_mix):
+#     """Makes array of indices where a peak is expected based on the bins."""
+#     peaks = person_mix.create_peaks()
+#     bin_indices = [[], [], [], [], [], []]
+#     # cannot find precise index, since "size" of bins is accurate to 2 decimals, measurements to 1
+#     for peak in peaks:
+#         left_index = round((peak.allele.mid - peak.allele.left) * 10)
+#         right_index = round((peak.allele.mid + peak.allele.right) * 10)
+#         dye_index = peak.allele.dye.plot_index - 1
+#         # intervals are all about 1 nucleotide wide at most, 0.8 at least
+#         bin_indices[dye_index] += list(np.arange(left_index, right_index))
+#     return bin_indices  # has indices of left to right side of each bin
 
 
 def bin_lefts_rights(person_mix):
@@ -61,20 +61,22 @@ def bin_lefts_rights(person_mix):
         dye_index = peak.allele.dye.plot_index - 1
         # intervals are all about 1 nucleotide wide at most, 0.8 at least
         bin_edges[dye_index].append((left_index, right_index))
+    for size_std_peak in [600, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2250, 2500, 2750, 3000, 3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000]:
+        bin_edges[5].append((size_std_peak-4,size_std_peak+4))
     return bin_edges  # list of left-right pairs (indices of left and right side) of each bin
 
 
-def find_peaks_in_bins(sample: Sample, list_of_bin_indices: list):
-    """Makes array of True/False of same size as data. True if a peak should theoretically be visible\
-    based on the composition and the bin locations, False otherwise."""
-    # Returns a 6xn numpy array
-    indices = []
-    for dye_color in range(6):
-        bin_data = list_of_bin_indices[dye_color]
-        sample_data = sample.data[:, dye_color]
-        new_indices = [True if sample_data[ind] > 80 and ind in bin_data else False for ind in range(len(sample_data))]
-        indices.append(new_indices)
-    return np.array(indices)
+# def find_peaks_in_bins(sample: Sample, list_of_bin_indices: list):
+#     """Makes array of True/False of same size as data. True if a peak should theoretically be visible\
+#     based on the composition and the bin locations, False otherwise."""
+#     # Returns a 6xn numpy array
+#     indices = []
+#     for dye_color in range(6):
+#         bin_data = list_of_bin_indices[dye_color]
+#         sample_data = sample.data[:, dye_color]
+#         new_indices = [True if sample_data[ind] > 80 and ind in bin_data else False for ind in range(len(sample_data))]
+#         indices.append(new_indices)
+#     return np.array(indices)
 
 
 def find_peaks_flowing_out_of_bins(sample: Sample, list_of_bin_sides: list):

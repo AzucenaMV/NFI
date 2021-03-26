@@ -15,10 +15,10 @@ def plot_results_unet(input, result, fig_size = (20,30)):
     result = result.squeeze()
     number_of_dyes = result.shape[1]
     for dye in range(number_of_dyes):
-        axes[dye].plot(30000*result[:,dye])
+        axes[dye].plot(max(input[:,dye])*result[:,dye])
         axes[dye].plot(input[:, dye])
     fig.show()
-    fig.close()
+    plt.close()
 
 
 def plot_sample_markers_6C(sample: Sample):
