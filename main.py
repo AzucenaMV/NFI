@@ -2,6 +2,7 @@ from src import data_prep_functions as dpf, plotting_functions as pf, reading_fu
 from src import classes as c
 import pandas as pd
 import numpy as np
+from src import models
 
 tracedata = ['TraceDataSet11.txt', 'TraceDataSet12.txt', 'TraceDataSet21.txt', 'TraceDataSet22.txt',
              'TraceDataSet31.txt', 'TraceDataSet32.txt', 'TraceDataSet41.txt', 'TraceDataSet42.txt',
@@ -14,14 +15,17 @@ def some_examples():
     samples = []
     for elt in tracedata:
         samples += rf.txt_read_sample(elt)
-    cutoff = 5988
+    leftoffset = 500
+    cutoff = 4800 + 500
     number_of_dyes = 6
-    inputs_for_unet = dpf.input_from_multiple_samples(samples, number_of_dyes, cutoff)
-    unet_model = trf.unet(inputs_for_unet, cutoff)
-    input_example = inputs_for_unet.data[20,:,:].reshape(1,cutoff-500,number_of_dyes,1)
-    output_example = unet_model.predict(input_example)
+    inputs_for_unet = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff)
+    # unet_model = trf.unet(inputs_for_unet, cutoff)
+    theactualmodel = models.unet_small((cutoff-leftoffset,number_of_dyes,1))
+    theactualmodel.load_weights("weights.h5")
+    input_example = inputs_for_unet.data[0,:,:].reshape(1,cutoff-leftoffset,number_of_dyes,1)
+    output_example = theactualmodel.predict(input_example)
     pf6.plot_results_unet(input_example, output_example)
-
+    #
     # person_mixture = rf.make_person_mixture(samples[0].name)
     # peak_booleans = dpf.find_peaks_flowing_out_of_bins(samples[0], dpf.bin_lefts_rights(person_mixture))
 

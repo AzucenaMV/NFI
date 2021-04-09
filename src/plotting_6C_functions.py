@@ -1,6 +1,7 @@
 import numpy
 from matplotlib import pyplot as plt
 from src.classes import *
+import matplotlib.collections as collections
 
 
 def initialise_6C_figure(fig_size=(20, 30)):
@@ -9,16 +10,39 @@ def initialise_6C_figure(fig_size=(20, 30)):
     return fig, axes
 
 
-def plot_results_unet(input, result, fig_size = (20,30)):
-    fig, axes = plt.subplots(nrows=6, figsize=fig_size)
+def plot_results_unet(input, result, leftoffset = 50, fig_size = (30,20)):
+    number_of_dyes = 6
+    fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
     input = input.squeeze()
     result = result.squeeze()
-    number_of_dyes = result.shape[1]
+    x_array = np.linspace(0, len(result) / 10, len(result))
     for dye in range(number_of_dyes):
-        axes[dye].plot(max(input[:,dye])*result[:,dye])
-        axes[dye].plot(input[:, dye])
-    fig.show()
+        y_max = 0.1 * max(input[:,dye])
+        y_min = max(-50, -y_max)
+        axes[dye].set_ylim([y_min, y_max])
+        plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
+        axes[dye].plot(x_array, input[:, dye], "k")
+        # Optie 1
+        axes[dye].plot(x_array, y_max*result[:,dye])
+        # Optie 2
+        # labels(input[:,dye], result[:,dye] > 0.5, axes[dye], y_min, y_max)
+        ax_right = axes[dye].twin()
+        ax_right.set_ylim([0, 1])
+    plt.show()
     plt.close()
+
+
+def labels(sample_array, peak_bools, ax, y_min, y_max):
+    # note that sample_array and peak_bools have the same shape
+    x = np.linspace(0, len(sample_array) / 10, len(sample_array))
+    # plot background of peaks in green
+    collection = collections.BrokenBarHCollection.span_where(x, ymin=y_min, ymax=y_max, where=peak_bools,
+                                                             facecolor='green', alpha=0.5)
+    ax.add_collection(collection)
+    # plot background of non-peaks in red
+    collection = collections.BrokenBarHCollection.span_where(x, ymin=y_min, ymax=y_max, where=~peak_bools,
+                                                             facecolor='red', alpha=0.5)
+    ax.add_collection(collection)
 
 
 def plot_sample_markers_6C(sample: Sample):
@@ -38,6 +62,20 @@ def plot_sample_markers_6C(sample: Sample):
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
     plt.show()
+
+
+def plot_markers(dye_color: Dye, ax, vertical, leftoffset = 0):
+    # make dict of loci present in chosen dye
+    loci_on_dye = {locus_name: locus for (locus_name, locus) in locus_dict.items() if locus.dye == dye_color}
+    newticklist = []
+    newlabellist = []
+    for (locus_name, locus) in loci_on_dye.items():
+        ax.annotate(text="", xy=(locus.lower-leftoffset, vertical), xytext=(locus.upper-leftoffset, vertical),
+                     arrowprops=dict(arrowstyle='<->', color='b'))
+        newticklist.append((locus.lower + locus.upper) / 2 - leftoffset)
+        newlabellist.append(locus_name)
+    ax.set_xticks(newticklist)
+    ax.set_xticklabels(newlabellist)
 
 
 def plot_analyst_6C(peaks: list, sample: Sample):

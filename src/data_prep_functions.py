@@ -21,16 +21,16 @@ def create_input_from_sample(sample: Sample, width: int, person_mix, number_of_d
     return input_from_sample
 
 
-def input_from_multiple_samples(samplelist: List[Sample], width: int, cutoff):
+def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset, cutoff):
     """For one electropherogram, creates all input (node) images and their labels."""
     all_data = []
     all_labels = []
     for sample in samplelist:
         if len(sample.name) == 3:
-            all_data.append(sample.data[500:cutoff, :width])
+            all_data.append(sample.data[leftoffset:cutoff, :width])
             person_mix = rf.make_person_mixture(sample.name)
             labels = find_peaks_flowing_out_of_bins(sample, bin_lefts_rights(person_mix))
-            all_labels.append(labels[500:cutoff, :width])
+            all_labels.append(labels[leftoffset:cutoff, :width])
     input_from_samples = NewTrainInput(np.array(all_data), np.array(all_labels))
     return input_from_samples
 
@@ -61,7 +61,7 @@ def bin_lefts_rights(person_mix):
         dye_index = peak.allele.dye.plot_index - 1
         # intervals are all about 1 nucleotide wide at most, 0.8 at least
         bin_edges[dye_index].append((left_index, right_index))
-    for size_std_peak in [600, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2250, 2500, 2750, 3000, 3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000]:
+    for size_std_peak in [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2250, 2500, 2750, 3000, 3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000]:
         bin_edges[5].append((size_std_peak-4,size_std_peak+4))
     return bin_edges  # list of left-right pairs (indices of left and right side) of each bin
 
