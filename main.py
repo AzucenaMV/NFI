@@ -19,10 +19,12 @@ def some_examples():
     cutoff = 4800 + 500
     number_of_dyes = 6
     inputs_for_unet = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff)
+    input_example = inputs_for_unet.data[0,:,:].reshape(1,cutoff-leftoffset,number_of_dyes,1)
+    pf6.choose_normalisation(input_example)
+
     # unet_model = trf.unet(inputs_for_unet, cutoff)
     theactualmodel = models.unet_small((cutoff-leftoffset,number_of_dyes,1))
     theactualmodel.load_weights("weights.h5")
-    input_example = inputs_for_unet.data[0,:,:].reshape(1,cutoff-leftoffset,number_of_dyes,1)
     output_example = theactualmodel.predict(input_example)
     pf6.plot_results_unet(input_example, output_example)
     #

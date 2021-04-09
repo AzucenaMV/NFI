@@ -2,6 +2,7 @@ import numpy
 from matplotlib import pyplot as plt
 from src.classes import *
 import matplotlib.collections as collections
+from sklearn.preprocessing import normalize
 
 
 def initialise_6C_figure(fig_size=(20, 30)):
@@ -17,17 +18,21 @@ def plot_results_unet(input, result, leftoffset = 50, fig_size = (30,20)):
     result = result.squeeze()
     x_array = np.linspace(0, len(result) / 10, len(result))
     for dye in range(number_of_dyes):
-        y_max = 0.1 * max(input[:,dye])
-        y_min = max(-50, -y_max)
+        y_max = min(1000, 0.1 * max(input[:,dye]))
+        y_min = -0.1*y_max      # always a 10% gap on bottom for legibility
         axes[dye].set_ylim([y_min, y_max])
         plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
         axes[dye].plot(x_array, input[:, dye], "k")
         # Optie 1
-        axes[dye].plot(x_array, y_max*result[:,dye])
+        line1, = axes[dye].plot(x_array, y_max*result[:,dye])
         # Optie 2
+        # be careful when using this, need to set color of right axis manually
         # labels(input[:,dye], result[:,dye] > 0.5, axes[dye], y_min, y_max)
-        ax_right = axes[dye].twin()
-        ax_right.set_ylim([0, 1])
+        ax_right = axes[dye].twinx()
+        ax_right.set_ylim([-0.1, 1])
+        ax_right.spines["right"].set_color(line1.get_color())
+        ax_right.tick_params(axis='y', colors=line1.get_color())
+
     plt.show()
     plt.close()
 
@@ -153,5 +158,64 @@ def plot_all_markers_and_bins():
             start = allele.mid - allele.left  # calculate where it starts
             end = allele.mid + allele.right  # calculate where it ends
             plt.plot([start, end], [1, 1])  # plot allele bin at level 1
+    plt.show()
+    plt.close()
+
+
+def choose_normalisation(original, leftoffset = 50, fig_size = (15,10)):
+    number_of_dyes = 6
+    original = original.squeeze()
+
+    minima = [min(original[:,i]) for i in range(number_of_dyes)]
+    norm_per_dye = normalize(original - minima, axis = 0, norm = "max")
+
+
+    minimised = original-np.min(original)
+    norm_per_image = minimised/np.max(minimised)
+    # nowthen = minimised.reshape(1,-1)
+    # norm_per_image = normalize(nowthen, norm = "max").reshape(original.shape)
+    # norm_set_bounds =
+
+    x_array = np.linspace(0, len(original) / 10, len(original))
+
+    # norm1
+    fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
+    y_min = np.min(original)
+    y_max = np.max(original)
+    for dye in range(number_of_dyes):
+        plot_markers(Dyes.color_list[dye], axes[dye], 0, leftoffset)
+        axes[dye].plot(x_array, original[:, dye], "k")
+        axes[dye].set_ylim([y_min, y_max])
+    fig.suptitle("original")
+    plt.show()
+    plt.close()
+
+    # norm2
+    fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
+    for dye in range(number_of_dyes):
+        plot_markers(Dyes.color_list[dye], axes[dye], 0, leftoffset)
+        axes[dye].plot(x_array, norm_per_dye[:, dye], "k")
+        axes[dye].set_ylim([0,1])
+    fig.suptitle("per dye")
+    plt.show()
+    plt.close()
+
+    # norm3
+    fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
+    for dye in range(number_of_dyes):
+        plot_markers(Dyes.color_list[dye], axes[dye], 0, leftoffset)
+        axes[dye].plot(x_array, norm_per_image[:, dye], "k")
+        axes[dye].set_ylim([0,1])
+    fig.suptitle("per image")
+    plt.show()
+    plt.close()
+
+    # norm4
+    fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
+    for dye in range(number_of_dyes):
+        plot_markers(Dyes.color_list[dye], axes[dye], 0, leftoffset)
+        axes[dye].plot(x_array, norm_per_image[:, dye], "k")
+        axes[dye].set_ylim([0,1])
+    fig.suptitle("per image")
     plt.show()
     plt.close()
