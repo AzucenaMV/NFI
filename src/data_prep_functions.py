@@ -17,21 +17,25 @@ def create_input_from_sample(sample: Sample, width: int, person_mix, number_of_d
         window_list.append(window)
         label = labels[:number_of_dyes, center_location]
         label_list.append(label)
-    input_from_sample = TrainInput(sample, np.array(window_list), np.array(label_list))
+    input_from_sample = OldTrainInput(sample, np.array(window_list), np.array(label_list))
     return input_from_sample
 
 
-def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset, cutoff):
+def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset: int, cutoff: int, normalised = False):
     """For one electropherogram, creates all input (node) images and their labels."""
     all_data = []
     all_labels = []
     for sample in samplelist:
         if len(sample.name) == 3:
-            all_data.append(sample.data[leftoffset:cutoff, :width])
+            sample_data = sample.data[leftoffset:cutoff, :width]
+            if normalised:
+                new = sample_data-np.min(sample_data)
+                sample_data = new/np.max(new)
+            all_data.append(sample_data)
             person_mix = rf.make_person_mixture(sample.name)
             labels = find_peaks_flowing_out_of_bins(sample, bin_lefts_rights(person_mix))
             all_labels.append(labels[leftoffset:cutoff, :width])
-    input_from_samples = NewTrainInput(np.array(all_data), np.array(all_labels))
+    input_from_samples = TrainInput(np.array(all_data), np.array(all_labels))
     return input_from_samples
 
 

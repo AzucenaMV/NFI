@@ -162,7 +162,7 @@ class Center:
 
 
 @dataclass
-class TrainInput:
+class OldTrainInput:
     """The one with windows"""
     input_sample: Sample          # sample used to create input
     data: np.ndarray              # list of input nodes/data to be fed to nn
@@ -170,7 +170,7 @@ class TrainInput:
 
 
 @dataclass
-class NewTrainInput:
+class TrainInput:
     data: np.ndarray
     labels: np.ndarray
 
@@ -179,12 +179,6 @@ class NewTrainInput:
 class TrainOutput:
     input_sample: Sample
     labels: List
-
-@dataclass
-class TestInput:
-    """Class for input without labels to test on."""
-    # turns out the convnet also takes the labels of the test set as input
-    name: str
 
 
 @dataclass

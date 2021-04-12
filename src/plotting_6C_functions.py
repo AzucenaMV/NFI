@@ -37,6 +37,33 @@ def plot_results_unet(input, result, leftoffset = 50, fig_size = (30,20)):
     plt.close()
 
 
+def plot_results_unet_against_truth(input, result, leftoffset = 50, fig_size = (30,20)):
+    number_of_dyes = 6
+    fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
+    input = input.squeeze()
+    result = result.squeeze()
+    x_array = np.linspace(0, len(result) / 10, len(result))
+    for dye in range(number_of_dyes):
+        y_max = min(1000, 0.1 * max(input[:,dye]))
+        y_min = -0.1*y_max      # always a 10% gap on bottom for legibility
+        axes[dye].set_ylim([y_min, y_max])
+        plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
+        axes[dye].plot(x_array, input[:, dye], "k")
+        # Optie 1
+        line1, = axes[dye].plot(x_array, y_max*result[:,dye])
+        # Optie 2
+        # be careful when using this, need to set color of right axis manually
+        # labels(input[:,dye], result[:,dye] > 0.5, axes[dye], y_min, y_max)
+        ax_right = axes[dye].twinx()
+        ax_right.set_ylim([-0.1, 1])
+        ax_right.spines["right"].set_color(line1.get_color())
+        ax_right.tick_params(axis='y', colors=line1.get_color())
+
+    plt.show()
+    plt.close()
+
+
+
 def labels(sample_array, peak_bools, ax, y_min, y_max):
     # note that sample_array and peak_bools have the same shape
     x = np.linspace(0, len(sample_array) / 10, len(sample_array))
@@ -163,18 +190,15 @@ def plot_all_markers_and_bins():
 
 
 def choose_normalisation(original, leftoffset = 50, fig_size = (15,10)):
+    """Visualising some options to choose a normalisation from"""
     number_of_dyes = 6
     original = original.squeeze()
 
     minima = [min(original[:,i]) for i in range(number_of_dyes)]
     norm_per_dye = normalize(original - minima, axis = 0, norm = "max")
 
-
     minimised = original-np.min(original)
     norm_per_image = minimised/np.max(minimised)
-    # nowthen = minimised.reshape(1,-1)
-    # norm_per_image = normalize(nowthen, norm = "max").reshape(original.shape)
-    # norm_set_bounds =
 
     x_array = np.linspace(0, len(original) / 10, len(original))
 

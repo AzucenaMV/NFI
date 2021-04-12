@@ -36,7 +36,7 @@ def unet(train_input, cutoff):
     return model
 
 
-def simplest_nn(train_input: TrainInput):
+def simplest_nn(train_input: OldTrainInput):
     number_of_dyes = 5
     # TODO: maybe use np.tile to get same data multiple times
     all_images = train_input.data
