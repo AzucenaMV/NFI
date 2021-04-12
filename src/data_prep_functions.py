@@ -24,19 +24,23 @@ def create_input_from_sample(sample: Sample, width: int, person_mix, number_of_d
 def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset: int, cutoff: int, normalised = False):
     """For one electropherogram, creates all input (node) images and their labels."""
     all_data = []
+    all_data_normalised = []
     all_labels = []
     for sample in samplelist:
         if len(sample.name) == 3:
             sample_data = sample.data[leftoffset:cutoff, :width]
-            if normalised:
-                new = sample_data-np.min(sample_data)
-                sample_data = new/np.max(new)
             all_data.append(sample_data)
+            new = sample_data-np.min(sample_data)
+            normalised_data = new/np.max(new)
+            all_data_normalised.append(normalised_data)
             person_mix = rf.make_person_mixture(sample.name)
             labels = find_peaks_flowing_out_of_bins(sample, bin_lefts_rights(person_mix))
             all_labels.append(labels[leftoffset:cutoff, :width])
-    input_from_samples = TrainInput(np.array(all_data), np.array(all_labels))
-    return input_from_samples
+    if normalised:
+        input_from_samples = TrainInput(np.array(all_data_normalised), np.array(all_labels))
+    else:
+        input_from_samples = TrainInput(np.array(all_data), np.array(all_labels))
+    return all_data, input_from_samples
 
 
 # def bin_all_indices(person_mix):
