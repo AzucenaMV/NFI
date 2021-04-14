@@ -63,6 +63,22 @@ def plot_results_unet_against_truth(input, result, label, leftoffset = 50, fig_s
     plt.close()
 
 
+def plot_inputs_unet(input, label, leftoffset = 50, fig_size = (30,20)):
+    number_of_dyes = 6
+    fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
+    input = input.squeeze()
+    x_array = np.linspace(0, len(input) / 10, len(input))
+    for dye in range(number_of_dyes):
+        y_max = 1000  # min(1000, 0.1 * max(input[:,dye]))
+        y_min = -0.1 * y_max  # always a 10% gap on bottom for legibility
+        axes[dye].set_ylim([y_min, y_max])
+        plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
+        axes[dye].plot(x_array, input[:, dye], "k")
+        # plot truth
+        plot_labels(input[:, dye], label[:, dye], axes[dye], y_min, y_max)
+    plt.show()
+    plt.close()
+
 
 def plot_labels(sample_array, peak_bools, ax, y_min, y_max):
     # note that sample_array and peak_bools have the same shape

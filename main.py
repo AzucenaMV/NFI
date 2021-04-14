@@ -19,14 +19,17 @@ def some_examples():
     cutoff = 4800 + 500
     number_of_dyes = 6
     original_samples, inputs_for_unet = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
-    unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'weights_norm.h5', False)
+    unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'weights_norm_avgpool.h5', False)
 
-    sample_number = 0
+    sample_number = -1
     original = original_samples[sample_number]
     input_example = inputs_for_unet.data[sample_number,:,:].reshape(1,cutoff-leftoffset,number_of_dyes,1)
-    label_example = inputs_for_unet.plot_labels[sample_number, :, :]
+    label_example = inputs_for_unet.labels[sample_number, :, :]
+
     output_example = unet_model.predict(input_example)
-    pf6.plot_results_unet(original, output_example)
+    print(np.max(output_example))
+    # pf6.plot_inputs_unet(original, label_example)
+    # pf6.plot_results_unet(original, output_example)
     pf6.plot_results_unet_against_truth(original, output_example, label_example)
 
 def old_examples():

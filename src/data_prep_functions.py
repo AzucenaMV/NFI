@@ -69,7 +69,7 @@ def bin_lefts_rights(person_mix):
         dye_index = peak.allele.dye.plot_index - 1
         # intervals are all about 1 nucleotide wide at most, 0.8 at least
         bin_edges[dye_index].append((left_index, right_index))
-    for size_std_peak in [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2250, 2500, 2750, 3000, 3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000]:
+    for size_std_peak in [600, 650, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2250, 2500, 2750, 3000, 3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000]:
         bin_edges[5].append((size_std_peak-4,size_std_peak+4))
     return bin_edges  # list of left-right pairs (indices of left and right side) of each bin
 

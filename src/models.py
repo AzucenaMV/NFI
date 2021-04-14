@@ -1,6 +1,6 @@
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Input, Dense, Flatten, Dropout, Conv1D, Conv2D, MaxPool2D, MaxPool1D, \
-    MaxPooling2D, UpSampling2D, concatenate
+    MaxPooling2D, UpSampling2D, concatenate, AvgPool2D
 from tensorflow.keras.optimizers import Adam
 
 
@@ -174,7 +174,7 @@ def unet_small(input_size=(6000, 6, 1)):
                    kernel_initializer='he_normal'
                    )(conv1)
     # Pooling 1
-    pool1 = MaxPooling2D(poolsize)(conv1)
+    pool1 = AvgPool2D(poolsize)(conv1)
     # Convolution 2
     conv2 = Conv2D(4, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
@@ -183,7 +183,7 @@ def unet_small(input_size=(6000, 6, 1)):
                    kernel_initializer='he_normal'
                    )(conv2)
     # Pooling 2
-    pool2 = MaxPooling2D(poolsize)(conv2)
+    pool2 = AvgPool2D(poolsize)(conv2)
     # Convolution 3
     conv3 = Conv2D(8, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
@@ -192,7 +192,7 @@ def unet_small(input_size=(6000, 6, 1)):
                    kernel_initializer='he_normal'
                    )(conv3)
     # Pooling 3
-    pool3 = MaxPooling2D(poolsize)(conv3)
+    pool3 = AvgPool2D(poolsize)(conv3)
     # Convolution 3
     conv4 = Conv2D(16, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
@@ -245,7 +245,7 @@ def unet_small(input_size=(6000, 6, 1)):
     # want to end up with 1 filter right?
     conv10 = Conv2D(1, 1, activation='sigmoid')(conv9)
     model = Model(inputs=inputs, outputs=conv10)
-    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=['AUC'])
+    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=['AUC', 'accuracy'])
 
     return model
 
