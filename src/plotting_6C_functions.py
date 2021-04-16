@@ -38,7 +38,7 @@ def plot_results_unet(input, result, leftoffset = 50, fig_size = (30,20)):
     plt.close()
 
 
-def plot_results_unet_against_truth(input, result, label, leftoffset = 50, fig_size = (30,20)):
+def plot_results_unet_against_truth(input, result, label, title = False, leftoffset = 50, fig_size = (30,20)):
     number_of_dyes = 6
     fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
     input = input.squeeze()
@@ -59,7 +59,10 @@ def plot_results_unet_against_truth(input, result, label, leftoffset = 50, fig_s
         ax_right.spines["right"].set_color(line1.get_color())
         ax_right.tick_params(axis='y', colors=line1.get_color())
 
-    plt.show()
+    if not title:
+        plt.show()
+    else:
+        plt.savefig(str(title)+".png")
     plt.close()
 
 

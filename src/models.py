@@ -174,7 +174,7 @@ def unet_small(input_size=(6000, 6, 1)):
                    kernel_initializer='he_normal'
                    )(conv1)
     # Pooling 1
-    pool1 = AvgPool2D(poolsize)(conv1)
+    pool1 = MaxPool2D(poolsize)(conv1)
     # Convolution 2
     conv2 = Conv2D(4, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
@@ -183,7 +183,7 @@ def unet_small(input_size=(6000, 6, 1)):
                    kernel_initializer='he_normal'
                    )(conv2)
     # Pooling 2
-    pool2 = AvgPool2D(poolsize)(conv2)
+    pool2 = MaxPool2D(poolsize)(conv2)
     # Convolution 3
     conv3 = Conv2D(8, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
@@ -192,7 +192,7 @@ def unet_small(input_size=(6000, 6, 1)):
                    kernel_initializer='he_normal'
                    )(conv3)
     # Pooling 3
-    pool3 = AvgPool2D(poolsize)(conv3)
+    pool3 = MaxPool2D(poolsize)(conv3)
     # Convolution 3
     conv4 = Conv2D(16, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'

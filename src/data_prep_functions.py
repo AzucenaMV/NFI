@@ -26,8 +26,10 @@ def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset
     all_data = []
     all_data_normalised = []
     all_labels = []
+    sample_names = []
     for sample in samplelist:
         if len(sample.name) == 3:
+            sample_names.append(sample.name)
             sample_data = sample.data[leftoffset:cutoff, :width]
             all_data.append(sample_data)
             new = sample_data-np.min(sample_data)
@@ -40,7 +42,7 @@ def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset
         input_from_samples = TrainInput(np.array(all_data_normalised), np.array(all_labels))
     else:
         input_from_samples = TrainInput(np.array(all_data), np.array(all_labels))
-    return all_data, input_from_samples
+    return all_data, input_from_samples, sample_names
 
 
 # def bin_all_indices(person_mix):
