@@ -204,47 +204,47 @@ def unet_small(input_size=(6000, 6, 1)):
     drop4 = Dropout(0.5)(conv4)
 
     # Upward Convolution 7
-    up7 = Conv2D(8, kernelsize_up, activation='relu', padding='same',
+    up5 = Conv2D(8, kernelsize_up, activation='relu', padding='same',
                  kernel_initializer='he_normal'
                  )(UpSampling2D(poolsize)(drop4))
     # Here we copy the input from the upward convolution and contraction path
-    merge7 = concatenate([conv3, up7])
-    conv7 = Conv2D(8, kernelsize, activation='relu', padding='same',
+    merge5 = concatenate([conv3, up5])
+    conv5 = Conv2D(8, kernelsize, activation='relu', padding='same',
+                   kernel_initializer='he_normal'
+                   )(merge5)
+    conv5 = Conv2D(8, kernelsize, activation='relu', padding='same', kernel_initializer='he_normal'
+                   )(conv5)
+    # Upward Convolution 8
+    up6 = Conv2D(4, kernelsize_up, activation='relu', padding='same',
+                 kernel_initializer='he_normal'
+                 )(UpSampling2D(poolsize)(conv5))
+    # Here we copy the input from the upward convolution and contraction path
+    merge6 = concatenate([conv2, up6])
+    conv6 = Conv2D(4, kernelsize, activation='relu', padding='same',
+                   kernel_initializer='he_normal'
+                   )(merge6)
+    conv6 = Conv2D(4, kernelsize, activation='relu', padding='same',
+                   kernel_initializer='he_normal'
+                   )(conv6)
+    # Upward Convolution 9
+    up7 = Conv2D(2, kernelsize, activation='relu', padding='same',
+                 kernel_initializer='he_normal'
+                 )(UpSampling2D(poolsize)(conv6))
+    # Here we copy the input from the upward convolution and contraction path
+    merge7 = concatenate([conv1, up7])
+    conv7 = Conv2D(2, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
                    )(merge7)
-    conv7 = Conv2D(8, kernelsize, activation='relu', padding='same', kernel_initializer='he_normal'
+    conv7 = Conv2D(2, kernelsize, activation='relu', padding='same',
+                   kernel_initializer='he_normal'
                    )(conv7)
-    # Upward Convolution 8
-    up8 = Conv2D(4, kernelsize_up, activation='relu', padding='same',
-                 kernel_initializer='he_normal'
-                 )(UpSampling2D(poolsize)(conv7))
-    # Here we copy the input from the upward convolution and contraction path
-    merge8 = concatenate([conv2, up8])
-    conv8 = Conv2D(4, kernelsize, activation='relu', padding='same',
+    conv7 = Conv2D(2, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
-                   )(merge8)
-    conv8 = Conv2D(4, kernelsize, activation='relu', padding='same',
-                   kernel_initializer='he_normal'
-                   )(conv8)
-    # Upward Convolution 9
-    up9 = Conv2D(2, kernelsize, activation='relu', padding='same',
-                 kernel_initializer='he_normal'
-                 )(UpSampling2D(poolsize)(conv8))
-    # Here we copy the input from the upward convolution and contraction path
-    merge9 = concatenate([conv1, up9])
-    conv9 = Conv2D(2, kernelsize, activation='relu', padding='same',
-                   kernel_initializer='he_normal'
-                   )(merge9)
-    conv9 = Conv2D(2, kernelsize, activation='relu', padding='same',
-                   kernel_initializer='he_normal'
-                   )(conv9)
-    conv9 = Conv2D(2, kernelsize, activation='relu', padding='same',
-                   kernel_initializer='he_normal'
-                   )(conv9)
+                   )(conv7)
     # not sure what to do with this shape
     # want to end up with 1 filter right?
-    conv10 = Conv2D(1, 1, activation='sigmoid')(conv9)
-    model = Model(inputs=inputs, outputs=conv10)
+    conv8 = Conv2D(1, 1, activation='sigmoid')(conv7)
+    model = Model(inputs=inputs, outputs=conv8)
     model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=['AUC', 'accuracy'])
 
     return model
