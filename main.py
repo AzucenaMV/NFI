@@ -1,4 +1,4 @@
-from src import data_prep_functions as dpf, plotting_functions as pf, reading_functions as rf, training_functions as trf, plotting_6C_functions as pf6
+from src import data_prep_functions as dpf, plotting_functions as pf, reading_functions as rf, training_functions as trf, plotting_6C_functions as pf6, post_processing_functions as ppf
 from src import classes as c
 import pandas as pd
 import numpy as np
@@ -28,7 +28,8 @@ def some_examples():
         label_example = inputs_for_unet.labels[sample_number, :, :]
 
         output_example = unet_model.predict(input_example)
-        pf6.plot_inputs_unet(original, label_example)
+        ppf.pixels_to_peaks(output_example)
+        # pf6.plot_inputs_unet(original, label_example)
         # pf6.plot_results_unet(original, output_example)
         # pf6.plot_results_unet_against_truth(original, output_example, label_example)
 
