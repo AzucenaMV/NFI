@@ -3,6 +3,7 @@ from src import classes as c
 import pandas as pd
 import numpy as np
 from src import models
+import matplotlib.pyplot as plt
 
 tracedata = ['TraceDataSet11.txt', 'TraceDataSet12.txt', 'TraceDataSet21.txt', 'TraceDataSet22.txt',
              'TraceDataSet31.txt', 'TraceDataSet32.txt', 'TraceDataSet41.txt', 'TraceDataSet42.txt',
@@ -18,19 +19,34 @@ def some_examples():
     leftoffset = 500
     cutoff = 4800 + 500
     number_of_dyes = 6
-    original_samples, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
+    original_samples, inputs_for_unet, sample_names, peakwidths, doubles, nopeaks = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
     unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'weights_norm_avgpool.h5', False)
+    plt.hist(peakwidths, bins='auto')  # arguments are passed to np.histogram
+    print("Max value is:", max(peakwidths))
+    print("Min value is:", min(peakwidths))
+    print("Average value is:", sum(peakwidths)/len(peakwidths))
 
-    for sample_number in range(1):
+    plt.hist(doubles, bins='auto')  # arguments are passed to np.histogram
+    print("Max value is:", max(doubles))
+    print("Min value is:", min(doubles))
+    print("Average value is:", sum(doubles) / len(doubles))
 
-        original = original_samples[sample_number]
-        input_example = inputs_for_unet.data[sample_number,:,:].reshape(1,cutoff-leftoffset,number_of_dyes,1)
-        label_example = inputs_for_unet.labels[sample_number, :, :]
+    plt.hist(nopeaks, bins='auto')  # arguments are passed to np.histogram
+    plt.show()
+    print("Max value is:", max(nopeaks))
+    print("Min value is:", min(nopeaks))
+    print("Average value is:", sum(nopeaks) / len(nopeaks))
 
-        output_example = unet_model.predict(input_example)
-        ppf.pixels_to_peaks(output_example)
-        # pf6.plot_inputs_unet(original, label_example)
-        # pf6.plot_results_unet(original, output_example)
+    # for sample_number in range(1):
+    #
+    #     original = original_samples[sample_number]
+    #     input_example = inputs_for_unet.data[sample_number,:,:].reshape(1,cutoff-leftoffset,number_of_dyes,1)
+    #     label_example = inputs_for_unet.labels[sample_number, :, :]
+    #
+    #     output_example = unet_model.predict(input_example)
+    #     ppf.pixels_to_peaks(output_example)
+    #     # pf6.plot_inputs_unet(original, label_example)
+    #     # pf6.plot_results_unet(original, output_example)
         # pf6.plot_results_unet_against_truth(original, output_example, label_example)
 
 def old_examples():
