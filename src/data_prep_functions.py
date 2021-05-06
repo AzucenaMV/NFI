@@ -27,9 +27,6 @@ def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset
     all_data_normalised = []
     all_labels = []
     sample_names = []
-    peakwidths_all_samples = []
-    doubles_all_samples = []
-    nopeaks_all_samples = []
     for sample in samplelist:
         if len(sample.name) == 3:
             sample_names.append(sample.name)
@@ -39,17 +36,14 @@ def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset
             normalised_data = new/np.max(new)
             all_data_normalised.append(normalised_data)
             person_mix = rf.make_person_mixture(sample.name)
-            labels, peakwidths, doubles, nopeaks = find_peaks_flowing_out_of_bins(sample, bin_lefts_rights(person_mix))
+            labels = find_peaks_flowing_out_of_bins(sample, bin_lefts_rights(person_mix))
             all_labels.append(labels[leftoffset:cutoff, :width])
-            peakwidths_all_samples += peakwidths
-            doubles_all_samples += doubles
-            nopeaks_all_samples += nopeaks
 
     if normalised:
         input_from_samples = TrainInput(np.array(all_data_normalised), np.array(all_labels))
     else:
         input_from_samples = TrainInput(np.array(all_data), np.array(all_labels))
-    return all_data, input_from_samples, sample_names, peakwidths_all_samples, doubles_all_samples, nopeaks_all_samples
+    return all_data, input_from_samples, sample_names
 
 
 # def bin_all_indices(person_mix):
@@ -100,15 +94,11 @@ def find_peaks_flowing_out_of_bins(sample: Sample, list_of_bin_sides: list):
     """Makes array of same size as data with True/False values if peak should be visible.
     Uses maximum within bin and follows whatever part of peak is visible to entire peak."""
     indices = []
-    peakwidths = []
-    doubles = []
-    nopeaks = []
     for color in range(6):
         bin_data = list_of_bin_sides[color]
         sample_data = sample.data[:, color]
         bin_booleans = [False] * len(sample_data)
         for left, right in bin_data:
-            peakwidth = 0
             max_index = left + np.argmax(sample_data[left:right + 1])
             if sample_data[max_index - 1] > sample_data[max_index]:
                 while sample_data[max_index - 1] - sample_data[max_index] > 1e-10:
@@ -116,34 +106,17 @@ def find_peaks_flowing_out_of_bins(sample: Sample, list_of_bin_sides: list):
             elif sample_data[max_index + 1] > sample_data[max_index]:
                 while sample_data[max_index + 1] - sample_data[max_index] > 1e-10:
                     max_index += 1
-            # if this max has already been found, so has the entire peak.
-            if bin_booleans[max_index]:
-                check_double = True
-            else:
-                check_double = False
-            if sample_data[max_index] < 100:
-                check_nopeak = True
-            else:
-                check_nopeak = False
             bin_booleans[max_index] = True
-            peakwidth += 1
             left_end = max_index
             right_end = max_index
             while sample_data[left_end] - sample_data[left_end - 1] > 1e-10:
                 left_end -= 1
                 bin_booleans[left_end] = True
-                peakwidth += 1
             while sample_data[right_end] - sample_data[right_end + 1] > 1e-10:
                 right_end += 1
                 bin_booleans[right_end] = True
-                peakwidth += 1
-            if check_double:
-                doubles.append(peakwidth)
-            if check_nopeak:
-                nopeaks.append(peakwidth)
-            peakwidths.append(peakwidth)
         indices.append(bin_booleans)
     # array returned has same dimensions as sample array
     # correction: not same shape as array, but transposed
     # this will probably cause trouble in some other functions
-    return np.array(indices).transpose(), peakwidths, doubles, nopeaks
+    return np.array(indices).transpose()

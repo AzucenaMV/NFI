@@ -19,23 +19,8 @@ def some_examples():
     leftoffset = 500
     cutoff = 4800 + 500
     number_of_dyes = 6
-    original_samples, inputs_for_unet, sample_names, peakwidths, doubles, nopeaks = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
+    original_samples, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
     unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'weights_norm_avgpool.h5', False)
-    plt.hist(peakwidths, bins='auto')  # arguments are passed to np.histogram
-    print("Max value is:", max(peakwidths))
-    print("Min value is:", min(peakwidths))
-    print("Average value is:", sum(peakwidths)/len(peakwidths))
-
-    plt.hist(doubles, bins='auto')  # arguments are passed to np.histogram
-    print("Max value is:", max(doubles))
-    print("Min value is:", min(doubles))
-    print("Average value is:", sum(doubles) / len(doubles))
-
-    plt.hist(nopeaks, bins='auto')  # arguments are passed to np.histogram
-    plt.show()
-    print("Max value is:", max(nopeaks))
-    print("Min value is:", min(nopeaks))
-    print("Average value is:", sum(nopeaks) / len(nopeaks))
 
     # for sample_number in range(1):
     #
