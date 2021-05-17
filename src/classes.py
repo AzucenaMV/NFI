@@ -42,6 +42,7 @@ class Locus:
     dye: Dye                        # dye that locus is on
     lower: float                    # lower boundary of marker
     upper: float                    # upper boundary of marker
+    index: int                      # 0-5
 
 
 @dataclass
@@ -57,11 +58,12 @@ class Loci:
             locus_name = locus.find('MarkerTitle').text
             # to translate the numbers in xml file to dyes
             temp_dict = {1: Dyes.BLUE, 2: Dyes.GREEN, 3: Dyes.YELLOW, 4: Dyes.RED, 5: Dyes.SIZESTD, 6: Dyes.PURPLE}
-            dye = int(locus.find('DyeIndex').text)
+            dye = temp_dict[int(locus.find('DyeIndex').text)]
             lower = float(locus.find('LowerBoundary').text)
             upper = float(locus.find('UpperBoundary').text)
+            index = dye.plot_index - 1
             # store info so far in Locus dataclass
-            new_locus = Locus({}, locus_name, temp_dict[dye], lower, upper)
+            new_locus = Locus({}, locus_name, dye, lower, upper, index)
             # add all alleles to locus
             for allele in locus.findall('Allele'):
                 allele_name = allele.get('Label')
@@ -69,16 +71,45 @@ class Loci:
                 left = float(allele.get('Left_Binning'))
                 right = float(allele.get('Right_Binning'))
                 # store in Allele dataclass
-                new_allele = Allele(allele_name, mid, left, right, temp_dict[dye])
+                new_allele = Allele(allele_name, mid, left, right, dye)
                 # add to alleles dict of locus
                 new_locus.alleles[allele_name] = new_allele
             # add created locus to locus dict
             locus_dict[locus_name] = new_locus
         return locus_dict
 
+    def create_map(self):
+        """Read xml file for bins of each allele, \
+                returns mapping of x-axis to allele"""
+        tree_file = eT.parse("data/PPF6C_SPOOR.xml")
+        root = tree_file.getroot()
+        # make empty array set to Out Of Bin notations
+        allele_map = np.array([[None] * 6] * 6000)
+        # now add locations
+        for locus in root[5]:
+        # root[5] is the node with loci, rest is panel info
+            locus_name = locus.find('MarkerTitle').text
+            # to translate the numbers in xml file to indices in mapping
+            # very unlogical dict, apologies
+            temp_dict = {1: 0, 2: 1, 3: 2, 4: 3, 5: 5, 6: 4}
+            dye = temp_dict[int(locus.find('DyeIndex').text)]
+            lower = float(locus.find('LowerBoundary').text)
+            upper = float(locus.find('UpperBoundary').text)
+            for allele in locus.findall('Allele'):
+                allele_name = allele.get('Label')
+                mid = float(allele.get('Size'))
+                left = float(allele.get('Left_Binning'))
+                right = float(allele.get('Right_Binning'))
+                # set all entries to that allele name
+                start = round((mid - left) * 10)
+                end = round((mid + right) * 10)
+                allele_map[start:end, dye] = locus_name + "_" + allele_name
+        return allele_map
+
 
 # global variable
 locus_dict = Loci().create_dict()
+allele_map = Loci().create_map()
 
 
 @dataclass

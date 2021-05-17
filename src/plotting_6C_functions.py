@@ -5,11 +5,6 @@ import matplotlib.collections as collections
 from sklearn.preprocessing import normalize
 
 
-def initialise_6C_figure(fig_size=(20, 30)):
-    fig, axes = plt.subplots(nrows=6, figsize=fig_size)
-    plt.xlim([50, 500])
-    return fig, axes
-
 
 def plot_results_unet(input, result, leftoffset = 50, fig_size = (30,20)):
     number_of_dyes = 6
