@@ -27,10 +27,11 @@ def some_examples():
         label_example = inputs_for_unet.labels[sample_number, :, :]
 
         output_example = unet_model.predict(input_example).reshape(4800,6)
-        ppf.peak_metric(output_example, 0, leftoffset)
-        print(rf.make_person_mixture("1A2").create_peaks())
+        ppf.peak_metric(output_example, leftoffset)
+        ppf.print_all_peaks("1A2")
+        ppf.pixels_to_peaks(original, output_example, 0.5, leftoffset)
         # pf6.plot_inputs_unet(original, label_example)
-        pf6.plot_results_unet(original, output_example)
+        # pf6.plot_results_unet(original, output_example)
         pf6.plot_results_unet_against_truth(original, output_example, label_example)
 
 
