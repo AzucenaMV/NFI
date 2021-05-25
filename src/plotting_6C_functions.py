@@ -40,7 +40,7 @@ def plot_results_unet_against_truth(input, result, label, title = False, leftoff
     result = result.squeeze()
     x_array = np.linspace(0, len(result) / 10, len(result))
     for dye in range(number_of_dyes):
-        y_max = 1000 #min(1000, 0.1 * max(input[:,dye]))
+        y_max = 1000            #min(1000, 0.1 * max(input[:,dye]))
         y_min = -0.1*y_max      # always a 10% gap on bottom for legibility
         axes[dye].set_ylim([y_min, y_max])
         plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
@@ -53,7 +53,6 @@ def plot_results_unet_against_truth(input, result, label, title = False, leftoff
         ax_right.set_ylim([-0.1, 1])
         ax_right.spines["right"].set_color(line1.get_color())
         ax_right.tick_params(axis='y', colors=line1.get_color())
-
     if not title:
         plt.show()
     else:
@@ -256,4 +255,35 @@ def choose_normalisation(original, leftoffset = 50, fig_size = (15,10)):
         axes[dye].set_ylim([0,1])
     fig.suptitle("per image")
     plt.show()
+    plt.close()
+
+
+def plot_bins_vs_labels(input, labels_bin, labels_peak, title = False, leftoffset = 50, fig_size = (14,10)):
+    number_of_dyes = 6
+    fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
+    input = input.squeeze()
+    x_array = np.linspace(0, len(input) / 10, len(input))
+    for dye in range(number_of_dyes):
+        y_max = 1000            # min(1000, 0.1 * max(input[:,dye]))
+        y_min = -0.1*y_max      # always a 10% gap on bottom for legibility
+        axes[dye].set_ylim([y_min, y_max])
+        plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
+        line1, = axes[dye].plot(x_array, input[:, dye], "k")
+
+        # plot background of bins in green
+        collection = collections.BrokenBarHCollection.span_where(x_array, ymin=y_min, ymax=y_max, where=labels_bin[500:5300,dye],
+                                                                 facecolor='blue', alpha=0.5)
+        axes[dye].add_collection(collection)
+        # plot background of peaks in blue
+        collection = collections.BrokenBarHCollection.span_where(x_array, ymin=y_min, ymax=y_max, where=labels_peak[500:5300,dye],
+                                                                 facecolor='green', alpha=0.3)
+        axes[dye].add_collection(collection)
+        ax_right = axes[dye].twinx()
+        ax_right.set_ylim([-0.1, 1])
+        ax_right.spines["right"].set_color(line1.get_color())
+        ax_right.tick_params(axis='y', colors=line1.get_color())
+    if not title:
+        plt.show()
+    else:
+        plt.savefig(str(title)+".png")
     plt.close()
