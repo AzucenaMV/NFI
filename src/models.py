@@ -160,7 +160,7 @@ def unet_from_aml(input_size=(6000, 6, 1)):
     return model
 
 
-def unet_small(input_size=(6000, 6, 1)):
+def unet_small(input_size=(4800, 6, 1)):
     inputs = Input(input_size)
     # Convolution 1
     kernelsize = (3, 6)     # all 5 dyes

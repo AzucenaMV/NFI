@@ -18,21 +18,25 @@ def some_examples():
     cutoff = 4800 + 500
     number_of_dyes = 6
     original_sampledata, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
-    unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'weights_norm_avgpool.h5', True)
+    unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'weights_norm_avgpool.h5', False)
 
-    # for sample_number in range(1):
-    #     original = original_sampledata[sample_number]
-    #     input_example = inputs_for_unet.data[sample_number,:,:].reshape(1,cutoff-leftoffset,number_of_dyes,1)
-    #     label_example = inputs_for_unet.labels[sample_number, :, :]
-    #     pf6.plot_bins_vs_labels(original, dpf.find_peaks_in_bins(samples[15]), dpf.find_peaks_flowing_out_of_bins(samples[15]))
-    #
-    #     output_example = unet_model.predict(input_example).reshape(4800,6)
-    #     # ppf.peak_metric(output_example, leftoffset)
-    #     # ppf.print_all_peaks("1A2")
-    #     # ppf.pixels_to_peaks(original, output_example, 0.5, leftoffset)
-    #     # # pf6.plot_inputs_unet(original, label_example)
-    #     # # pf6.plot_results_unet(original, output_example)
-    #     # pf6.plot_results_unet_against_truth(original, output_example, label_example)
+    for sample_number in range(len(sample_names)):
+        sample_name = sample_names[sample_number]
+        sample_data = original_sampledata[sample_number]
+        # has been normalised
+        input_example = inputs_for_unet.data[sample_number,:,:].reshape(1,cutoff-leftoffset,number_of_dyes,1)
+        # labels
+        label_example = inputs_for_unet.labels[sample_number, :, :]
+        # result of u-net
+        output_example = unet_model.predict(input_example).reshape(4800,6)
+        # Intersect over Union
+        print(ppf.IOU(label_example, output_example))
+        # ppf.peak_metric(output_example, leftoffset)
+        # ppf.print_all_peaks(sample_name)
+        # ppf.pixels_to_peaks(sample_data, output_example, 0.5, leftoffset)
+        # # pf6.plot_inputs_unet(sample_data, label_example)
+        # # pf6.plot_results_unet(sample_data, output_example)
+        # pf6.plot_results_unet_against_truth(sample_data, output_example, label_example)
 
 
 def old_examples():

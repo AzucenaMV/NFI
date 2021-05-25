@@ -44,8 +44,13 @@ def pixels_to_peaks(original, unet_output, threshold, left_offset):
 #     # Do I need the probabilities/window for the peak as well?
 #     return allele_map[max_index, dye_index]
 
-def peak_oriented_loss():
-    pass
+def IOU(labels, output):
+    labels = np.array(labels, dtype=bool)
+    output = np.array(labels>0.5, dtype=bool)
+    intersect = labels * output   # Logical AND
+    union = labels + output     # Logical OR
+    return intersect.sum() / union.sum()
+
 
 def peak_metric(unet_output, left_offset):
     peak_list = print_all_peaks("1A2")
