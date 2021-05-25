@@ -42,9 +42,11 @@ def plot_results_unet_against_truth(input, result, label, title = False, leftoff
     for dye in range(number_of_dyes):
         y_max = 1000            #min(1000, 0.1 * max(input[:,dye]))
         y_min = -0.1*y_max      # always a 10% gap on bottom for legibility
+        axes[dye].set_xlim([0, 480])
         axes[dye].set_ylim([y_min, y_max])
         plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
         axes[dye].plot(x_array, input[:, dye], "k")
+        axes[dye].axhline(y=500, linestyle="--", color = "gray")
         # plot result
         line1, = axes[dye].plot(x_array, y_max*result[:,dye])
         # plot truth

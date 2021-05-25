@@ -46,7 +46,7 @@ def pixels_to_peaks(original, unet_output, threshold, left_offset):
 
 def IOU(labels, output):
     labels = np.array(labels, dtype=bool)
-    output = np.array(labels>0.5, dtype=bool)
+    output = np.array(output>0.5, dtype=bool)
     intersect = labels * output   # Logical AND
     union = labels + output     # Logical OR
     return intersect.sum() / union.sum()
