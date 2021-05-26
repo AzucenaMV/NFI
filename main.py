@@ -27,16 +27,14 @@ def some_examples():
         input_example = inputs_for_unet.data[sample_number,:,:].reshape(1,cutoff-leftoffset,number_of_dyes,1)
         # labels
         label_example = inputs_for_unet.labels[sample_number, :, :]
+        # pf6.plot_bins_vs_labels(sample_data, dpf.find_peaks_in_bins(sample_data, sample_name), label_example, "Bins_vs_peaks_" + sample_name)
         # result of u-net
-        output_example = unet_model.predict(input_example).reshape(4800,6)
-        # Intersect over Union
-        print(ppf.IOU(label_example, output_example))
-        # ppf.peak_metric(output_example, leftoffset)
+        # output_example = unet_model.predict(input_example).reshape(4800,6)
+        # print(ppf.IOU(label_example, output_example))
         # ppf.print_all_peaks(sample_name)
-        # ppf.pixels_to_peaks(sample_data, output_example, 0.5, leftoffset)
-        # # pf6.plot_inputs_unet(sample_data, label_example)
-        # # pf6.plot_results_unet(sample_data, output_example)
+        # ppf.pixels_to_peaks(sample_data, output_example, 0.5, leftoffset, sample_name)
         # pf6.plot_results_unet_against_truth(sample_data, output_example, label_example)
+        # pf6.plot_results_unet_against_truth_alt(sample_data, output_example, label_example)
 
 
 def old_examples():
@@ -48,8 +46,8 @@ def old_examples():
         # still contains pocons and ladders, so next loop filters this
         if len(current_name) == 3 and current_name != "3E2":
             person_mixture = rf.make_person_mixture(current_name)
-            peak_booleans = dpf.find_peaks_flowing_out_of_bins(sample, dpf.bin_lefts_rights(person_mixture))
-            # peak_booleans_alt = dpf.find_peaks_in_bins(sample, dpf.bin_all_indices(person_mixture))
+            peak_booleans = dpf.find_peaks_flowing_out_of_bins(sample)
+            # peak_booleans_alt = dpf.find_peaks_in_bins(sample)
             # for dye_index in range(5):
             dye_index = 4
             pf.plot_labeled_background(sample.data[:, dye_index], peak_booleans[dye_index], dye_index)

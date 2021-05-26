@@ -245,7 +245,7 @@ def unet_small(input_size=(4800, 6, 1)):
     # want to end up with 1 filter right?
     conv8 = Conv2D(1, 1, activation='sigmoid')(conv7)
     model = Model(inputs=inputs, outputs=conv8)
-    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=['AUC', 'accuracy'])
+    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=['MeanIoU'])
 
     return model
 

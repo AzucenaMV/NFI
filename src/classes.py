@@ -62,7 +62,7 @@ class Loci:
             lower = float(locus.find('LowerBoundary').text)
             upper = float(locus.find('UpperBoundary').text)
             index = dye.plot_index - 1
-            # store info so far in Locus dataclass
+            # store info gathered in Locus dataclass
             new_locus = Locus({}, locus_name, dye, lower, upper, index)
             # add all alleles to locus
             for allele in locus.findall('Allele'):
@@ -93,8 +93,8 @@ class Loci:
             # very unlogical dict, apologies
             temp_dict = {1: 0, 2: 1, 3: 2, 4: 3, 5: 5, 6: 4}
             dye = temp_dict[int(locus.find('DyeIndex').text)]
-            lower = float(locus.find('LowerBoundary').text)
-            upper = float(locus.find('UpperBoundary').text)
+            # lower = float(locus.find('LowerBoundary').text)
+            # upper = float(locus.find('UpperBoundary').text)
             for allele in locus.findall('Allele'):
                 allele_name = allele.get('Label')
                 mid = float(allele.get('Size'))

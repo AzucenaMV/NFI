@@ -35,8 +35,7 @@ def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset
             new = sample_data-np.min(sample_data)
             normalised_data = new/np.max(new)
             all_data_normalised.append(normalised_data)
-            person_mix = rf.make_person_mixture(sample.name)
-            labels = find_peaks_flowing_out_of_bins(sample)
+            labels = find_peaks_flowing_out_of_bins(sample.data, sample.name)
             all_labels.append(labels[leftoffset:cutoff, :width])
 
     if normalised:
@@ -46,11 +45,11 @@ def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset
     return all_data, input_from_samples, sample_names
 
 
-def find_peaks_in_bins(sample: Sample):
+def find_peaks_in_bins(sampledata, samplename):
     """Makes array of True/False of same size as data. True if a peak should theoretically be visible\
     based on the composition and the bin locations, False otherwise."""
     # Returns a nx6 numpy array
-    person_mix = rf.make_person_mixture(sample.name)
+    person_mix = rf.make_person_mixture(samplename)
     peaks = person_mix.create_peaks()
     bin_indices = [[], [], [], [], [], []]
     # cannot find precise index, since "size" of bins is accurate to 2 decimals, measurements to 1
@@ -64,17 +63,17 @@ def find_peaks_in_bins(sample: Sample):
     indices = []
     for dye_index in range(6):
         bin_data = bin_indices[dye_index]
-        sample_data = sample.data[:, dye_index]
+        sample_data = sampledata[:, dye_index]
         new_indices = [True if ind in bin_data else False for ind in range(len(sample_data))]
         indices.append(new_indices)
 
     return np.array(indices).transpose()
 
 
-def find_peaks_flowing_out_of_bins(sample: Sample):
+def find_peaks_flowing_out_of_bins(sampledata, samplename):
     """Makes array of same size as data with True/False values if peak should be visible.
     Uses maximum within bin and follows whatever part of peak is visible to entire peak."""
-    person_mix = rf.make_person_mixture(sample.name)
+    person_mix = rf.make_person_mixture(samplename)
     peaks = person_mix.create_peaks()
     bin_edges = [[], [], [], [], [], []]
     # cannot find precise index, since "size" of bins is accurate to 2 decimals, measurements to 1
@@ -91,7 +90,7 @@ def find_peaks_flowing_out_of_bins(sample: Sample):
     indices = []
     for color in range(6):
         bin_data = bin_edges[color]
-        sample_data = sample.data[:, color]
+        sample_data = sampledata[:, color]
         bin_booleans = [False] * len(sample_data)
         for left, right in bin_data:
             max_index = left + np.argmax(sample_data[left:right + 1])
