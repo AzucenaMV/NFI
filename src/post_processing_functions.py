@@ -3,13 +3,12 @@ import numpy as np
 from src import reading_functions as rf
 from collections import Counter
 
-def pixels_to_peaks(original, unet_output, threshold, left_offset, name):
+def pixels_to_peaks(unet_output, threshold, left_offset):
     result = unet_output > threshold
-
+    allele_list = []
     # TODO: Add some kind of pre-processing smoothing?
-
     for dye in range(result.shape[1]-1):
-        # don't iterate over ladder
+        # -1 so we don't iterate over size std
         current = result[:, dye]
         index_start = 0
         while index_start != len(current) - 1:
@@ -29,7 +28,7 @@ def pixels_to_peaks(original, unet_output, threshold, left_offset, name):
                 index_end += 1
 
             # TODO: add a check for amount of peaks/no peak?
-            # more than 10 pixels is first requirement
+            # more than 5 pixels is first requirement
             if index_end - index_start < 5:
                 index_start = index_end
             else:
@@ -39,36 +38,29 @@ def pixels_to_peaks(original, unet_output, threshold, left_offset, name):
                 # print(possible_alleles)
                 alleles[None] = 0
                 decision = max(alleles.items(), key=lambda x: x[1])
-                print("Decision: ", decision, decision in print_all_peaks(name))
+                allele_list.append(decision[0])
+                # TODO: may need probabilities later
                 index_start = index_end
-    pass
+    return allele_list
 
 
-def IOU(labels, output):
-    labels = np.array(labels, dtype=bool)
-    output = np.array(output>0.5, dtype=bool)
-    intersect = labels * output   # Logical AND
-    union = labels + output     # Logical OR
-    return intersect.sum() / union.sum()
-
-
-def peak_metric(unet_output, left_offset):
-    peak_list = print_all_peaks("1A2")
-    for key_locus in locus_dict:
-        locus = locus_dict[key_locus]  # get locus class object
-        alleles = locus.alleles
-        for key_allele in alleles:
-            allele = alleles[key_allele]
-            start = -left_offset + round(10*(allele.mid-allele.left))
-            stop = -left_offset + round(10*(allele.mid+allele.right))
-            kansop = np.average(unet_output[start:stop,locus.index])
-            if kansop > 0.5:
-                print(key_locus, key_allele, kansop, (str(key_locus+"_"+key_allele) in peak_list))
-    # go over all alleles
-    # check probability of there being a peak
-    # either do or don't call peak
-    # I am afraid there will be too many positively identified bins
-    pass
+# def peak_metric(unet_output, left_offset):
+#     peak_list = print_all_peaks("1A2")
+#     for key_locus in locus_dict:
+#         locus = locus_dict[key_locus]  # get locus class object
+#         alleles = locus.alleles
+#         for key_allele in alleles:
+#             allele = alleles[key_allele]
+#             start = -left_offset + round(10*(allele.mid-allele.left))
+#             stop = -left_offset + round(10*(allele.mid+allele.right))
+#             kansop = np.average(unet_output[start:stop,locus.index])
+#             if kansop > 0.5:
+#                 print(key_locus, key_allele, kansop, (str(key_locus+"_"+key_allele) in peak_list))
+#     # go over all alleles
+#     # check probability of there being a peak
+#     # either do or don't call peak
+#     # I am afraid there will be too many positively identified bins
+#     pass
 
 
 def print_all_peaks(mix_name):
@@ -80,5 +72,19 @@ def print_all_peaks(mix_name):
         for locus_allele in person.alleles:
             if locus_allele not in peak_list:
                 peak_list.append(locus_allele)
-    # print(sorted(peak_list))
     return peak_list
+
+
+def F1_score(alleles_present: List, alleles_detected: List):
+    """Calculates F1-score of result of U-net"""
+    # TODO: need total amount of alleles
+    positives = set(alleles_detected)
+    truth = set(alleles_present)
+    TP = len(positives & truth)
+    FP = len(positives - truth)
+    FN = len(truth - positives)
+    precision = TP/(TP+FP)
+    recall = TP/(TP+FN)
+    return 2*(precision*recall)/(precision+recall)
+
+

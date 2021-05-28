@@ -20,6 +20,7 @@ def some_examples():
     original_sampledata, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
     unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'weights_norm_avgpool.h5', False)
 
+    F1_list = []
     for sample_number in range(len(sample_names)):
         sample_name = sample_names[sample_number]
         sample_data = original_sampledata[sample_number]
@@ -27,14 +28,14 @@ def some_examples():
         input_example = inputs_for_unet.data[sample_number,:,:].reshape(1,cutoff-leftoffset,number_of_dyes,1)
         # labels
         label_example = inputs_for_unet.labels[sample_number, :, :]
-        # pf6.plot_bins_vs_labels(sample_data, dpf.find_peaks_in_bins(sample_data, sample_name), label_example, "Bins_vs_peaks_" + sample_name)
         # result of u-net
-        # output_example = unet_model.predict(input_example).reshape(4800,6)
-        # print(ppf.IOU(label_example, output_example))
-        # ppf.print_all_peaks(sample_name)
-        # ppf.pixels_to_peaks(sample_data, output_example, 0.5, leftoffset, sample_name)
+        output_example = unet_model.predict(input_example).reshape(4800,6)
+        actual_peaks = ppf.print_all_peaks(sample_name)
+        predicted_peaks = ppf.pixels_to_peaks(output_example, 0.5, leftoffset)
+        F1_list.append(ppf.F1_score(actual_peaks, predicted_peaks))
         # pf6.plot_results_unet_against_truth(sample_data, output_example, label_example)
         # pf6.plot_results_unet_against_truth_alt(sample_data, output_example, label_example)
+    print(sum(F1_list)/len(F1_list))
 
 
 def old_examples():
