@@ -8,7 +8,6 @@ import pandas as pd
 def pixels_to_peaks(unet_output: np.ndarray, threshold: float, left_offset: int):
     result = unet_output > threshold
     allele_list = []
-    # TODO: Add some kind of pre-processing smoothing?
     for dye in range(result.shape[1]-1):
         # -1 so we don't iterate over size std
         current = result[:, dye]
@@ -29,8 +28,6 @@ def pixels_to_peaks(unet_output: np.ndarray, threshold: float, left_offset: int)
                     alleles[allele] = prob
                 index_end += 1
 
-            # TODO: add a check for amount of peaks/no peak?
-            # more than 5 pixels is first requirement
             if index_end - index_start < 5:
                 index_start = index_end
             else:
@@ -45,6 +42,23 @@ def pixels_to_peaks(unet_output: np.ndarray, threshold: float, left_offset: int)
                 index_start = index_end
     return allele_list
 
+
+def check_correct_alleles_first(alleles_present: List, unet_output: np.ndarray, left_offset: int):
+    unet_output_augmented = unet_output.copy()
+    alleles_detected = []
+    for locus_allele in alleles_present:
+        locus_name, allele_name = locus_allele.split("_")
+        allele = locus_dict[locus_name].alleles[allele_name]
+        dye_index = allele.dye.plot_index - 1
+        index_left = round((allele.mid-allele.left)*10) - left_offset
+        index_right = round((allele.mid+allele.right)*10) - left_offset
+        prob = 1
+        for subprob in unet_output[index_left:index_right, dye_index]:
+            prob *= subprob
+        if prob > 0.5:
+            alleles_detected.append(locus_allele)
+            unet_output_augmented[index_left-15:index_right+15, dye_index] = 0
+    return alleles_detected, unet_output_augmented
 
 # def peak_metric(unet_output, left_offset):
 #     peak_list = print_all_peaks("1A2")
@@ -87,10 +101,6 @@ def F1_score(alleles_present: List, alleles_detected: List):
     precision = TP/(TP+FP)
     recall = TP/(TP+FN)
     return 2*(precision*recall)/(precision+recall)
-
-
-def upper_bound_score(alleles_present: List, unet_output: List):
-    pass
 
 
 def result_dataframe(score_list, name_list):

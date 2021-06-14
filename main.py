@@ -27,9 +27,12 @@ def some_examples():
         label_example = inputs_for_unet.labels[sample_number, :, :]
         output_example = unet_model.predict(input_example).reshape(4800,6)
         actual_peaks = ppf.list_all_peaks(sample_name)
+        correct_alleles, augmented_output = ppf.check_correct_alleles_first(actual_peaks, output_example, leftoffset)
+        restofpeaks = ppf.pixels_to_peaks(augmented_output, 0.5, leftoffset)
+        correct_alleles.extend(restofpeaks)
         predicted_peaks = ppf.pixels_to_peaks(output_example, 0.5, leftoffset)
         analyst_peaks = rf.shallow_analyst(sample_name)[int(replica)-1]
-        print(ppf.F1_score(actual_peaks, predicted_peaks), ppf.F1_score(actual_peaks, analyst_peaks))
+        print(ppf.F1_score(actual_peaks, predicted_peaks), ppf.F1_score(actual_peaks, correct_alleles), ppf.F1_score(actual_peaks, analyst_peaks))
         # pf6.plot_results_unet_against_truth(sample_data, output_example, label_example)
         # pf6.plot_results_unet_against_truth_alt(sample_data, output_example, label_example)
 
