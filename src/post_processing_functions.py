@@ -2,8 +2,10 @@ from src.classes import *
 import numpy as np
 from src import reading_functions as rf
 from collections import Counter
+import pandas as pd
 
-def pixels_to_peaks(unet_output, threshold, left_offset):
+
+def pixels_to_peaks(unet_output: np.ndarray, threshold: float, left_offset: int):
     result = unet_output > threshold
     allele_list = []
     # TODO: Add some kind of pre-processing smoothing?
@@ -63,7 +65,7 @@ def pixels_to_peaks(unet_output, threshold, left_offset):
 #     pass
 
 
-def print_all_peaks(mix_name):
+def list_all_peaks(mix_name: str):
     person_mix = rf.make_person_mixture(mix_name)
     peak_list = []
     # iterate through persons in mix
@@ -77,7 +79,6 @@ def print_all_peaks(mix_name):
 
 def F1_score(alleles_present: List, alleles_detected: List):
     """Calculates F1-score of result of U-net"""
-    # TODO: need total amount of alleles
     positives = set(alleles_detected)
     truth = set(alleles_present)
     TP = len(positives & truth)
@@ -86,5 +87,16 @@ def F1_score(alleles_present: List, alleles_detected: List):
     precision = TP/(TP+FP)
     recall = TP/(TP+FN)
     return 2*(precision*recall)/(precision+recall)
+
+
+def upper_bound_score(alleles_present: List, unet_output: List):
+    pass
+
+
+def result_dataframe(score_list, name_list):
+    dict = {"name": name_list, "score": score_list}
+    df = pd.DataFrame(dict)
+    df.to_csv("scores_network.csv")
+    return df
 
 

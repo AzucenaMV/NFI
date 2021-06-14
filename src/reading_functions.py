@@ -127,3 +127,36 @@ def csv_read_analyst(sample_name):
                 peak_list.append(new_peak)
     mixture_list.append(AnalystMixture(name, replicate, peak_list))
     return mixture_list
+
+
+def shallow_analyst(sample_name):
+    """Read csv file of analyst's identified alleles returns shallow list"""
+    file_name = "data/analysts_data_filtered/"+str(sample_name)+"_New.csv"
+    with open(file_name) as f:
+        first_line = f.readline()
+    if "," in first_line:
+        file_delimiter = ","
+    if ";" in first_line:
+        file_delimiter = ";"
+    results = pd.read_csv(file_name, dtype = str, delimiter = file_delimiter)
+    name = results['Sample Name'][0]    # to start iteration
+    sample_name, replicate = name.split('.')
+    mixture_list = []                   # initialize big lists
+    peak_list = []                      # initialize small lists
+    number_of_columns = int((len(results.columns)-2)/2)
+    for index, row in results.iterrows():
+        # iterate over all rows, because each row contains the peaks for one allele
+        if name != row[0]:                      # then start new sample
+            sample_name, replicate = name.split('.')
+            mixture_list.append(peak_list)
+            peak_list = []                      # empty list
+        name = row[0]                           # then set name to current sample name
+        for i in range(2, 2+number_of_columns):
+            # go over the 8-10 possible locations of peak identification
+            if str(row[i]) == row[i]:
+                # append value only if non-empty
+                locus = row[1]
+                allele = row[i]
+                peak_list.append(str(locus)+"_"+str(allele))
+    mixture_list.append(peak_list)
+    return mixture_list

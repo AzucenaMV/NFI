@@ -20,22 +20,18 @@ def some_examples():
     original_sampledata, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
     unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'weights_norm_avgpool.h5', False)
 
-    F1_list = []
-    for sample_number in range(len(sample_names)):
-        sample_name = sample_names[sample_number]
+    for sample_number in range(20):#len(sample_names)):
+        sample_name, replica = sample_names[sample_number].split(".")
         sample_data = original_sampledata[sample_number]
-        # has been normalised
         input_example = inputs_for_unet.data[sample_number,:,:].reshape(1,cutoff-leftoffset,number_of_dyes,1)
-        # labels
         label_example = inputs_for_unet.labels[sample_number, :, :]
-        # result of u-net
         output_example = unet_model.predict(input_example).reshape(4800,6)
-        actual_peaks = ppf.print_all_peaks(sample_name)
+        actual_peaks = ppf.list_all_peaks(sample_name)
         predicted_peaks = ppf.pixels_to_peaks(output_example, 0.5, leftoffset)
-        F1_list.append(ppf.F1_score(actual_peaks, predicted_peaks))
+        analyst_peaks = rf.shallow_analyst(sample_name)[int(replica)-1]
+        print(ppf.F1_score(actual_peaks, predicted_peaks), ppf.F1_score(actual_peaks, analyst_peaks))
         # pf6.plot_results_unet_against_truth(sample_data, output_example, label_example)
         # pf6.plot_results_unet_against_truth_alt(sample_data, output_example, label_example)
-    print(sum(F1_list)/len(F1_list))
 
 
 def old_examples():

@@ -21,7 +21,7 @@ def create_input_from_sample(sample: Sample, width: int, person_mix, number_of_d
     return input_from_sample
 
 
-def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset: int, cutoff: int, normalised = False):
+def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset: int, cutoff: int, normalised = True):
     """For one electropherogram, creates all input (node) images and their labels."""
     all_data = []
     all_data_normalised = []
@@ -29,7 +29,7 @@ def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset
     sample_names = []
     for sample in samplelist:
         if len(sample.name) == 3:
-            sample_names.append(sample.name)
+            sample_names.append(str(sample.name)+"."+str(sample.replica))
             sample_data = sample.data[leftoffset:cutoff, :width]
             all_data.append(sample_data)
             new = sample_data-np.min(sample_data)
@@ -37,7 +37,6 @@ def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset
             all_data_normalised.append(normalised_data)
             labels = find_peaks_flowing_out_of_bins(sample.data, sample.name)
             all_labels.append(labels[leftoffset:cutoff, :width])
-
     if normalised:
         input_from_samples = TrainInput(np.array(all_data_normalised), np.array(all_labels))
     else:
