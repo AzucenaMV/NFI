@@ -18,42 +18,45 @@ def some_examples():
     cutoff = 4800 + 500
     number_of_dyes = 6
     original_sampledata, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
-    unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'weights_norm_avgpool.h5', False)
+    unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'data/weights_norm_avgpool.h5', False)
 
-    for sample_number in range(20):#len(sample_names)):
+    F1_scores = []
+    F1_scores_corrected = []
+    F1_scores_analyst = []
+    for sample_number in range(len(sample_names)):
         sample_name, replica = sample_names[sample_number].split(".")
-        sample_data = original_sampledata[sample_number]
+        # sample_data = original_sampledata[sample_number]
         input_example = inputs_for_unet.data[sample_number,:,:].reshape(1,cutoff-leftoffset,number_of_dyes,1)
-        label_example = inputs_for_unet.labels[sample_number, :, :]
+        # label_example = inputs_for_unet.labels[sample_number, :, :]
         output_example = unet_model.predict(input_example).reshape(4800,6)
         actual_peaks = ppf.list_all_peaks(sample_name)
-        correct_alleles, augmented_output = ppf.check_correct_alleles_first(actual_peaks, output_example, leftoffset)
-        restofpeaks = ppf.pixels_to_peaks(augmented_output, 0.5, leftoffset)
-        correct_alleles.extend(restofpeaks)
-        predicted_peaks = ppf.pixels_to_peaks(output_example, 0.5, leftoffset)
-        analyst_peaks = rf.shallow_analyst(sample_name)[int(replica)-1]
-        print(ppf.F1_score(actual_peaks, predicted_peaks), ppf.F1_score(actual_peaks, correct_alleles), ppf.F1_score(actual_peaks, analyst_peaks))
-        # pf6.plot_results_unet_against_truth(sample_data, output_example, label_example)
-        # pf6.plot_results_unet_against_truth_alt(sample_data, output_example, label_example)
+        corrected_peaks, augmented_output = ppf.check_correct_alleles_first(actual_peaks, output_example, leftoffset, 30)
+        restofpeaks = ppf.mult_peaks(augmented_output, 0.5, leftoffset)
+        corrected_peaks.extend(restofpeaks)
+        predicted_peaks = ppf.mult_peaks(output_example, 0.5, leftoffset)
+        if sample_name != "3E2":
+            analyst_peaks = rf.shallow_analyst(sample_name)[int(replica)-1]
+            F1_scores_analyst.append(ppf.F1_score(actual_peaks, analyst_peaks))
+        else:
+            F1_scores_analyst.append(0)
+        F1_scores.append(ppf.F1_score(actual_peaks, predicted_peaks))
+        F1_scores_corrected.append(ppf.F1_score(actual_peaks, corrected_peaks))
+    ppf.result_dataframe(sample_names, F1_scores, F1_scores_corrected, F1_scores_analyst)
 
 
-def old_examples():
-    samples = []
-    for elt in tracedata:
-        samples += rf.txt_read_sample(elt)
-    for sample in samples:
-        current_name = sample.name
-        # still contains pocons and ladders, so next loop filters this
-        if len(current_name) == 3 and current_name != "3E2":
-            person_mixture = rf.make_person_mixture(current_name)
-            peak_booleans = dpf.find_peaks_flowing_out_of_bins(sample)
-            # peak_booleans_alt = dpf.find_peaks_in_bins(sample)
-            # for dye_index in range(5):
-            dye_index = 4
-            pf.plot_labeled_background(sample.data[:, dye_index], peak_booleans[dye_index], dye_index)
-            # pf.plot_labeled_background(sample.data[:, dye_index], peak_booleans_alt[dye_index], dye_index)
+def scores_only():
+    dataframe = rf.csv_read_scores()
+    print(dataframe.describe())
+    print(dataframe.head())
+    two_donors = dataframe.filter(like = "2.", axis = 0)
+    three_donors = dataframe.filter(like = "3.", axis = 0)
+    four_donors = dataframe.filter(like = "4.", axis = 0)
+    five_donors = dataframe.filter(like = "5.", axis = 0)
+
+
 
 if __name__ == '__main__':
-    some_examples()
+    # some_examples()
+    scores_only()
 
 

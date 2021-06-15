@@ -5,7 +5,7 @@ from collections import Counter
 import pandas as pd
 
 
-def pixels_to_peaks(unet_output: np.ndarray, threshold: float, left_offset: int):
+def mult_peaks(unet_output: np.ndarray, threshold: float, left_offset: int):
     result = unet_output > threshold
     allele_list = []
     for dye in range(result.shape[1]-1):
@@ -31,10 +31,6 @@ def pixels_to_peaks(unet_output: np.ndarray, threshold: float, left_offset: int)
             if index_end - index_start < 5:
                 index_start = index_end
             else:
-                # TODO: add a peak splitter of some kind?
-                # print(unet_output[index_start:index_end, dye])
-                # possible_alleles = allele_map[index_start+left_offset:index_end+left_offset, dye]
-                # print(possible_alleles)
                 alleles[None] = 0
                 decision = max(alleles.items(), key=lambda x: x[1])
                 allele_list.append(decision[0])
@@ -43,7 +39,7 @@ def pixels_to_peaks(unet_output: np.ndarray, threshold: float, left_offset: int)
     return allele_list
 
 
-def check_correct_alleles_first(alleles_present: List, unet_output: np.ndarray, left_offset: int):
+def check_correct_alleles_first(alleles_present: List, unet_output: np.ndarray, left_offset: int, halfpeakwidth: int):
     unet_output_augmented = unet_output.copy()
     alleles_detected = []
     for locus_allele in alleles_present:
@@ -52,31 +48,11 @@ def check_correct_alleles_first(alleles_present: List, unet_output: np.ndarray, 
         dye_index = allele.dye.plot_index - 1
         index_left = round((allele.mid-allele.left)*10) - left_offset
         index_right = round((allele.mid+allele.right)*10) - left_offset
-        prob = 1
-        for subprob in unet_output[index_left:index_right, dye_index]:
-            prob *= subprob
+        prob = sum(unet_output[index_left-halfpeakwidth:index_right+halfpeakwidth, dye_index])/(index_right-index_left)
         if prob > 0.5:
             alleles_detected.append(locus_allele)
-            unet_output_augmented[index_left-15:index_right+15, dye_index] = 0
+            unet_output_augmented[index_left-halfpeakwidth:index_right+halfpeakwidth, dye_index] = 0
     return alleles_detected, unet_output_augmented
-
-# def peak_metric(unet_output, left_offset):
-#     peak_list = print_all_peaks("1A2")
-#     for key_locus in locus_dict:
-#         locus = locus_dict[key_locus]  # get locus class object
-#         alleles = locus.alleles
-#         for key_allele in alleles:
-#             allele = alleles[key_allele]
-#             start = -left_offset + round(10*(allele.mid-allele.left))
-#             stop = -left_offset + round(10*(allele.mid+allele.right))
-#             kansop = np.average(unet_output[start:stop,locus.index])
-#             if kansop > 0.5:
-#                 print(key_locus, key_allele, kansop, (str(key_locus+"_"+key_allele) in peak_list))
-#     # go over all alleles
-#     # check probability of there being a peak
-#     # either do or don't call peak
-#     # I am afraid there will be too many positively identified bins
-#     pass
 
 
 def list_all_peaks(mix_name: str):
@@ -103,10 +79,11 @@ def F1_score(alleles_present: List, alleles_detected: List):
     return 2*(precision*recall)/(precision+recall)
 
 
-def result_dataframe(score_list, name_list):
-    dict = {"name": name_list, "score": score_list}
-    df = pd.DataFrame(dict)
-    df.to_csv("scores_network.csv")
+def result_dataframe(name_list, score_list, upper_bound_score_list, analyst_score_list):
+    # dict = {"name": name_list, "score": score_list, "upper": upper_bound_score_list, "analyst": analyst_score_list}
+    # df = pd.dataframe(dict)
+    # df.to_csv("data/F1_scores_15_6_2021.csv", index = False)
+    df = pd.DataFrame(data=np.array([score_list, upper_bound_score_list, analyst_score_list]).transpose(), index=name_list, columns=["score", "upper", "analyst"])
     return df
 
 

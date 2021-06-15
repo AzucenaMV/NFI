@@ -160,3 +160,8 @@ def shallow_analyst(sample_name):
                 peak_list.append(str(locus)+"_"+str(allele))
     mixture_list.append(peak_list)
     return mixture_list
+
+
+def csv_read_scores(filename = "data/F1_scores_15_6_2021.csv"):
+    df = pd.read_csv(filename, index_col=0)
+    return df

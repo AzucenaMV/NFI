@@ -11,7 +11,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard, LearningRateScheduler
 
 
-def unet(train_input, length, weights = 'weights.h5', train = True):
+def unet(train_input, length, weights = 'data/weights_norm_avgpool.h5', train = True):
     """unet training. Default is training and storing under weights.h5"""
     number_of_dyes = 6
     model = unet_small((length, number_of_dyes, 1))
@@ -79,43 +79,3 @@ def simplest_nn(train_input: OldTrainInput):
     #     print(model.predict(row.reshape(1,161,5)))
     return model
 
-
-def example_from_rolf():
-    # Configuration options
-    n_samples = 6
-    n_features = 4
-    n_classes = 3
-    n_labels = 2
-    n_epochs = 10
-    random_state = 42
-    batch_size = 250
-    verbosity = 1
-    validation_split = 0
-    # Create dataset
-    X, y = make_multilabel_classification(n_samples=n_samples, n_features=n_features, n_classes=n_classes,
-                                          n_labels=n_labels, random_state=random_state)
-    # Split into training and testing data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=random_state)
-    # Create the model
-    model = model_for_example(n_features, n_classes)
-
-    # Compile the model
-    model.compile(loss=binary_crossentropy,
-                  optimizer=Adam(),
-                  metrics=['accuracy', 'AUC'])
-    # Fit data to model
-    model.fit(X_train, y_train,
-              batch_size=batch_size,
-              epochs=n_epochs,
-              verbose=verbosity,
-              validation_split=validation_split)
-    # Generate generalization metrics
-    score = model.evaluate(X_test, y_test, verbose=0)
-    print(f'Test loss: {score[0]} / Test accuracy: {score[1]}')
-
-    metric_values = model.evaluate(x=X_test, y=y_test)
-    print('Final TEST performance')
-    for metric_value, metric_name in zip(metric_values, model.metrics_names):
-        print('{}: {}'.format(metric_name, metric_value))
-
-    print(model.predict(X_test), y_test)
