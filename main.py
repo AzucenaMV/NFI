@@ -1,7 +1,6 @@
-from src import data_prep_functions as dpf, plotting_functions as pf, reading_functions as rf, training_functions as trf, plotting_6C_functions as pf6, post_processing_functions as ppf
-from src import classes as c
-import numpy as np
-from src import models
+from src import data_prep_functions as dpf, plotting_functions as pf, reading_functions as rf, training_functions as trf, plotting_6C_functions as pf6, post_processing_functions as ppf, results as r
+
+
 
 tracedata = ['TraceDataSet11.txt', 'TraceDataSet12.txt', 'TraceDataSet21.txt', 'TraceDataSet22.txt',
              'TraceDataSet31.txt', 'TraceDataSet32.txt', 'TraceDataSet41.txt', 'TraceDataSet42.txt',
@@ -23,6 +22,7 @@ def some_examples():
     F1_scores = []
     F1_scores_corrected = []
     F1_scores_analyst = []
+    new_sample_names = []
     for sample_number in range(len(sample_names)):
         sample_name, replica = sample_names[sample_number].split(".")
         # sample_data = original_sampledata[sample_number]
@@ -37,21 +37,31 @@ def some_examples():
         if sample_name != "3E2":
             analyst_peaks = rf.shallow_analyst(sample_name)[int(replica)-1]
             F1_scores_analyst.append(ppf.F1_score(actual_peaks, analyst_peaks))
-        else:
-            F1_scores_analyst.append(0)
-        F1_scores.append(ppf.F1_score(actual_peaks, predicted_peaks))
-        F1_scores_corrected.append(ppf.F1_score(actual_peaks, corrected_peaks))
-    ppf.result_dataframe(sample_names, F1_scores, F1_scores_corrected, F1_scores_analyst)
+            F1_scores.append(ppf.F1_score(actual_peaks, predicted_peaks))
+            F1_scores_corrected.append(ppf.F1_score(actual_peaks, corrected_peaks))
+            new_sample_names.append(sample_names[sample_number])
+    ppf.result_dataframe(new_sample_names, F1_scores, F1_scores_corrected, F1_scores_analyst)
 
 
 def scores_only():
-    dataframe = rf.csv_read_scores()
-    print(dataframe.describe())
-    print(dataframe.head())
-    two_donors = dataframe.filter(like = "2.", axis = 0)
-    three_donors = dataframe.filter(like = "3.", axis = 0)
-    four_donors = dataframe.filter(like = "4.", axis = 0)
-    five_donors = dataframe.filter(like = "5.", axis = 0)
+    df = rf.csv_read_scores()
+    print(df.describe())
+    print(df.head())
+    two_donors = df.filter(like ="2.", axis = 0)
+    three_donors = df.filter(like ="3.", axis = 0)
+    four_donors = df.filter(like ="4.", axis = 0)
+    five_donors = df.filter(like ="5.", axis = 0)
+    # print(two_donors.describe())
+    # print(three_donors.describe())
+    # print(four_donors.describe())
+    # print(five_donors.describe())
+    r.make_boxplot(df, ['score', 'upper', 'analyst'])
+    r.make_boxplot(two_donors, ['score', 'upper', 'analyst'])
+    r.make_boxplot(three_donors, ['score', 'upper', 'analyst'])
+    r.make_boxplot(four_donors, ['score', 'upper', 'analyst'])
+    r.make_boxplot(five_donors, ['score', 'upper', 'analyst'])
+
+
 
 
 
