@@ -46,7 +46,6 @@ def some_examples():
 def scores_only():
     df = rf.csv_read_scores()
     print(df.describe())
-    print(df.head())
     two_donors = df.filter(like ="2.", axis = 0)
     three_donors = df.filter(like ="3.", axis = 0)
     four_donors = df.filter(like ="4.", axis = 0)
