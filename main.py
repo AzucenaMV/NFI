@@ -19,6 +19,9 @@ def some_examples():
     original_sampledata, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
     unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'data/weights_norm_avgpool.h5', False)
 
+    donor_sets = []
+    mix_types = []
+    number_donors = []
     F1_scores = []
     F1_scores_corrected = []
     F1_scores_analyst = []
@@ -40,32 +43,29 @@ def some_examples():
             F1_scores.append(ppf.F1_score(actual_peaks, predicted_peaks))
             F1_scores_corrected.append(ppf.F1_score(actual_peaks, corrected_peaks))
             new_sample_names.append(sample_names[sample_number])
-    ppf.result_dataframe(new_sample_names, F1_scores, F1_scores_corrected, F1_scores_analyst)
+            donor_set, mix_type, number_donor = sample_name
+            donor_sets.append(donor_set)
+            mix_types.append(mix_type)
+            number_donors.append(number_donor)
+    ppf.result_dataframe(new_sample_names, donor_sets, mix_types, number_donors, F1_scores, F1_scores_corrected, F1_scores_analyst)
 
 
 def scores_only():
     df = rf.csv_read_scores()
     print(df.describe())
-    two_donors = df.filter(like ="2.", axis = 0)
-    three_donors = df.filter(like ="3.", axis = 0)
-    four_donors = df.filter(like ="4.", axis = 0)
-    five_donors = df.filter(like ="5.", axis = 0)
-    # print(two_donors.describe())
-    # print(three_donors.describe())
-    # print(four_donors.describe())
-    # print(five_donors.describe())
+
     r.make_boxplot(df, ['score', 'upper', 'analyst'])
-    r.make_boxplot(two_donors, ['score', 'upper', 'analyst'])
-    r.make_boxplot(three_donors, ['score', 'upper', 'analyst'])
-    r.make_boxplot(four_donors, ['score', 'upper', 'analyst'])
-    r.make_boxplot(five_donors, ['score', 'upper', 'analyst'])
+    # r.make_boxplot(two_donors, ['score', 'upper', 'analyst'])
+    # r.make_boxplot(three_donors, ['score', 'upper', 'analyst'])
+    # r.make_boxplot(four_donors, ['score', 'upper', 'analyst'])
+    # r.make_boxplot(five_donors, ['score', 'upper', 'analyst'])
 
 
 
 
 
 if __name__ == '__main__':
-    # some_examples()
+    some_examples()
     scores_only()
 
 
