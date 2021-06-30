@@ -1,5 +1,6 @@
 from src import data_prep_functions as dpf, plotting_functions as pf, reading_functions as rf, training_functions as trf, plotting_6C_functions as pf6, post_processing_functions as ppf, results as r
-
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 tracedata = ['TraceDataSet11.txt', 'TraceDataSet12.txt', 'TraceDataSet21.txt', 'TraceDataSet22.txt',
@@ -47,25 +48,29 @@ def some_examples():
             donor_sets.append(donor_set)
             mix_types.append(mix_type)
             number_donors.append(number_donor)
-    ppf.result_dataframe(new_sample_names, donor_sets, mix_types, number_donors, F1_scores, F1_scores_corrected, F1_scores_analyst)
+    r.store_dataframe(new_sample_names, np.array([donor_sets, mix_types, number_donors, F1_scores, F1_scores_corrected, F1_scores_analyst]).transpose())
 
 
 def scores_only():
-    df = rf.csv_read_scores()
+    df = r.load_dataframe()
     print(df.describe())
+    print(df[df['upper'] == df['upper'].min()])
+    # r.make_boxplot(df, ['analyst', 'upper', 'score'], 'donors')
 
-    r.make_boxplot(df, ['score', 'upper', 'analyst'])
-    # r.make_boxplot(two_donors, ['score', 'upper', 'analyst'])
-    # r.make_boxplot(three_donors, ['score', 'upper', 'analyst'])
-    # r.make_boxplot(four_donors, ['score', 'upper', 'analyst'])
-    # r.make_boxplot(five_donors, ['score', 'upper', 'analyst'])
 
 
 
 
 
 if __name__ == '__main__':
-    some_examples()
+    # some_examples()
     scores_only()
+    # samples = rf.txt_read_sample("TraceDataSet11.txt")
+    # pf.initialise_figure()
+    # sample_array = samples[30].data[:,0]
+    # pf.plot_sample_array(sample_array)
+    # plt.vlines([50,530], 0, max(sample_array[1000:]) * 1.2, linestyles='--')
+    # pf.finish_plot()
+
 
 

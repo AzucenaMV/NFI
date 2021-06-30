@@ -79,11 +79,6 @@ def F1_score(alleles_present: List, alleles_detected: List):
     return 2*(precision*recall)/(precision+recall)
 
 
-def result_dataframe(name_list, donor_set_list, mix_type_list, number_donor_list, score_list, upper_bound_score_list, analyst_score_list):
-    # dict = {"name": name_list, "score": score_list, "upper": upper_bound_score_list, "analyst": analyst_score_list}
-    # df = pd.dataframe(dict)
-    # df.to_csv("data/F1_scores_15_6_2021.csv", index = False)
-    df = pd.DataFrame(data=np.array([donor_set_list, mix_type_list, number_donor_list, score_list, upper_bound_score_list, analyst_score_list]).transpose(), index=name_list, columns=["set", "mix", "donors", "score", "upper", "analyst"])
-    return df
+
 
 

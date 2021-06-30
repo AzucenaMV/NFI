@@ -162,6 +162,3 @@ def shallow_analyst(sample_name):
     return mixture_list
 
 
-def csv_read_scores(filename = "data/F1_scores_15_6_2021.csv"):
-    df = pd.read_csv(filename, index_col=0)
-    return df
