@@ -1,7 +1,7 @@
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Dropout, Conv2D, UpSampling2D, concatenate, AvgPool2D
 from tensorflow.keras.optimizers import Adam
-
+from tensorflow.keras.metrics import MeanIoU
 
 def unet_small(input_size=(4800, 6, 1)):
     inputs = Input(input_size)
@@ -86,7 +86,7 @@ def unet_small(input_size=(4800, 6, 1)):
                    )(conv7)
     conv8 = Conv2D(1, 1, activation='sigmoid')(conv7)
     model = Model(inputs=inputs, outputs=conv8)
-    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=['MeanIoU'])
+    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=MeanIoU(2))
 
     return model
 

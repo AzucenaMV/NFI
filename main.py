@@ -20,42 +20,42 @@ def some_examples():
     original_sampledata, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
     unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'data/weights_norm_avgpool.h5', False)
 
-    donor_sets = []
-    mix_types = []
-    number_donors = []
-    F1_scores = []
-    F1_scores_corrected = []
-    F1_scores_analyst = []
-    new_sample_names = []
-    for sample_number in range(len(sample_names)):
-        sample_name, replica = sample_names[sample_number].split(".")
-        # sample_data = original_sampledata[sample_number]
-        input_example = inputs_for_unet.data[sample_number,:,:].reshape(1,cutoff-leftoffset,number_of_dyes,1)
-        # label_example = inputs_for_unet.labels[sample_number, :, :]
-        output_example = unet_model.predict(input_example).reshape(4800,6)
-        actual_peaks = ppf.list_all_peaks(sample_name)
-        corrected_peaks, augmented_output = ppf.check_correct_alleles_first(actual_peaks, output_example, leftoffset, 30)
-        restofpeaks = ppf.mult_peaks(augmented_output, 0.5, leftoffset)
-        corrected_peaks.extend(restofpeaks)
-        predicted_peaks = ppf.mult_peaks(output_example, 0.5, leftoffset)
-        if sample_name != "3E2":
-            analyst_peaks = rf.shallow_analyst(sample_name)[int(replica)-1]
-            F1_scores_analyst.append(ppf.F1_score(actual_peaks, analyst_peaks))
-            F1_scores.append(ppf.F1_score(actual_peaks, predicted_peaks))
-            F1_scores_corrected.append(ppf.F1_score(actual_peaks, corrected_peaks))
-            new_sample_names.append(sample_names[sample_number])
-            donor_set, mix_type, number_donor = sample_name
-            donor_sets.append(donor_set)
-            mix_types.append(mix_type)
-            number_donors.append(number_donor)
-    r.store_dataframe(new_sample_names, np.array([donor_sets, mix_types, number_donors, F1_scores, F1_scores_corrected, F1_scores_analyst]).transpose())
+    # donor_sets = []
+    # mix_types = []
+    # number_donors = []
+    # F1_scores = []
+    # F1_scores_corrected = []
+    # F1_scores_analyst = []
+    # new_sample_names = []
+    # for sample_number in range(len(sample_names)):
+    #     sample_name, replica = sample_names[sample_number].split(".")
+    #     # sample_data = original_sampledata[sample_number]
+    #     input_example = inputs_for_unet.data[sample_number,:,:].reshape(1,cutoff-leftoffset,number_of_dyes,1)
+    #     # label_example = inputs_for_unet.labels[sample_number, :, :]
+    #     output_example = unet_model.predict(input_example).reshape(4800,6)
+    #     actual_peaks = ppf.list_all_peaks(sample_name)
+    #     corrected_peaks, augmented_output = ppf.check_correct_alleles_first(actual_peaks, output_example, leftoffset, 30)
+    #     restofpeaks = ppf.mult_peaks(augmented_output, 0.5, leftoffset)
+    #     corrected_peaks.extend(restofpeaks)
+    #     predicted_peaks = ppf.mult_peaks(output_example, 0.5, leftoffset)
+    #     if sample_name != "3E2":
+    #         analyst_peaks = rf.shallow_analyst(sample_name)[int(replica)-1]
+    #         F1_scores_analyst.append(ppf.F1_score(actual_peaks, analyst_peaks))
+    #         F1_scores.append(ppf.F1_score(actual_peaks, predicted_peaks))
+    #         F1_scores_corrected.append(ppf.F1_score(actual_peaks, corrected_peaks))
+    #         new_sample_names.append(sample_names[sample_number])
+    #         donor_set, mix_type, number_donor = sample_name
+    #         donor_sets.append(donor_set)
+    #         mix_types.append(mix_type)
+    #         number_donors.append(number_donor)
+    # r.store_dataframe(new_sample_names, np.array([donor_sets, mix_types, number_donors, F1_scores, F1_scores_corrected, F1_scores_analyst]).transpose())
 
 
 def scores_only():
     df = r.load_dataframe()
-    print(df.describe())
-    print(df[df['upper'] == df['upper'].min()])
-    # r.make_boxplot(df, ['analyst', 'upper', 'score'], 'donors')
+    # print(df.describe())
+    # print(df[df['upper'] == df['upper'].min()])
+    r.make_boxplot(df, ['analyst', 'upper'], 'mix')
 
 
 
@@ -63,14 +63,20 @@ def scores_only():
 
 
 if __name__ == '__main__':
-    # some_examples()
-    scores_only()
-    # samples = rf.txt_read_sample("TraceDataSet11.txt")
-    # pf.initialise_figure()
-    # sample_array = samples[30].data[:,0]
-    # pf.plot_sample_array(sample_array)
-    # plt.vlines([50,530], 0, max(sample_array[1000:]) * 1.2, linestyles='--')
-    # pf.finish_plot()
+    some_examples()
+    # scores_only()
+    # samples = rf.txt_read_sample("TraceDataSet62.txt")
+    # leftoffset = 500
+    # cutoff = 4800 + 500
+    # number_of_dyes = 6
+    # original_sampledata, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
+    # unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'data/weights_norm.h5', False)
+    # sample_data = original_sampledata[-15]
+    # print(sample_names[-15])
+    # input_example = inputs_for_unet.data[-15, :, :].reshape(1, cutoff - leftoffset, number_of_dyes, 1)
+    # output_example = unet_model.predict(input_example).reshape(4800, 6)
+    # label_example = inputs_for_unet.labels[-15, :, :]
+    # pf6.plot_results_unet_against_truth(sample_data, output_example, label_example)
 
 
 
