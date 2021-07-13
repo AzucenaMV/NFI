@@ -141,7 +141,7 @@ def plot_sample_markers_6C(sample: Sample):
         current = sample.data[:, i]
         plt.plot(np.linspace(0, len(current) / 10, len(current)), current, str(Dyes.color_list[i].plot_color))
         plt.xlim([50, 500])
-        plt.ylim(0, max)
+        plt.ylim(0, 2000)
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
     plt.show()
