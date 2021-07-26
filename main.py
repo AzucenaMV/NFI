@@ -34,7 +34,7 @@ def some_examples():
     #     # label_example = inputs_for_unet.labels[sample_number, :, :]
     #     output_example = unet_model.predict(input_example).reshape(4800,6)
     #     actual_peaks = ppf.list_all_peaks(sample_name)
-    #     corrected_peaks, augmented_output = ppf.check_correct_alleles_first(actual_peaks, output_example, leftoffset, 30)
+    #     corrected_peaks, augmented_output = ppf.check_correct_alleles_first(actual_peaks, output_example, leftoffset, 15)
     #     restofpeaks = ppf.mult_peaks(augmented_output, 0.5, leftoffset)
     #     corrected_peaks.extend(restofpeaks)
     #     predicted_peaks = ppf.mult_peaks(output_example, 0.5, leftoffset)
@@ -55,7 +55,7 @@ def scores_only():
     df = r.load_dataframe()
     # print(df.describe())
     # print(df[df['upper'] == df['upper'].min()])
-    r.make_boxplot(df, ['analyst', 'upper', 'score'], 'donors')
+    r.make_boxplot(df, ['analyst', 'score'], 'donors')
 
 
 
@@ -64,16 +64,16 @@ def scores_only():
 
 if __name__ == '__main__':
     # some_examples()
-    scores_only()
-    # samples = rf.txt_read_sample("TraceDataSet11.txt")
-    # leftoffset = 500
-    # cutoff = 4800 + 500
-    # number_of_dyes = 6
-    # original_sampledata, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
-    # unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'data/weights_norm_avgpool.h5', False)
-    # for index_of_sample in range(18,21):
-    #     sample_data = original_sampledata[index_of_sample]
-    #     input_example = inputs_for_unet.data[index_of_sample, :, :].reshape(1, cutoff - leftoffset, number_of_dyes, 1)
-    #     output_example = unet_model.predict(input_example).reshape(4800, 6)
-    #     label_example = inputs_for_unet.labels[index_of_sample, :, :]
-    #     pf6.plot_results_unet_against_truth(sample_data, output_example, label_example)
+    # scores_only()
+    samples = rf.txt_read_sample("TraceDataSet11.txt")
+    leftoffset = 500
+    cutoff = 4800 + 500
+    number_of_dyes = 6
+    original_sampledata, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
+    unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'data/weights_norm_avgpool.h5', False)
+    for index_of_sample in range(18,19):
+        sample_data = original_sampledata[index_of_sample]
+        input_example = inputs_for_unet.data[index_of_sample, :, :].reshape(1, cutoff - leftoffset, number_of_dyes, 1)
+        output_example = unet_model.predict(input_example).reshape(4800, 6)
+        label_example = inputs_for_unet.labels[index_of_sample, :, :]
+        pf6.plot_results_unet_against_truth(sample_data, output_example, label_example)

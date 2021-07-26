@@ -48,9 +48,9 @@ def plot_results_unet_against_truth(input, result, label, title = False, leftoff
         axes[dye].plot(x_array, input[:, dye], "k")
         axes[dye].axhline(y=500, linestyle="--", color = "gray")
         # plot result
-        line1, = axes[dye].plot(x_array, y_max*result[:,dye])
+        line1, = axes[dye].plot(x_array, y_max*result[:,dye], color="deepskyblue")
         # plot truth
-        plot_labels(input[:, dye], label[:, dye], axes[dye], y_min, y_max)
+        plot_labels(input[:, dye], label[:, dye], axes[dye], y_min, y_max, alph=0.3, nopeak="w", peak="fuchsia")
         ax_right = axes[dye].twinx()
         ax_right.set_ylim([-0.1, 1])
         ax_right.spines["right"].set_color(line1.get_color())
@@ -115,16 +115,16 @@ def plot_inputs_unet(input, label, leftoffset = 50, fig_size = (30,20)):
     plt.close()
 
 
-def plot_labels(sample_array, peak_bools, ax, y_min, y_max):
+def plot_labels(sample_array, peak_bools, ax, y_min, y_max, alph = 0.5, nopeak = "red", peak = "green"):
     # note that sample_array and peak_bools have the same shape
     x = np.linspace(0, len(sample_array) / 10, len(sample_array))
     # plot background of peaks in green
     collection = collections.BrokenBarHCollection.span_where(x, ymin=y_min, ymax=y_max, where=peak_bools,
-                                                             facecolor='green', alpha=0.5)
+                                                             facecolor=peak, alpha=alph)
     ax.add_collection(collection)
     # plot background of non-peaks in red
     collection = collections.BrokenBarHCollection.span_where(x, ymin=y_min, ymax=y_max, where=~peak_bools,
-                                                             facecolor='red', alpha=0.5)
+                                                             facecolor=nopeak, alpha=alph)
     ax.add_collection(collection)
 
 
