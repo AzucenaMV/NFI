@@ -48,9 +48,9 @@ def plot_results_unet_against_truth(input, result, label, title = False, leftoff
         axes[dye].plot(x_array, input[:, dye], "k")
         axes[dye].axhline(y=500, linestyle="--", color = "gray")
         # plot result
-        line1, = axes[dye].plot(x_array, y_max*result[:,dye], color="deepskyblue")
+        line1, = axes[dye].plot(x_array, y_max*result[:,dye], color="magenta")
         # plot truth
-        plot_labels(input[:, dye], label[:, dye], axes[dye], y_min, y_max, alph=0.3, nopeak="w", peak="fuchsia")
+        plot_labels(input[:, dye], label[:, dye], axes[dye], y_min, y_max, alph=0.3, nopeak="w", peak="c")
         ax_right = axes[dye].twinx()
         ax_right.set_ylim([-0.1, 1])
         ax_right.spines["right"].set_color(line1.get_color())
@@ -109,13 +109,14 @@ def plot_inputs_unet(input, label, leftoffset = 50, fig_size = (30,20)):
         axes[dye].set_ylim([y_min, y_max])
         plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
         axes[dye].plot(x_array, input[:, dye], "k")
+        axes[dye].set_xlim([0,480])
         # plot truth
         plot_labels(input[:, dye], label[:, dye], axes[dye], y_min, y_max)
     plt.show()
     plt.close()
 
 
-def plot_labels(sample_array, peak_bools, ax, y_min, y_max, alph = 0.5, nopeak = "red", peak = "green"):
+def plot_labels(sample_array, peak_bools, ax, y_min, y_max, alph = 0.5, nopeak = "purple", peak = "green"):
     # note that sample_array and peak_bools have the same shape
     x = np.linspace(0, len(sample_array) / 10, len(sample_array))
     # plot background of peaks in green
