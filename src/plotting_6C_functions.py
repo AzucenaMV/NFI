@@ -297,7 +297,7 @@ def choose_normalisation(original, leftoffset = 50, fig_size = (15,10)):
     plt.close()
 
 
-def plot_bins_vs_labels(input, labels_bin, labels_peak, title = False, leftoffset = 50, fig_size = (30, 20)):
+def plot_bins_vs_labels(input, labels_peaks, labels_bins, title = False, leftoffset = 50, fig_size = (30, 20)):
     number_of_dyes = 6
     fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
     input = input.squeeze()
@@ -309,13 +309,13 @@ def plot_bins_vs_labels(input, labels_bin, labels_peak, title = False, leftoffse
         plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
         line1, = axes[dye].plot(x_array, input[:, dye], "k")
 
-        # plot background of bins in green
-        collection = collections.BrokenBarHCollection.span_where(x_array, ymin=y_min, ymax=y_max, where=labels_bin[500:5300,dye],
-                                                                 facecolor='blue', alpha=0.5)
-        axes[dye].add_collection(collection)
-        # plot background of peaks in blue
-        collection = collections.BrokenBarHCollection.span_where(x_array, ymin=y_min, ymax=y_max, where=labels_peak[:,dye],
+        # plot background of peaks in green
+        collection = collections.BrokenBarHCollection.span_where(x_array, ymin=y_min, ymax=y_max, where=labels_peaks[:, dye],
                                                                  facecolor='green', alpha=0.3)
+        axes[dye].add_collection(collection)
+        # plot background of bins in blue
+        collection = collections.BrokenBarHCollection.span_where(x_array, ymin=y_min, ymax=y_max, where=labels_bins[500:5300, dye],
+                                                                 facecolor='blue', alpha=0.3)
         axes[dye].add_collection(collection)
     if not title:
         plt.show()
