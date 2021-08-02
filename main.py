@@ -19,7 +19,6 @@ def make_dataframe():
     number_of_dyes = 6
     original_sampledata, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
     unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'data/weights_norm_avgpool.h5', False)
-
     # donor_sets = []
     # mix_types = []
     # number_donors = []
@@ -93,18 +92,18 @@ def last_plots():
 
 if __name__ == '__main__':
     # make_dataframe()
-    last_plots()
+    # last_plots()
     # scores_only()
-    # samples = rf.txt_read_sample("TraceDataSet62.txt")
-    # leftoffset = 500
-    # cutoff = 4800 + 500
-    # number_of_dyes = 6
-    # original_sampledata, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
-    # unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'data/weights_norm.h5', False)
-    # print(sample_names)
-    # for index_of_sample in range(7,10):
-    #     sample_data = original_sampledata[index_of_sample]
-    #     input_example = inputs_for_unet.data[index_of_sample, :, :].reshape(1, cutoff - leftoffset, number_of_dyes, 1)
-    #     output_example = unet_model.predict(input_example).reshape(4800, 6)
-    #     label_example = inputs_for_unet.labels[index_of_sample, :, :]
-    #     pf6.plot_results_unet_against_truth(sample_data, output_example, label_example)
+    samples = rf.txt_read_sample("TraceDataSet62.txt")
+    leftoffset = 500
+    cutoff = 4800 + 500
+    number_of_dyes = 6
+    original_sampledata, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
+    unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'data/weights_norm_avgpool.h5', False)
+    for index_of_sample in range(1):
+        sample_data = original_sampledata[index_of_sample]
+        sample_name = sample_names[index_of_sample].split(".")[0]
+        input_example = inputs_for_unet.data[index_of_sample, :, :].reshape(1, cutoff - leftoffset, number_of_dyes, 1)
+        output_example = unet_model.predict(input_example).reshape(4800, 6)
+        label_example = inputs_for_unet.labels[index_of_sample, :, :]
+        pf6.plot_results_unet(sample_data, output_example)

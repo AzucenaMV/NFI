@@ -28,7 +28,7 @@ def plot_results_unet(input, result, leftoffset = 50, fig_size = (30,20)):
         ax_right.set_ylim([-0.1, 1])
         ax_right.spines["right"].set_color(line1.get_color())
         ax_right.tick_params(axis='y', colors=line1.get_color())
-
+        axes[dye].set_xlim([0,100])
     plt.show()
     plt.close()
 
@@ -303,7 +303,7 @@ def plot_bins_vs_labels(input, labels_peaks, labels_bins, title = False, leftoff
     input = input.squeeze()
     x_array = np.linspace(0, len(input) / 10, len(input))
     for dye in range(number_of_dyes):
-        y_max = 1000            # min(1000, 0.1 * max(input[:,dye]))
+        y_max = 20000            # min(1000, 0.1 * max(input[:,dye]))
         y_min = -0.1*y_max      # always a 10% gap on bottom for legibility
         axes[dye].set_ylim([y_min, y_max])
         plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
@@ -317,6 +317,7 @@ def plot_bins_vs_labels(input, labels_peaks, labels_bins, title = False, leftoff
         collection = collections.BrokenBarHCollection.span_where(x_array, ymin=y_min, ymax=y_max, where=labels_bins[500:5300, dye],
                                                                  facecolor='blue', alpha=0.3)
         axes[dye].add_collection(collection)
+        axes[dye].set_xlim([0,100])
     if not title:
         plt.show()
     else:

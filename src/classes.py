@@ -170,9 +170,9 @@ class PersonMixture:
             locus_name, allele_name = locus_allele.split("_")
             locus = locus_dict[locus_name]
             allele = locus.alleles[allele_name]
-            height = peak_dict[locus_allele]        # store rel. height
+            height = peak_dict[locus_allele]            # store rel. height
             new_peak = Peak(allele, height)
-            peak_list.append(new_peak)               # append peak to list
+            peak_list.append(new_peak)                  # append peak to list
         return peak_list
 
 
@@ -182,14 +182,6 @@ class AnalystMixture:
     name: str               # name of mixture, '1A2' for example
     replica: int            # where 1 is donor set, 2 is #donors, A is mixture type and 3 is replica
     peaks: List[Peak]       # list of peaks
-
-
-# TBD ############################################################################
-@dataclass
-class Center:
-    """class to store center of input to be labeled"""
-    index: float    # nucleotide location
-    dye: Dye        # dye in which center is present
 
 
 @dataclass
@@ -211,11 +203,6 @@ class TrainOutput:
     input_sample: Sample
     labels: List
 
-
-@dataclass
-class Result:
-    """ TBD """
-    name: str
 
 
 # Global variables
