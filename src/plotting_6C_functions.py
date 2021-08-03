@@ -29,8 +29,33 @@ def plot_results_unet(input, result, leftoffset = 50, fig_size = (30,20)):
         ax_right.spines["right"].set_color(line1.get_color())
         ax_right.tick_params(axis='y', colors=line1.get_color())
         axes[dye].set_xlim([0,100])
+    y_max = min(1000,0.1*max(input[:,1]))
+    blue_bins = np.zeros(len(result))
+    red_bins = np.zeros(len(result))
+    red_bins[839:848] = 1      # 17.2
+    blue_bins[850:858] = 1      # 17.3
+    red_bins[860:869] = 1      # 18
+    blue_bins[871:879] = 1      # 18.1
+    collection = collections.BrokenBarHCollection.span_where(x_array, ymin=-0.1*y_max, ymax=y_max, where=blue_bins, facecolor="blue", alpha=0.4)
+    axes[0].add_collection(collection)
+    collection = collections.BrokenBarHCollection.span_where(x_array, ymin=-0.1*y_max, ymax=y_max, where=red_bins, facecolor="red", alpha=0.4)
+    axes[0].add_collection(collection)
+    axes[0].hlines(500, 0, 100, "gray", "--")
     plt.show()
     plt.close()
+    bin_17_2 = 1
+    bin_17_3 = 1
+    bin_18 = 1
+    for prob in result[839:848,0]:
+        if prob > 0.5:
+            bin_17_2 *= prob
+    for prob in result[850:858,0]:
+        if prob > 0.5:
+            bin_17_3 *= prob
+    for prob in result[860:869,0]:
+        if prob > 0.5:
+            bin_18 *= prob
+    print(bin_17_2, bin_17_3, bin_18)
 
 
 def plot_results_unet_against_truth(input, result, label, title = False, leftoffset = 50, fig_size = (30,20)):
