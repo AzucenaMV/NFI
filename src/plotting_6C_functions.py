@@ -7,6 +7,7 @@ from sklearn.preprocessing import normalize
 
 
 def plot_results_unet(input, result, leftoffset = 50, fig_size = (30,20)):
+    # OLD?
     number_of_dyes = 6
     fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
     input = input.squeeze()
