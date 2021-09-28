@@ -115,27 +115,27 @@ def plot_results_unet_against_truth_alt(input, result, label, title = False, lef
     plt.close()
 
 
-def plot_inputs_unet(input, label, leftoffset = 50, fig_size = (30,20)):
+def plot_inputs_unet(input, label, leftoffset = 50, fig_size = (30,20), rescale=10):
     number_of_dyes = 6
     fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
     input = input.squeeze()
-    x_array = np.linspace(0, len(input) / 10, len(input))
+    x_array = np.linspace(0, len(input) / rescale, len(input))
     for dye in range(number_of_dyes):
         y_max = 1000  # min(1000, 0.1 * max(input[:,dye]))
         y_min = -0.1 * y_max  # always a 10% gap on bottom for legibility
-        axes[dye].set_ylim([y_min, y_max])
+        # axes[dye].set_ylim([y_min, y_max])
         plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
         axes[dye].plot(x_array, input[:, dye], "k")
-        axes[dye].set_xlim([0,480])
+        # axes[dye].set_xlim([0,480])
         # plot truth
-        plot_labels(input[:, dye], label[:, dye], axes[dye], y_min, y_max)
+        plot_labels(input[:, dye], label[:, dye], axes[dye], y_min, y_max, rescale=rescale)
     plt.show()
     plt.close()
 
 
-def plot_labels(sample_array, peak_bools, ax, y_min, y_max, alph = 0.5, nopeak = "purple", peak = "green"):
+def plot_labels(sample_array, peak_bools, ax, y_min, y_max, alph = 0.5, nopeak = "purple", peak = "green", rescale = 10):
     # note that sample_array and peak_bools have the same shape
-    x = np.linspace(0, len(sample_array) / 10, len(sample_array))
+    x = np.linspace(0, len(sample_array) / rescale, len(sample_array))
     # plot background of peaks in green
     collection = collections.BrokenBarHCollection.span_where(x, ymin=y_min, ymax=y_max, where=peak_bools,
                                                              facecolor=peak, alpha=alph)

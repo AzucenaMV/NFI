@@ -194,14 +194,9 @@ class OldTrainInput:
 
 @dataclass
 class TrainInput:
+    """Shape of input is 6x4800"""
     data: np.ndarray
     labels: np.ndarray
-
-
-@dataclass
-class TrainOutput:
-    input_sample: Sample
-    labels: List
 
 
 

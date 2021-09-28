@@ -1,12 +1,12 @@
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Dropout, Conv2D, UpSampling2D, concatenate, AvgPool2D
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.metrics import MeanIoU
+from tensorflow.keras.metrics import MeanIoU, BinaryAccuracy
 
 def unet_small(input_size=(4800, 6, 1)):
     inputs = Input(input_size)
     # Convolution 1
-    kernelsize = (3, 6)     # all 5 dyes
+    kernelsize = (3, 6)     # 3->6 all 6 dyes
     kernelsize_up = (2, 6)  # one less because concatenated
     poolsize = (2, 1)       # pooling
 
@@ -86,7 +86,7 @@ def unet_small(input_size=(4800, 6, 1)):
                    )(conv7)
     conv8 = Conv2D(1, 1, activation='sigmoid')(conv7)
     model = Model(inputs=inputs, outputs=conv8)
-    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=MeanIoU(2))
+    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=BinaryAccuracy())
 
     return model
 
