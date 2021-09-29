@@ -34,7 +34,6 @@ def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset
             all_data.append(sample_data)
             new = sample_data-np.min(sample_data)
             normalised_data = new/np.max(new)
-            print(normalised_data.shape)
             all_data_normalised.append(normalised_data)
             labels = find_peaks_flowing_out_of_bins(sample.data, sample.name)
             all_labels.append(labels[leftoffset:cutoff, :width])
