@@ -21,17 +21,6 @@ def read_csv_DTDP(filename = "3130 references - test profiles/1 - 449753.csv", f
     return data[range_start:range_start+4800, :], labels_binary[range_start:range_start+4800, :]
 
 
-def find_marker_ranges_DTDP():
-    """temporary function to check where allees end and start"""
-    for filename in all_files:
-        dataframe = pd.read_csv("data/DTDP_profiles/"+filename)
-        data = np.array(dataframe[['dye1', 'dye2', 'dye3', 'dye4', 'dye6',
-                               'dye5']].values)  # need to swap 5 and 6 to get size std at bottom
-        labels_multi = np.array(dataframe[['dye1GT', 'dye2GT', 'dye3GT', 'dye4GT', 'dye6GT', 'dye5GT']].values)
-        labels_binary = np.where(labels_multi == 'A')
-        # print(labels_binary[0][0], labels_binary[0][-1])
-    pass
-
 
 def input_from_DTDP(normalised = True, filenames = all_files):
     original_data = []
