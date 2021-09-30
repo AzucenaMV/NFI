@@ -1,7 +1,7 @@
-from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Dropout, Conv2D, UpSampling2D, concatenate, AvgPool2D
+from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.layers import Input, Dropout, Conv2D, UpSampling2D, concatenate, AvgPool2D, Flatten, Dense
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.metrics import MeanIoU, BinaryAccuracy
+from tensorflow.keras.metrics import BinaryAccuracy
 
 def unet_small(input_size=(4800, 6, 1)):
     inputs = Input(input_size)
@@ -89,4 +89,17 @@ def unet_small(input_size=(4800, 6, 1)):
     model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=BinaryAccuracy())
 
     return model
+
+
+def FFN_DTDP(input_size = (1206,)):
+    model = Sequential()
+    model.add(Dropout(0.2, input_shape = input_size))
+    model.add(Dense(100, activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(1, activation='sigmoid'))
+    # final layer should be softmax, but sigmoid is better for binary
+    # categorical cross entropy loss is changed to binary
+    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=BinaryAccuracy())
+    return model
+
 

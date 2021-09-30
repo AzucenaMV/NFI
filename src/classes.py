@@ -127,7 +127,7 @@ class Sample:
     """
     name: str       # example: '1A2'
     replica: int
-    data: List
+    data: np.array  # changed from List to numpy array because I think I'm always using numpy arrays anyway
 
 
 @dataclass
@@ -185,7 +185,7 @@ class AnalystMixture:
 
 
 @dataclass
-class OldTrainInput:
+class DTDPTrainInput:
     """The one with windows"""
     input_sample: Sample          # sample used to create input
     data: np.ndarray              # list of input nodes/data to be fed to nn

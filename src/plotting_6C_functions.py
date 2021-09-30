@@ -57,7 +57,7 @@ def plot_results_unet_against_truth(input, result, label, title = False, leftoff
     result = result.squeeze()
     x_array = np.linspace(0, len(result) / 10, len(result))
     for dye in range(number_of_dyes):
-        y_max = 1000            #min(1000, 0.1 * max(input[:,dye]))
+        y_max = 1            #min(1000, 0.1 * max(input[:,dye]))
         y_min = -0.1*y_max      # always a 10% gap on bottom for legibility
         axes[dye].set_xlim([0, 480])
         axes[dye].set_ylim([y_min, y_max])

@@ -41,7 +41,7 @@ def input_from_DTDP(normalised = True, filenames = all_files):
         unnormalised_data, labels = read_csv_DTDP(filename)
         input_labels.append(labels)
         new = unnormalised_data - np.min(unnormalised_data)
-        normalised_data = new / np.max(new)
+        normalised_data = new / 10000   # theoretical max of 3130 data
         input_data.append(normalised_data)
         original_data.append(unnormalised_data)
     if normalised:

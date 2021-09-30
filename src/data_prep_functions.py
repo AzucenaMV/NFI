@@ -2,22 +2,35 @@ from src.classes import *
 import numpy as np
 from src import reading_functions as rf
 
-# should have approximately that shape, but need to decide what to do about other colours.
-def create_input_from_sample(sample: Sample, width: int, person_mix, number_of_dyes):
+
+def create_DTDP_inputs_from_sample(sample: Sample, width: int, number_of_dyes = 6, range_start = 500, range_end = 5300):
     """For one electropherogram, creates all input (node) images and their labels."""
-    # width is amount of steps in each direction, either 80 or 100
+    # width is amount of steps in each direction, usually 100
     sample_data = sample.data
     window_list = []
-    # apparently, this works?
-    labels = find_peaks_flowing_out_of_bins(sample)
+    labels = find_peaks_flowing_out_of_bins(sample_data, sample.name)
     label_list = []
-    for i in range(len(sample_data) - 2 * width):
-        window = sample_data[i: i + 2 * width + 1, :number_of_dyes].copy()
-        center_location = i + width + 1
-        window_list.append(window)
-        label = labels[:number_of_dyes, center_location]
+    # iterate over all windows with center in same range as U-net
+    for window_index in range(range_start, range_end):
+        center_location = window_index
+        left = center_location - width
+        right = center_location + width + 1
+        window = sample_data[left: right, :]
+
+        flat_window = window.flatten('F')  # flatten it icw DTDP, F means dyes first (column-major)
+        window_list.append(flat_window)     # add blue dye
+        label = labels[center_location, 0]
         label_list.append(label)
-    input_from_sample = OldTrainInput(sample, np.array(window_list), np.array(label_list))
+        # uncomment if you also want non-blue dyes
+        # for dye in range(1, number_of_dyes):
+        #     label = labels[center_location, dye]
+        #     label_list.append(label)
+        #     to_end = window[:,:1]                     # put different dye first
+        #     start = window[:,1:]
+        #     new_window = np.append(start, to_end)
+        #     flat_window = new_window.flatten('F')           # flatten it icw DTDP, F means dyes first (column-major)
+        #     window_list.append(flat_window)
+    input_from_sample = DTDPTrainInput(sample, np.array(window_list), np.array(label_list))
     return input_from_sample
 
 
