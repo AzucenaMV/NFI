@@ -3,7 +3,7 @@ import numpy as np
 from src import reading_functions as rf
 
 
-def create_DTDP_inputs_from_sample(sample: Sample, width: int, number_of_dyes = 6, range_start = 500, range_end = 5300):
+def create_DTDP_inputs_from_sample(sample: Sample, width = 100, range_start = 500, range_end = 5300):
     """For one electropherogram, creates all input (node) images and their labels."""
     # width is amount of steps in each direction, usually 100
     sample_data = sample.data
@@ -18,7 +18,7 @@ def create_DTDP_inputs_from_sample(sample: Sample, width: int, number_of_dyes = 
         window = sample_data[left: right, :]
 
         flat_window = window.flatten('F')  # flatten it icw DTDP, F means dyes first (column-major)
-        window_list.append(flat_window)     # add blue dye
+        window_list.append(flat_window)
         label = labels[center_location, 0]
         label_list.append(label)
         # uncomment if you also want non-blue dyes
@@ -30,12 +30,23 @@ def create_DTDP_inputs_from_sample(sample: Sample, width: int, number_of_dyes = 
         #     new_window = np.append(start, to_end)
         #     flat_window = new_window.flatten('F')           # flatten it icw DTDP, F means dyes first (column-major)
         #     window_list.append(flat_window)
-    input_from_sample = DTDPTrainInput(sample, np.array(window_list), np.array(label_list))
-    return input_from_sample
+    return window_list, label_list
+
+
+def DTDP_input_from_multiple_samples(samplelist: List[Sample], width = 100):
+    windows_total = []
+    labels_total = []
+    for sample in samplelist:
+        if len(sample.name)==3:
+            windows, labels = create_DTDP_inputs_from_sample(sample, width=width)
+            windows_total.extend(windows)
+            labels_total.extend(labels)
+    inputs = DTDPTrainInput(samplelist, np.array(windows_total), np.array(labels_total))
+    return inputs
 
 
 def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset: int, cutoff: int, normalised = True):
-    """For one electropherogram, creates all input (node) images and their labels."""
+    """For a set of electropherograms, creates all input (node) images and their labels."""
     all_data = []
     all_data_normalised = []
     all_labels = []

@@ -1,6 +1,4 @@
 from src.models import unet_small, FFN_DTDP
-
-# Imports
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import ModelCheckpoint
 
@@ -52,9 +50,8 @@ def unet_train_test_split(train_input, test_input, length, weightpath = 'data/we
     return model
 
 
-def FFN(train_input, test_input, weightpath = "data/weights_DTDP/weights_our_data.h5", train = False):
-    number_of_dyes = 6
-    model = FFN_DTDP()
+def FFN(train_input, test_input, weightpath = "data/weights_DTDP/weights_our_data.h5", inputsize= (1206,), train = False, batchsize=10, epochs=10):
+    model = FFN_DTDP(input_size=inputsize)
     model.summary()
     model.load_weights(weightpath)
     test_images = test_input.data
@@ -63,8 +60,8 @@ def FFN(train_input, test_input, weightpath = "data/weights_DTDP/weights_our_dat
     if train:
         train_images = train_input.data
         train_labels = train_input.labels
-        batch_size = 10  # number of samples processed before the model is updated
-        num_epochs = 10  # number of complete passes through the training dataset before the training stops
+        batch_size = batchsize  # number of samples processed before the model is updated
+        num_epochs = epochs # number of complete passes through the training dataset before the training stops
         model_checkpoint = ModelCheckpoint(weightpath, monitor='val_loss', save_best_only=True)
         # storing history is optional, for plotting
         history = model.fit(train_images, train_labels, batch_size=batch_size, epochs=num_epochs, verbose=1, shuffle=True, validation_split=0.2, callbacks=[model_checkpoint])

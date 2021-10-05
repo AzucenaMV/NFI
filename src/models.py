@@ -103,3 +103,21 @@ def FFN_DTDP(input_size = (1206,)):
     return model
 
 
+def FFN_2_DTDP():
+    # FFN from second paper
+    # still needs input_shape
+    # dropout is not described but used in previous and following papers
+    model = Sequential()
+    model.add(Dense(200, activation='sigmoid'))
+    model.add(Dropout(0.5))
+    model.add(Dense(50, activation='sigmoid'))
+    model.add(Dropout(0.5))
+    model.add(Dense(20, activation='sigmoid'))
+    model.add(Dropout(0.5))
+    model.add(Dense(1, activation='sigmoid'))
+    # final layer should be softmax, but sigmoid is better for binary
+    # cross entropy loss is changed to binary
+    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=BinaryAccuracy())
+    return model
+
+
