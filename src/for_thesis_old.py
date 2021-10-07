@@ -67,7 +67,7 @@ def last_plots():
     cutoff = 4800 + 500
     number_of_dyes = 6
     original_sampledata, inputs_for_unet, sample_names = dpf.input_from_multiple_samples(samples, number_of_dyes, leftoffset, cutoff, True)
-    unet_model = trf.unet(inputs_for_unet, cutoff - leftoffset, 'data/weights_norm_avgpool.h5', False)
+    unet_model = trf.unet_OLD(inputs_for_unet, cutoff - leftoffset, 'data/weights_norm_avgpool.h5', False)
 
     new_sample_names = []
     for sample_number in range(1):#len(sample_names)):

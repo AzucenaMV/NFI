@@ -16,15 +16,8 @@ tracedata_for_testing = ['TraceDataSet61.txt', 'TraceDataSet62.txt']
 if __name__ == '__main__':
     number_of_dyes = 6
 
-    # unnormalised_test_input, normalised_test_input = rdD.input_from_DTDP()
-    # length = 4800
-    # unet_model_DTDP = trf.unet_train_test_split([], normalised_test_input, length, weightpath="data/weights_NFI/weights_6_split.h5", train=False)
-    # for index_of_sample in range(15,19):
-    #     sample_data = unnormalised_test_input[index_of_sample]
-    #     input_example = normalised_test_input.data[index_of_sample, :, :].reshape(1, length, number_of_dyes, 1)
-    #     output_example = unet_model_DTDP.predict(input_example).reshape(length, 6)
-    #     label_example = normalised_test_input.labels[index_of_sample, :, :]
-    #     pf6.plot_results_unet_against_truth(sample_data, output_example, label_example)
+    unnormalised_test_input_3130, normalised_test_input_3130 = rdD.input_3130_from_DTDP()
+    unnormalised_test_input_3500, normalised_test_input_3500 = rdD.input_3500_from_DTDP()
 
     leftoffset = 500
     rightcutoff = 4800 + 500
@@ -34,15 +27,20 @@ if __name__ == '__main__':
     test_samples = []
     for elt in tracedata_for_testing:
         test_samples += rf.txt_read_sample(elt)
-    # unnormalised_train_data, train_input, train_sample_names = dpf.input_from_multiple_samples(train_samples, number_of_dyes, leftoffset, rightcutoff, True)
-    # unnormalised_test_data, test_input, test_sample_names = dpf.input_from_multiple_samples(test_samples, number_of_dyes, leftoffset, rightcutoff, True)
+    unnormalised_train_data, train_input, train_sample_names = dpf.input_from_multiple_samples(train_samples, number_of_dyes, leftoffset, rightcutoff, True)
+    unnormalised_test_data, test_input, test_sample_names = dpf.input_from_multiple_samples(test_samples, number_of_dyes, leftoffset, rightcutoff, True)
+    Unet = trf.unet_train_test_split([], test_input, 4800, "data/weights_NFI/weights_6_split_new.h5", train=False)
 
-    width = 80
-    input_dim = 6*(width*2+1)
-    DTDP_train_input = dpf.DTDP_input_from_multiple_samples(train_samples, width = width)
-    DTDP_test_input = dpf.DTDP_input_from_multiple_samples(test_samples, width = width)
-    FFN_model = trf.FFN(DTDP_train_input, DTDP_test_input, weightpath="data/weights_DTDP/weights_FFN_our_data_w80.h5", inputsize=(input_dim,), train = True, epochs=10, batchsize=100)
-    check_shape = FFN_model.predict(DTDP_test_input.data[0].reshape(1,input_dim))
+    # width = 80
+    # input_dim = 6*(width*2+1)
+    # DTDP_train_input = dpf.DTDP_input_from_multiple_samples(train_samples, width = width)
+    # DTDP_test_input = dpf.DTDP_input_from_multiple_samples(test_samples, width = width)
+    # FFN_model = trf.FFN(DTDP_train_input, DTDP_test_input, weightpath="data/weights_DTDP/weights_FFN_our_data_w80_100epochs.h5", inputsize=(input_dim,), train = True, epochs=100, batchsize=100)
+    # images, prediction = ppf.combine_results_FFN(DTDP_test_input, test_input, FFN_model, input_dim)
+
+    for index_of_image in range(test_input.data.shape[0]):
+        input = test_input.data[index_of_image]
+        pf.plot_results_FFN(input[:,0], Unet.predict(input.reshape(1,4800,6))[:,:,0], test_input.labels[index_of_image,:,0], "Unet_on_"+test_sample_names[index_of_image])
 
     # unet_model = trf.unet_train_test_split(train_input, test_input, rightcutoff - leftoffset, weightpath='data/weights_NFI/weights_6_split_new.h5', train=False)
     # for index_of_sample in range(1):

@@ -1,9 +1,16 @@
 from src.models import unet_small, FFN_DTDP
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
+from math import exp
+
+def scheduler(epoch, lr):
+  if epoch < 10:
+    return lr
+  else:
+    return lr * exp(-0.1)
 
 
-def unet(train_input, length, weights = 'data/weights_NFI/weights_norm_avgpool.h5', train = False):
+def unet_OLD(train_input, test_input, length, weights = 'data/weights_NFI/weights_norm_avgpool.h5', train = False):
     """unet training. Default is training and storing under weights.h5"""
     number_of_dyes = 6
     model = unet_small((length, number_of_dyes, 1))
@@ -13,7 +20,6 @@ def unet(train_input, length, weights = 'data/weights_NFI/weights_norm_avgpool.h
     if train:
         all_images = train_input.data
         all_labels = train_input.labels
-        train_images, test_images, train_labels, test_labels = train_test_split(all_images, all_labels, test_size=0.5, random_state=42)
         batch_size = 10  # number of samples processed before the model is updated
         num_epochs = 10  # number of complete passes through the training dataset before the training stops
         model_checkpoint = ModelCheckpoint(weights, monitor='val_loss', save_best_only=True)
@@ -26,7 +32,7 @@ def unet(train_input, length, weights = 'data/weights_NFI/weights_norm_avgpool.h
     return model
 
 
-def unet_train_test_split(train_input, test_input, length, weightpath = 'data/weights_NFI/weights_norm_avgpool.h5', train = False, batchsize = 10, epochs = 10):
+def unet_train_test_split(train_input, test_input, length: int, weightpath = 'data/weights_NFI/weights_norm_avgpool.h5', train = False, batchsize = 10, epochs = 10):
     """unet training. Default is training and storing under weights.h5"""
     number_of_dyes = 6
     model = unet_small((length, number_of_dyes, 1))
@@ -53,7 +59,7 @@ def unet_train_test_split(train_input, test_input, length, weightpath = 'data/we
 def FFN(train_input, test_input, weightpath = "data/weights_DTDP/weights_our_data.h5", inputsize= (1206,), train = False, batchsize=10, epochs=10):
     model = FFN_DTDP(input_size=inputsize)
     model.summary()
-    model.load_weights(weightpath)
+    # model.load_weights(weightpath)
     test_images = test_input.data
     test_labels = test_input.labels
 
@@ -63,8 +69,9 @@ def FFN(train_input, test_input, weightpath = "data/weights_DTDP/weights_our_dat
         batch_size = batchsize  # number of samples processed before the model is updated
         num_epochs = epochs # number of complete passes through the training dataset before the training stops
         model_checkpoint = ModelCheckpoint(weightpath, monitor='val_loss', save_best_only=True)
+        lrscheduler = LearningRateScheduler(scheduler)
         # storing history is optional, for plotting
-        history = model.fit(train_images, train_labels, batch_size=batch_size, epochs=num_epochs, verbose=1, shuffle=True, validation_split=0.2, callbacks=[model_checkpoint])
+        history = model.fit(train_images, train_labels, batch_size=batch_size, epochs=num_epochs, verbose=1, shuffle=True, validation_split=0.2, callbacks=[model_checkpoint, lrscheduler])
     metric_values = model.evaluate(x=test_images, y=test_labels)
     print('Final TEST performance')
     for metric_value, metric_name in zip(metric_values, model.metrics_names):

@@ -1,8 +1,6 @@
 from src.classes import *
 import numpy as np
 from src import reading_functions as rf
-from collections import Counter
-import pandas as pd
 
 
 def mult_peaks(unet_output: np.ndarray, threshold: float, left_offset: int):
@@ -79,6 +77,14 @@ def F1_score(alleles_present: List, alleles_detected: List):
     return 2*(precision*recall)/(precision+recall)
 
 
-
-
+def combine_results_FFN(testset: DTDPTrainInput, testset_full_images: TrainInput, model, input_length: int):
+    images = testset_full_images.data[:,:,0]  # only blue
+    labels = []
+    for image_index in range(images.shape[0]):
+        prediction_array = np.zeros(4800)
+        for point in range(4800):
+            prediction = model.predict(testset.data[image_index*4800 + point].reshape(1, input_length))
+            prediction_array[point] = prediction
+        labels.append(prediction_array)
+    return images, np.array(labels)
 

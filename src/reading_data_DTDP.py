@@ -25,23 +25,22 @@ files_3500_ref = ["3500 references - test profiles/08_3500xl_01_P986_06_20ng_to_
 all_files = files_3130_mix + files_3130_ref + files_3500_mix + files_3500_ref
 
 
-def read_csv_DTDP(filename="3130 references - test profiles/1 - 449753.csv", folder="data/DTDP_profiles/"):
+def read_csv_DTDP(filename, range_start: int, folder="data/DTDP_profiles/"):
     dataframe = pd.read_csv(folder + filename)
     data = np.array(dataframe[['dye1', 'dye2', 'dye3', 'dye4', 'dye6',
                                'dye5']].values)  # need to swap 5 and 6 to get size std at bottom
     labels_multi = np.array(dataframe[['dye1GT', 'dye2GT', 'dye3GT', 'dye4GT', 'dye6GT', 'dye5GT']].values)
     labels_binary = np.isin(labels_multi, 'A')  # label 'A' is reserved for alleles
-    range_start = 3750
     # pf6.plot_inputs_unet(data[range_start:9000, :], labels_binary[range_start:9000,:], rescale=12)
-    return data[range_start:range_start + 4800, :], labels_binary[range_start:range_start + 4800, :]
+    return data[range_start:range_start+4800, :], labels_binary[range_start:range_start + 4800, :]
 
 
-def input_3500_from_DTDP(normalised=True, filenames=files_3130_mix + files_3130_ref):
+def input_3130_from_DTDP(normalised=True, filenames=files_3130_mix + files_3130_ref):
     original_data = []
     input_data = []
     input_labels = []
     for filename in filenames:
-        unnormalised_data, labels = read_csv_DTDP(filename)
+        unnormalised_data, labels = read_csv_DTDP(filename, 3500)
         input_labels.append(labels)
         new = unnormalised_data - np.min(unnormalised_data)
         normalised_data = new / 10000  # theoretical max of 3130 data
@@ -54,12 +53,12 @@ def input_3500_from_DTDP(normalised=True, filenames=files_3130_mix + files_3130_
     return original_data, inputs
 
 
-def input_3130_from_DTDP(normalised=True, filenames=files_3500_mix + files_3500_ref):
+def input_3500_from_DTDP(normalised=True, filenames=files_3500_mix + files_3500_ref):
     original_data = []
     input_data = []
     input_labels = []
     for filename in filenames:
-        unnormalised_data, labels = read_csv_DTDP(filename)
+        unnormalised_data, labels = read_csv_DTDP(filename, 4000)
         input_labels.append(labels)
         new = unnormalised_data - np.min(unnormalised_data)
         normalised_data = new / 30000  # theoretical max of 3500 data
