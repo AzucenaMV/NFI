@@ -68,6 +68,28 @@ def input_from_multiple_samples(samplelist: List[Sample], width: int, leftoffset
     return all_data, input_from_samples, sample_names
 
 
+def input_from_multiple_PROVEDIt_samples(samplelist: List[Sample], width: int, leftoffset: int, cutoff: int, normalised = True):
+    """For a set of PROVEDIt samples, creates all input images and their labels."""
+    all_data = []
+    all_data_normalised = []
+    all_labels = []
+    sample_names = []
+    for sample in samplelist:
+        sample_names.append(str(sample.name))
+        sample_data = sample.data[leftoffset:cutoff, :width]
+        all_data.append(sample_data)
+        new = sample_data-np.min(sample_data)
+        normalised_data = new/np.max(new)
+        all_data_normalised.append(normalised_data)
+        # labels = find_peaks_flowing_out_of_bins(sample.data, sample.name)
+        # all_labels.append(labels[leftoffset:cutoff, :width])
+    if normalised:
+        input_from_samples = TrainInput(np.array(all_data_normalised), np.array(all_labels))
+    else:
+        input_from_samples = TrainInput(np.array(all_data), np.array(all_labels))
+    return all_data, input_from_samples, sample_names
+
+
 def find_peaks_in_bins(sampledata, samplename):
     """Makes array of True/False of same size as data. True if a peak should theoretically be visible\
     based on the composition and the bin locations, False otherwise."""
