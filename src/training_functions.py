@@ -10,6 +10,7 @@ def scheduler(epoch, lr):
     return lr * exp(-0.1)
 
 
+
 def unet_OLD(train_input, test_input, length, weights = 'data/weights_NFI/weights_norm_avgpool.h5', train = False):
     """unet training. Default is training and storing under weights.h5"""
     number_of_dyes = 6
@@ -48,7 +49,8 @@ def unet_train_test_split(train_input, test_input, length: int, weightpath = 'da
         num_epochs = epochs  # number of complete passes through the training dataset before the training stops
         model_checkpoint = ModelCheckpoint(weightpath, monitor='val_loss', save_best_only=True)
         # history is optional for plotting
-        history = model.fit(train_images, train_labels, batch_size=batch_size, epochs=num_epochs, verbose=1, shuffle=True, validation_split=0.2, callbacks=[model_checkpoint])
+        lrscheduler = LearningRateScheduler(scheduler)
+        history = model.fit(train_images, train_labels, batch_size=batch_size, epochs=num_epochs, verbose=1, shuffle=True, validation_split=0.2, callbacks=[model_checkpoint, lrscheduler])
     metric_values = model.evaluate(x=test_images, y=test_labels)
     print('Final TEST performance')
     for metric_value, metric_name in zip(metric_values, model.metrics_names):
@@ -56,10 +58,10 @@ def unet_train_test_split(train_input, test_input, length: int, weightpath = 'da
     return model
 
 
-def FFN(train_input, test_input, weightpath = "data/weights_DTDP/weights_our_data.h5", inputsize= (1206,), train = False, batchsize=10, epochs=10):
+def FFN(train_input, test_input, weightpath = "data/weights_DTDP/weights_our_data_new.h5", inputsize= (1206,), train = False, batchsize=10, epochs=10):
     model = FFN_DTDP(input_size=inputsize)
     model.summary()
-    # model.load_weights(weightpath)
+    model.load_weights(weightpath)
     test_images = test_input.data
     test_labels = test_input.labels
 

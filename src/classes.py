@@ -47,10 +47,10 @@ class Locus:
 
 @dataclass
 class Loci:
-    def create_dict(self):
+    def create_dict(self, filename = "data/PPF6C_SPOOR.xml"):
         """Read xml file for bins of each allele, \
         returns dictionary of information"""
-        tree_file = eT.parse("data/PPF6C_SPOOR.xml")
+        tree_file = eT.parse(filename)
         root = tree_file.getroot()
         locus_dict = {}
         # root[5] is the node with loci, rest is panel info
@@ -77,6 +77,7 @@ class Loci:
             # add created locus to locus dict
             locus_dict[locus_name] = new_locus
         return locus_dict
+
 
     def create_map(self):
         """Read xml file for bins of each allele, \
@@ -107,8 +108,9 @@ class Loci:
         return allele_map
 
 
-# global variable
+# global variables
 locus_dict = Loci().create_dict()
+locus_dict_alt = Loci().create_dict("data/Globalfiler.xml")
 allele_map = Loci().create_map()
 
 

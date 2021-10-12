@@ -81,7 +81,7 @@ def plot_expected(peaks: list, sample: Sample):
         plt.hlines(max_relative, 0, 500)
         plot_sample_array(current_plot)
         plot_peaks_expected(peaks, max_relative, current_dye)
-        plot_markers(current_dye)
+        plot_markers(current_dye, 0)
         finish_plot()  # "Sample_"+sample.name+"_"+str(sample.replica)+"_expected_peaks_"+current_dye.name)
 
 
