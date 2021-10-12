@@ -109,6 +109,21 @@ def person_contributions(person_list, number_of_donors: int, mixture_type: str):
     return person_dict, persons
 
 
+def csv_read_persons_PROVEDIt(filename = 'data/donor_profiles/PROVEDIt_RD14-0003 GF Known Genotypes.csv'):
+    """reads all profiles from PROVEDIt file, alternative to csv_read_persons()"""
+    donor_alleles = pd.read_csv(filename, dtype=str, delimiter=";")
+    person_list = []
+    for index, row in donor_alleles.iterrows():
+        sample_id = row['Sample ID']
+        locus_allele = []
+        for marker in donor_alleles.columns[2:]:
+            alleles = row[marker].split(',')
+            for allele in alleles:
+                locus_allele.append(marker+'_'+allele)
+        person_list.append(Person(sample_id, locus_allele))
+    return person_list
+
+
 def make_person_mixture(mixture_name):
     """Uses person_contributions and csv_read_persons to create expected peaks in person mixture"""
     donor_set, mixture_type, donor_amount = mixture_name        # can be "1A2" for example
@@ -187,5 +202,6 @@ def shallow_analyst(sample_name):
                 peak_list.append(str(locus)+"_"+str(allele))
     mixture_list.append(peak_list)
     return mixture_list
+
 
 

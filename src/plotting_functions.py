@@ -13,7 +13,7 @@ def plot_sample_array(sample_array, plot_color="k"):
     plt.ylim([0, max(sample_array[1000:]) * 1.2])
 
 
-def plot_markers(dye_color: Dye, vertical, leftoffset: int):
+def plot_markers(dye_color: Dye, vertical=0, leftoffset=50):
     # make dict of loci present in chosen dye
     loci_on_dye = {locus_name: locus for (locus_name, locus) in locus_dict.items() if locus.dye == dye_color}
     newloclist = []
@@ -62,7 +62,7 @@ def plot_analyst(peaks: list, sample: Sample):
         initialise_figure()
         # plt.title(str('filename: '+sample.name+', dye: ' + str(Dyes.color_list[j].name)))
         plot_sample_array(current_plot)
-        plot_markers(current_dye)
+        plot_markers(current_dye, 0)
         plot_peaks_analyst(peaks, current_dye)
         title = "Sample_" + sample.name + "_" + str(sample.replica) + "_analyst_peaks_" + current_dye.name
         finish_plot()
@@ -81,7 +81,7 @@ def plot_expected(peaks: list, sample: Sample):
         plt.hlines(max_relative, 0, 500)
         plot_sample_array(current_plot)
         plot_peaks_expected(peaks, max_relative, current_dye)
-        plot_markers(current_dye, 0)
+        plot_markers(current_dye)
         finish_plot()  # "Sample_"+sample.name+"_"+str(sample.replica)+"_expected_peaks_"+current_dye.name)
 
 
