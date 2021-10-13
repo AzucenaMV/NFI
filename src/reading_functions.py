@@ -56,10 +56,11 @@ def txt_read_sample_PROVEDIt(filename: str):
         counter += 1
     # now pour contents into separate sample dataclasses
     sample_list = []
-    for i in range(len(titles)):
-        name = titles[i]
-        new_sample = Sample(name, 0, data[:, 6*i:6*i+6])
-        sample_list.append(new_sample)
+    for ind in range(len(titles)):
+        name = titles[ind]
+        if name.__contains__('RD14'):
+            new_sample = Sample(name, 0, data[:, 6 * ind:6 * ind + 6])
+            sample_list.append(new_sample)
     return sample_list
 
 
@@ -112,16 +113,20 @@ def person_contributions(person_list, number_of_donors: int, mixture_type: str):
 def csv_read_persons_PROVEDIt(filename = 'data/donor_profiles/PROVEDIt_RD14-0003 GF Known Genotypes.csv'):
     """reads all profiles from PROVEDIt file, alternative to csv_read_persons()"""
     donor_alleles = pd.read_csv(filename, dtype=str, delimiter=";")
-    person_list = []
+    person_dict = {}
     for index, row in donor_alleles.iterrows():
-        sample_id = row['Sample ID']
+        sample_id = str(row['Sample ID'])
+        if len(sample_id) == 1:
+            sample_id = "0"+sample_id
         locus_allele = []
         for marker in donor_alleles.columns[2:]:
-            alleles = row[marker].split(',')
+            alleles = str(row[marker]).split(',')
             for allele in alleles:
-                locus_allele.append(marker+'_'+allele)
-        person_list.append(Person(sample_id, locus_allele))
-    return person_list
+                if allele != 'nan' and allele != '18.1':
+                    locus_allele.append(marker+'_'+allele)
+        person = Person(sample_id, locus_allele)
+        person_dict[sample_id] = person
+    return person_dict
 
 
 def make_person_mixture(mixture_name):
@@ -132,6 +137,21 @@ def make_person_mixture(mixture_name):
     person_fracs, persons = person_contributions(person_list, donor_amount, mixture_type)
     person_mix = PersonMixture(mixture_name, persons, person_fracs)
     return person_mix
+
+
+def make_person_mix_PROVEDIt(filename: str):
+    donorlist = read_donors_from_PROVEDIt_filename(filename)
+    donordict = csv_read_persons_PROVEDIt()
+    donors = []
+    for donor in donorlist:
+        donors.append(donordict[donor])
+    person_mix = PersonMixture(filename, donors, {})
+    return person_mix
+
+
+def read_donors_from_PROVEDIt_filename(filename: str):
+    donors = filename.split("-")[2].split("d")[0].split("_")
+    return donors
 
 
 def csv_read_analyst(sample_name):

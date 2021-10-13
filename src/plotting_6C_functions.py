@@ -4,8 +4,8 @@ import matplotlib.collections as collections
 from sklearn.preprocessing import normalize
 
 
-def plot_inputs_PROVEDIt(result, leftoffset=50, fig_size=(25, 15)):
-    # OLD?
+def plot_inputs_PROVEDIt(result: np.array, title: str, leftoffset=50, fig_size=(25, 15)):
+    # wanted to check out the data without labels
     number_of_dyes = 6
     fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
     result = result.squeeze()
@@ -17,6 +17,7 @@ def plot_inputs_PROVEDIt(result, leftoffset=50, fig_size=(25, 15)):
         plot_markers(Dyes.color_list[dye], axes[dye], locus_dict_alt, y_min, leftoffset)
         axes[dye].plot(x_array, result[:, dye], "k")
         axes[dye].set_xlim([0, 480])
+    plt.title(title)
     plt.show()
     plt.close()
 
@@ -136,7 +137,7 @@ def plot_sample_markers_6C(sample: Sample):
     plt.show()
 
 
-def plot_markers(dye_color: Dye, ax, dyekit: {}, vertical=0, leftoffset=50):
+def plot_markers(dye_color: Dye, ax, dyekit: {}, vertical=0.0, leftoffset=50):
     # make dict of loci present in chosen dye
     loci_on_dye = {locus_name: locus for (locus_name, locus) in dyekit.items() if locus.dye == dye_color}
     newticklist = []

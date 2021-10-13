@@ -34,9 +34,11 @@ if __name__ == '__main__':
     for elt in PROVEDIT_tracedata:
         PROVEDIt_samples += rf.txt_read_sample_PROVEDIt(elt)
     originals, PROVEDIt_input, names = dpf.input_from_multiple_PROVEDIt_samples(PROVEDIt_samples, number_of_dyes, leftoffset, rightcutoff, True)
-    for data_index in range(200,205):
-        pf6.plot_inputs_PROVEDIt(PROVEDIt_input.data[data_index])
-    # trf.unet_train_test_split([], PROVEDIt_input, rightcutoff-leftoffset, "data/weights_NFI/weights_6_split_300epochs+LRs100.h5", train=False)
+    # rf.csv_read_persons_PROVEDIt()
+    # for sample_index in range(len(names)):
+    #     print(rf.read_donors_from_PROVEDIt_filename(names[sample_index]))
+        # pf6.plot_inputs_PROVEDIt(PROVEDIt_input.data[sample_index], names[sample_index])
+    trf.unet_train_test_split([], PROVEDIt_input, rightcutoff-leftoffset, "data/weights_NFI/weights_6_split_300epochs+LRs100.h5", train=False)
 
 
 

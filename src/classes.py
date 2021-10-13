@@ -177,6 +177,23 @@ class PersonMixture:
             peak_list.append(new_peak)                  # append peak to list
         return peak_list
 
+    def create_peaks_no_heights(self):
+        """Returns list of peaks expected in mixture and NOT their relative heights"""
+        peak_list = []
+        shallow_peak_list = []
+        # iterate through persons in mix
+        for person in self.persons:
+            # iterate over their alleles
+            for locus_allele in person.alleles:
+                if locus_allele not in shallow_peak_list:
+                    shallow_peak_list.append(locus_allele)
+                    locus_name, allele_name = locus_allele.split("_")
+                    locus = locus_dict_alt[locus_name]
+                    allele = locus.alleles[allele_name]
+                    new_peak = Peak(allele, 0)
+                    peak_list.append(new_peak)
+        return peak_list
+
 
 @dataclass
 class AnalystMixture:
