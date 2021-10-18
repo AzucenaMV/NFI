@@ -36,10 +36,8 @@ def txt_read_sample(filename: str):
     return sample_list
 
 
-def txt_read_sample_PROVEDIt(filename: str):
-    """ Function to read data files\
-    Returns a list of sample names, colors, \
-    and the data itself as matrix."""
+def txt_read_sized_sample_PROVEDIt(filename: str):
+    """ Function to read data from PROVEDIt sized trace data"""
     with open("data/trace_data/"+filename, "r") as text_file:
         texts = text_file.read()
     texts = texts.split("\n")       # split into lines
@@ -62,6 +60,33 @@ def txt_read_sample_PROVEDIt(filename: str):
             new_sample = Sample(name, 0, data[:, 6 * ind:6 * ind + 6])
             sample_list.append(new_sample)
     return sample_list
+
+
+def txt_read_raw_sample_PROVEDIt(filename: str):
+    """ Reads data from PROVEDIt raw data """
+    with open("data/trace_data/"+filename, "r") as text_file:
+        texts = text_file.read()
+    texts = texts.split("\n")       # split into lines
+    # lines 1 an 2 are not interesting
+    titles = texts[2].split('\t')                       # get titles of files
+    titles = [item for item in titles if item != '']    # remove empty entries after splitting
+    colors = texts[3].split('\t')                       # only needed for width of lines
+    data = np.zeros((len(texts[4:]), len(colors)))
+    counter = 0                                         # counter is needed for line number
+    for elt in texts[4:]:
+        new = np.array(elt.split('\t'))     # split into words
+        new[new == ''] = 0                  # if empty string, make zero
+        data[counter, :] = new              # store into data array
+        counter += 1
+    # now pour contents into separate sample dataclasses
+    sample_list = []
+    for ind in range(len(titles)):
+        name = titles[ind]
+        if name.__contains__('RD14'):
+            new_sample = Sample(name, 0, data[:, 6 * ind:6 * ind + 6])
+            sample_list.append(new_sample)
+    return sample_list
+
 
 
 def csv_read_persons(donor_set):
@@ -122,7 +147,7 @@ def csv_read_persons_PROVEDIt(filename = 'data/donor_profiles/PROVEDIt_RD14-0003
         for marker in donor_alleles.columns[2:]:
             alleles = str(row[marker]).split(',')
             for allele in alleles:
-                if allele != 'nan' and allele != '18.1':
+                if allele != 'nan':
                     locus_allele.append(marker+'_'+allele)
         person = Person(sample_id, locus_allele)
         person_dict[sample_id] = person

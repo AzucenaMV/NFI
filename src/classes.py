@@ -189,9 +189,10 @@ class PersonMixture:
                     shallow_peak_list.append(locus_allele)
                     locus_name, allele_name = locus_allele.split("_")
                     locus = locus_dict_alt[locus_name]
-                    allele = locus.alleles[allele_name]
-                    new_peak = Peak(allele, 0)
-                    peak_list.append(new_peak)
+                    if locus_allele != "SE33_18.1":
+                        allele = locus.alleles[allele_name]
+                        new_peak = Peak(allele, 0)
+                        peak_list.append(new_peak)
         return peak_list
 
 

@@ -78,4 +78,4 @@ def FFN(train_input, test_input, weightpath = "data/weights_DTDP/weights_our_dat
     print('Final TEST performance')
     for metric_value, metric_name in zip(metric_values, model.metrics_names):
         print('{}: {}'.format(metric_name, metric_value))
-    return model
+    return model, metric_values

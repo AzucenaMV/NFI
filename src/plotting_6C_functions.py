@@ -33,7 +33,7 @@ def plot_results_unet_against_truth(input, result, label, title=False, leftoffse
         y_min = -0.1 * y_max  # always a 10% gap on bottom for legibility
         axes[dye].set_xlim([0, 480])
         axes[dye].set_ylim([y_min, y_max])
-        plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
+        plot_markers(Dyes.color_list[dye], axes[dye], locus_dict_alt, y_min, leftoffset)
         axes[dye].plot(x_array, input[:, dye], "k")
         axes[dye].axhline(y=500, linestyle="--", color="gray")
         # plot result
