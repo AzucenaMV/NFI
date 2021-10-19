@@ -11,30 +11,50 @@ tracedata_for_training = ['TraceDataSet11.txt', 'TraceDataSet12.txt', 'TraceData
              'TraceDataSet51.txt', 'TraceDataSet52.txt']
 tracedata_for_testing = ['TraceDataSet61.txt', 'TraceDataSet62.txt']
 
-PROVEDIT_sized_trace_data = ['PROVEDIt_RD14-0003(010616CMG_15sec)_sized1.txt', 'PROVEDIt_RD14-0003(010616CMG_15sec)_sized2.txt', 'PROVEDIt_RD14-0003(010616CMG_15sec)_sized3.txt', 'PROVEDIt_RD14-0003(020216ADG_15sec)_sized1.txt', 'PROVEDIt_RD14-0003(020216ADG_15sec)_sized2.txt', 'PROVEDIt_RD14-0003(021716ADG_15sec)_sized1.txt', 'PROVEDIt_RD14-0003(021716ADG_15sec)_sized2.txt', 'PROVEDIt_RD14-0003(021716ADG_15sec)_sized3.txt', 'PROVEDIt_RD14-0003(022516ADG_15sec)_sized1.txt', 'PROVEDIt_RD14-0003(022516ADG_15sec)_sized2.txt', 'PROVEDIt_RD14-0003(022516ADG_15sec)_sized3.txt', 'PROVEDIt_RD14-0003(100515ADG_15sec)_sized1.txt', 'PROVEDIt_RD14-0003(100515ADG_15sec)_sized2.txt']
+PROVEDIt_sized_trace_data_mix = ['PROVEDIt_RD14-0003(021016ADG_15sec)_sized_improved1.txt', 'PROVEDIt_RD14-0003(021016ADG_15sec)_sized_improved2.txt']
+PROVEDIt_sized_trace_data_SS = ['PROVEDIt_RD14-0003(100115ADG_15sec)_sized_improved1.txt', 'PROVEDIt_RD14-0003(100115ADG_15sec)_sized_improved2.txt']
 
-PROVEDIt_raw_trace_data_mix = ['PROVEDIt_RD14-0003(021016ADG_15sec)_raw1.txt', 'PROVEDIt_RD14-0003(021016ADG_15sec)_raw2.txt']
-PROVEDIt_raw_trace_data_SS = ['PROVEDIt_RD14-0003(100115ADG_15sec)_raw1.txt', 'PROVEDIt_RD14-0003(100115ADG_15sec)_raw2.txt']
+
+PROVEDIt_raw_trace_data_mix = ['PROVEDIt_RD14-0003(021016ADG_15sec)_raw_improved1.txt', 'PROVEDIt_RD14-0003(021016ADG_15sec)_raw_improved2.txt']
+PROVEDIt_raw_trace_data_SS = ['PROVEDIt_RD14-0003(100115ADG_15sec)_raw_improved1.txt', 'PROVEDIt_RD14-0003(100115ADG_15sec)_raw_improved2.txt']
 
 #
 if __name__ == '__main__':
-    # number_of_dyes = 6
-    # test_samples = []
-    # for elt in tracedata_for_testing:
-    #     test_samples += rf.txt_read_sample(elt)
+    number_of_dyes = 6
+    test_samples = []
+    for elt in tracedata_for_testing:
+        test_samples += rf.txt_read_sample(elt)
     #
-    # leftoffset = 500
-    # rightcutoff = 4800 + 500
-    # #
-    # unnormalised, test_input, names = dpf.input_from_multiple_samples(test_samples, number_of_dyes, leftoffset, rightcutoff, True)
-    # Unet = trf.unet_train_test_split([], test_input, 4800, "data/weights_NFI/weights_6_split_300epochs+LRs100.h5", train=False,epochs=100)
+    leftoffset = 500
+    rightcutoff = 4800 + 500
+    #
+    unnormalised, test_input, names = dpf.input_from_multiple_samples(test_samples, number_of_dyes, leftoffset, rightcutoff, True)
+    Unet = trf.unet_train_test_split([], test_input, 4800, "data/weights_NFI/weights_6_split_300epochs+LRs100.h5", train=False,epochs=100)
 
-    # PROVEDIt_samples = []
-    # for elt in PROVEDIT_sized_trace_data:
-    #     PROVEDIt_samples += rf.txt_read_sized_sample_PROVEDIt(elt)
-    # originals, PROVEDIt_input, names = dpf.input_from_multiple_PROVEDIt_samples(PROVEDIt_samples, number_of_dyes, leftoffset, rightcutoff, True)
-    # Unet = trf.unet_train_test_split([], PROVEDIt_input, rightcutoff-leftoffset, "data/weights_NFI/weights_6_split_300epochs+LRs100.h5", train=False)
-    #
+    PROVEDIt_samples = []
+    for elt in PROVEDIt_sized_trace_data_SS:
+        PROVEDIt_samples += rf.txt_read_sample_PROVEDIt(elt)
+    originals_SS, PROVEDIt_input_SS, names_SS = dpf.input_from_multiple_PROVEDIt_samples(PROVEDIt_samples, number_of_dyes, leftoffset, rightcutoff, True)
+    PROVEDIt_samples = []
+    for elt in PROVEDIt_sized_trace_data_mix:
+        PROVEDIt_samples += rf.txt_read_sample_PROVEDIt(elt)
+    originals_mix, PROVEDIt_input_mix, names_mix = dpf.input_from_multiple_PROVEDIt_samples(PROVEDIt_samples, number_of_dyes, leftoffset, rightcutoff, True)
+
+    for name_ind in range(len(names_SS)):
+        name = names_SS[name_ind][:-4]+'.csv'
+        input_for_unet = PROVEDIt_input_SS.data[name_ind]
+        data, output_CNN = rdD.read_csv_DT_PROVEDIt(name, folder='data/DT_results_CNN/DT_ANN_SS/')
+        # data = (data-np.min(data))/np.max(data)
+        output_Unet = Unet.predict(input_for_unet.reshape(1,4800,6))
+        pf6.plot_Unet_against_CNN(input_for_unet, output_Unet, output_CNN, title=name, rescale=12)
+    for name_ind in range(len(names_mix)):
+        name = names_mix[name_ind][:-4]+'.csv'
+        input_for_unet = PROVEDIt_input_mix.data[name_ind]
+        input_for_cnn, output_CNN = rdD.read_csv_DT_PROVEDIt(name, folder='data/DT_results_CNN/DT_ANN_mix/')
+        # input_for_cnn = (input_for_cnn-np.min(input_for_cnn))/np.max(input_for_cnn)
+        output_Unet = Unet.predict(input_for_unet.reshape(1, 4800, 6))
+        pf6.plot_Unet_against_CNN(input_for_unet, output_Unet, output_CNN, title=name, rescale=12)
+
 
     # width = 80
     # input_dim = 6*(width*2+1)
@@ -65,8 +85,12 @@ if __name__ == '__main__':
     #     binacc.update_state(truth, result)
     # dataframe = pd.read_csv('data/results_paper/FFNvUnet_bluedye.csv')
     # ax = dataframe.plot.scatter(x='auc_FFN', y = 'auc_Unet', color= 'darkviolet', marker = '*')
+    # ax.plot(range(0,1,50), range(0,1,50))
     # ax.set_xlim([0.93,1])
     # ax.set_ylim([0.93,1])
+    # lims = [0.93, 1]
+    # # now plot both limits against eachother
+    # ax.plot(lims, lims, 'k-', alpha=0.75, zorder=0)
     # plt.grid()
     # ax.set_xlabel('AUC score FFN')
     # ax.set_ylabel('AUC score U-net')

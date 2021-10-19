@@ -62,7 +62,7 @@ def plot_results_unet_against_truth_alt(input, result, label, title=False, lefto
         y_min = -0.1 * y_max  # always a 10% gap on bottom for legibility
         axes[dye].set_xlim([0, 480])
         axes[dye].set_ylim([y_min, y_max])
-        plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
+        plot_markers(Dyes.color_list[dye], axes[dye], locus_dict, y_min, leftoffset)
         axes[dye].plot(x_array, input[:, dye], "k")
         # plot result
         line1, = axes[dye].plot(x_array, y_max * result[:, dye])
@@ -87,16 +87,17 @@ def plot_results_unet_against_truth_alt(input, result, label, title=False, lefto
     plt.close()
 
 
-def plot_inputs_unet(input, label, leftoffset=50, fig_size=(30, 20), rescale=10):
+def plot_inputs_unet(input, label, leftoffset=50, fig_size=(30, 20), rescale=10, title=''):
     number_of_dyes = 6
     fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
     input = input.squeeze()
     x_array = np.linspace(0, len(input) / rescale, len(input))
+    plt.suptitle(title)
     for dye in range(number_of_dyes):
         y_max = 1000  # min(1000, 0.1 * max(input[:,dye]))
         y_min = -0.1 * y_max  # always a 10% gap on bottom for legibility
-        # axes[dye].set_ylim([y_min, y_max])
-        plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
+        axes[dye].set_ylim([y_min, y_max])
+        plot_markers(Dyes.color_list[dye], axes[dye], locus_dict_alt, y_min, leftoffset)
         axes[dye].plot(x_array, input[:, dye], "k")
         # axes[dye].set_xlim([0,480])
         # plot truth
@@ -118,7 +119,7 @@ def plot_labels(sample_array, peak_bools, ax, y_min, y_max, alph=0.5, nopeak="pu
     ax.add_collection(collection)
 
 
-def plot_sample_markers_6C(sample: Sample):
+def OLD_plot_sample_markers_6C(sample: Sample):
     """Plots sample and markers in 6C plot"""
     plt.figure()
     # iterate through all loci to plot markers
@@ -210,7 +211,7 @@ def OLD_plot_expected_6C(peaks: list, sample: Sample):
     plt.show()
 
 
-def plot_all_markers_and_bins():
+def OLD_plot_all_markers_and_bins():
     """Just a quick function to test marker boundaries"""
     plt.figure()
     # iterate through all loci
@@ -230,7 +231,7 @@ def plot_all_markers_and_bins():
     plt.close()
 
 
-def choose_normalisation(original, leftoffset=50, fig_size=(15, 10)):
+def OLD_choose_normalisation(original, leftoffset=50, fig_size=(15, 10)):
     """Visualising some options to choose a normalisation from"""
     number_of_dyes = 6
     original = original.squeeze()
@@ -248,7 +249,7 @@ def choose_normalisation(original, leftoffset=50, fig_size=(15, 10)):
     y_min = np.min(original)
     y_max = np.max(original)
     for dye in range(number_of_dyes):
-        plot_markers(Dyes.color_list[dye], axes[dye], 0, leftoffset)
+        plot_markers(Dyes.color_list[dye], axes[dye], locus_dict, 0, leftoffset)
         axes[dye].plot(x_array, original[:, dye], "k")
         axes[dye].set_ylim([y_min, y_max])
     fig.suptitle("original")
@@ -258,7 +259,7 @@ def choose_normalisation(original, leftoffset=50, fig_size=(15, 10)):
     # norm2
     fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
     for dye in range(number_of_dyes):
-        plot_markers(Dyes.color_list[dye], axes[dye], 0, leftoffset)
+        plot_markers(Dyes.color_list[dye], axes[dye], locus_dict, 0, leftoffset)
         axes[dye].plot(x_array, norm_per_dye[:, dye], "k")
         axes[dye].set_ylim([0, 1])
     fig.suptitle("per dye")
@@ -268,7 +269,7 @@ def choose_normalisation(original, leftoffset=50, fig_size=(15, 10)):
     # norm3
     fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
     for dye in range(number_of_dyes):
-        plot_markers(Dyes.color_list[dye], axes[dye], 0, leftoffset)
+        plot_markers(Dyes.color_list[dye], axes[dye], locus_dict, 0, leftoffset)
         axes[dye].plot(x_array, norm_per_image[:, dye], "k")
         axes[dye].set_ylim([0, 1])
     fig.suptitle("per image")
@@ -278,7 +279,7 @@ def choose_normalisation(original, leftoffset=50, fig_size=(15, 10)):
     # norm4
     fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
     for dye in range(number_of_dyes):
-        plot_markers(Dyes.color_list[dye], axes[dye], 0, leftoffset)
+        plot_markers(Dyes.color_list[dye], axes[dye], locus_dict, 0, leftoffset)
         axes[dye].plot(x_array, norm_per_image[:, dye], "k")
         axes[dye].set_ylim([0, 1])
     fig.suptitle("per image")
@@ -295,7 +296,7 @@ def plot_bins_vs_labels(input, labels_peaks, labels_bins, title=False, leftoffse
         y_max = 20000  # min(1000, 0.1 * max(input[:,dye]))
         y_min = -0.1 * y_max  # always a 10% gap on bottom for legibility
         axes[dye].set_ylim([y_min, y_max])
-        plot_markers(Dyes.color_list[dye], axes[dye], y_min, leftoffset)
+        plot_markers(Dyes.color_list[dye], axes[dye], locus_dict, y_min, leftoffset)
         line1, = axes[dye].plot(x_array, input[:, dye], "k")
 
         # plot background of peaks in green
@@ -314,3 +315,27 @@ def plot_bins_vs_labels(input, labels_peaks, labels_bins, title=False, leftoffse
     else:
         plt.savefig(str(title) + ".png")
     plt.close()
+
+
+def plot_Unet_against_CNN(input_for_nn, Unet_output, CNN_output, title, rescale, fig_size = (10,15)):
+    number_of_dyes = 6
+    fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
+    input_for_nn = input_for_nn.squeeze()
+    Unet_output = Unet_output.squeeze()
+    CNN_output = CNN_output.squeeze()
+
+    x_array = np.linspace(0, len(Unet_output) / 10, len(Unet_output))
+    x_array_cnn = np.linspace(0+25, len(CNN_output)/rescale+25, len(CNN_output))
+    for dye in range(number_of_dyes):
+        y_max = 1.1
+        y_min = -0.1 #* y_max  # always a 10% gap on bottom for legibility
+        axes[dye].set_ylim([y_min, y_max])
+        plot_markers(Dyes.color_list[dye], axes[dye], locus_dict_alt, y_min, 0)
+        axes[dye].plot(x_array, Unet_output[:, dye], "m", alpha=0.3)
+        axes[dye].plot(x_array_cnn, CNN_output[:, dye], "c", alpha=0.3)
+        axes[dye].plot(x_array, input_for_nn[:, dye], "k", alpha=0.7)
+        axes[dye].set_xlim([0, 480])
+    plt.suptitle(title)
+    plt.savefig(title+"_UnetCNN.png")
+    plt.close()
+

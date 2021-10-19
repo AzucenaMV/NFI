@@ -81,8 +81,8 @@ def input_from_multiple_PROVEDIt_samples(samplelist: List[Sample], width: int, l
         new = sample_data-np.min(sample_data)
         normalised_data = new/np.max(new)
         all_data_normalised.append(normalised_data)
-        labels = find_peaks_flowing_out_of_bins(sample.data, sample.name, alt = True)
-        all_labels.append(labels[leftoffset:rightcutoff, :width])
+        labels = np.zeros(9000)#find_peaks_flowing_out_of_bins(sample.data, sample.name, alt = True)
+        all_labels.append(labels[leftoffset:rightcutoff])
     if normalised:
         input_from_samples = TrainInput(np.array(all_data_normalised), np.array(all_labels))
     else:
