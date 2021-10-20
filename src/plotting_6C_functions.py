@@ -1,7 +1,6 @@
 from matplotlib import pyplot as plt
 from src.classes import *
 import matplotlib.collections as collections
-from sklearn.preprocessing import normalize
 
 
 def plot_inputs_PROVEDIt(result: np.array, title: str, leftoffset=50, fig_size=(25, 15)):

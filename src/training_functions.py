@@ -38,7 +38,7 @@ def unet_train_test_split(train_input, test_input, length: int, weightpath = 'da
     number_of_dyes = 6
     model = unet_small((length, number_of_dyes, 1))
     model.summary()
-    model.load_weights(weightpath)
+    # model.load_weights(weightpath)
     test_images = test_input.data
     test_labels = test_input.labels
 
