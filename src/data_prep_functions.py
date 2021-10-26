@@ -123,7 +123,7 @@ def find_peaks_flowing_out_of_bins(sampledata, samplename, alt = False):
         person_mix = rf.make_person_mixture(samplename)
         peaks = person_mix.create_peaks()
     else:
-        person_mix = rf.make_person_mix_PROVEDIt(samplename)
+        person_mix = rf.OLD_make_person_mix_PROVEDIt(samplename)
         peaks = person_mix.create_peaks_no_heights()
     # cannot find precise index, since "size" of bins is accurate to 2 decimals, measurements to 1
     for peak in peaks:

@@ -1,7 +1,8 @@
+# This file was used to read out data from Duncan Taylor and David Powers 3rd paper
+# Will be deleted as it's no longer used
+
+
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from src import plotting_6C_functions as pf6
 from src.classes import *
 
 files_3130_mix = ["3130 mixture - test profiles/889-09_400pg_4-1_B02_004.csv",
@@ -32,16 +33,17 @@ def read_csv_DTDP_labels(filename, range_start: int, folder="data/DTDP_profiles/
     labels_multi = np.array(dataframe[['dye1GT', 'dye2GT', 'dye3GT', 'dye4GT', 'dye6GT', 'dye5GT']].values)
     labels_binary = np.isin(labels_multi, 'A')  # label 'A' is reserved for alleles
     # pf6.plot_inputs_unet(data[range_start:9000, :], labels_binary[range_start:9000,:], rescale=12)
-    return data[range_start:range_start+4800, :], labels_binary[range_start:range_start + 4800, :]
+    return data[range_start:range_start + 4800, :], labels_binary[range_start:range_start + 4800, :]
 
 
-def read_csv_DT_PROVEDIt(filename, folder:str, range_start=4000):
+def read_csv_DT_PROVEDIt(filename, folder: str, range_start=4000):
     dataframe = pd.read_csv(folder + filename)
     data = np.array(dataframe[['dye1', 'dye2', 'dye3', 'dye4', 'dye6',
                                'dye5']].values)  # need to swap 5 and 6 to get size std at bottom
-    DT_output = np.array(dataframe[['dye1_allele_prob', 'dye2_allele_prob', 'dye3_allele_prob', 'dye4_allele_prob', 'dye6_allele_prob', 'dye5_allele_prob']].values)
+    DT_output = np.array(dataframe[['dye1_allele_prob', 'dye2_allele_prob', 'dye3_allele_prob', 'dye4_allele_prob',
+                                    'dye6_allele_prob', 'dye5_allele_prob']].values)
     # pf6.plot_inputs_unet(data[range_start:9000, :], DT_output[range_start:9000,:]>0.5, rescale=12, title = filename)
-    return data[range_start:range_start+4800, :], DT_output[range_start:range_start + 4800, :]
+    return data[range_start:range_start + 4800, :], DT_output[range_start:range_start + 4800, :]
 
 
 def input_3130_from_DTDP(normalised=True, filenames=files_3130_mix + files_3130_ref):

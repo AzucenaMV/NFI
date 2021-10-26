@@ -6,16 +6,16 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def load_dataframe(filename = "data/F1_scores_29_6_2021.csv"):
+def load_dataframe(filename="data/F1_scores_29_6_2021.csv"):
     df = pd.read_csv(filename, index_col=0)
     return df
 
 
-def store_dataframe(name_list, data_lists, filename = "data/F1_scores_29_6_2021.csv", ):
+def store_dataframe(name_list, data_lists, filename="data/F1_scores_29_6_2021.csv", ):
     # dict = {"name": name_list, "score": score_list, "upper": upper_bound_score_list, "analyst": analyst_score_list}
     # df = pd.dataframe(dict)
     df = pd.DataFrame(data=data_lists, index=name_list, columns=["set", "mix", "donors", "score", "upper", "analyst"])
-    df.to_csv(filename, index = False)
+    df.to_csv(filename, index=False)
     return df
 
 
