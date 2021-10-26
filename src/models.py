@@ -1,7 +1,7 @@
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Input, Dropout, Conv2D, UpSampling2D, concatenate, AvgPool2D, Flatten, Dense
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.metrics import BinaryAccuracy, AUC, MeanIoU
+from tensorflow.keras.metrics import BinaryAccuracy, AUC
 
 def unet_small(input_size=(4800, 6, 1)):
     inputs = Input(input_size)
