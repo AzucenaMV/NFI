@@ -94,3 +94,30 @@ def combine_results_FFN(testset: DTDPTrainInput, testset_full_images: TrainInput
             prediction_array[point] = prediction
         labels.append(prediction_array)
     return images, np.array(labels)
+
+
+def average_scores_from_dataframe(dataframe, score, crit, loc):
+    avg_a = []
+    avg_b = []
+    avg_c = []
+    avg_d = []
+    avg_e = []
+    for ind, elt in dataframe.iterrows():
+        name = elt['name']
+        if name[loc] == crit[0]:
+            avg_a.append(elt[score])
+        elif name[loc] == crit[1]:
+            avg_b.append(elt[score])
+        elif name[loc] == crit[2]:
+            avg_c.append(elt[score])
+        elif name[loc] == crit[3]:
+            avg_d.append(elt[score])
+        elif name[loc] == crit[4]:
+            avg_e.append(elt[score])
+        else:
+            print('oh no')
+    print(score, crit[0], np.average(avg_a))
+    print(score, crit[1], np.average(avg_b))
+    print(score, crit[2], np.average(avg_c))
+    print(score, crit[3], np.average(avg_d))
+    print(score, crit[4], np.average(avg_e))

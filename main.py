@@ -65,30 +65,11 @@ if __name__ == '__main__':
     #     binacc = BinaryAccuracy()
     #     binacc.update_state(truth, result)
     dataframe = pd.read_csv('data/results_paper/FFNvUnet_bluedye.csv')
-    avg_a = []
-    avg_b = []
-    avg_c = []
-    avg_d = []
-    avg_e = []
-    for ind, elt in dataframe.iterrows():
-        name = elt['name']
-        if name[1] == 'A':
-            avg_a.append(elt['auc_Unet'])
-        if name[1] == 'B':
-            avg_b.append(elt['auc_Unet'])
-        if name[1] == 'C':
-            avg_c.append(elt['auc_Unet'])
-        if name[1] == 'D':
-            avg_d.append(elt['auc_Unet'])
-        if name[1] == 'E':
-            avg_e.append(elt['auc_Unet'])
-        else:
-            print('oh no')
-    print(np.average(avg_a))
-    print(np.average(avg_b))
-    print(np.average(avg_c))
-    print(np.average(avg_d))
-    print(np.average(avg_e))
+    ppf.average_scores_from_dataframe(dataframe, 'auc_Unet', ['2', '3', '4', '5', '6'], 2)
+    ppf.average_scores_from_dataframe(dataframe, 'bin_acc_Unet', ['2', '3', '4', '5', '6'], 2)
+    ppf.average_scores_from_dataframe(dataframe, 'auc_FFN', ['2', '3', '4', '5', '6'], 2)
+    ppf.average_scores_from_dataframe(dataframe, 'bin_acc_FFN', ['2', '3', '4', '5', '6'], 2)
+
     # ax = dataframe.plot.scatter(x='auc_FFN', y = 'auc_Unet', color= 'darkviolet', marker = '*')
     # ax.plot(range(0,1,50), range(0,1,50))
     # ax.set_xlim([0.93,1])
