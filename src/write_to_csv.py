@@ -18,5 +18,5 @@ def save_data_to_csv(data_to_save: TrainInput, names: List):
             df_dict['dye'+str(dye+1)+'GT'] = labels[trace_index][:, dye].tolist()
 
         dataframe = pd.DataFrame(df_dict)
-        dataframe.to_csv('csvs/train/'+names[trace_index]+'_train.csv', index=False)
+        dataframe.to_csv('data_for_github/train/'+names[trace_index]+'_train.csv', index=False)
 
