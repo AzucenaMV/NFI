@@ -1,14 +1,19 @@
+# Neural networks used in comparison
+# U-net and FFN
+
+
 from tensorflow.keras.models import Model, Sequential
-from tensorflow.keras.layers import Input, Dropout, Conv2D, UpSampling2D, concatenate, AvgPool2D, Flatten, Dense
+from tensorflow.keras.layers import Input, Dropout, Conv2D, UpSampling2D, concatenate, AvgPool2D, Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import BinaryAccuracy, AUC
+
 
 def unet_small(input_size=(4800, 6, 1)):
     inputs = Input(input_size)
     # Convolution 1
-    kernelsize = (3, 6)     # 3->6 all 6 dyes
+    kernelsize = (3, 6)  # 3->6 all 6 dyes
     kernelsize_up = (2, 6)  # one less because concatenated
-    poolsize = (2, 1)       # pooling
+    poolsize = (2, 1)  # pooling
 
     conv1 = Conv2D(2, kernelsize, activation='relu', padding='same',
                    kernel_initializer='he_normal'
@@ -91,9 +96,9 @@ def unet_small(input_size=(4800, 6, 1)):
     return model
 
 
-def FFN_DTDP(input_size = (1206,)):
+def FFN_DTDP(input_size=(1206,)):
     model = Sequential()
-    model.add(Dropout(0.2, input_shape = input_size))
+    model.add(Dropout(0.2, input_shape=input_size))
     model.add(Dense(100, activation='relu'))
     model.add(Dropout(0.5))
     model.add(Dense(1, activation='sigmoid'))
@@ -101,4 +106,3 @@ def FFN_DTDP(input_size = (1206,)):
     # categorical cross entropy loss is changed to binary
     model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=[BinaryAccuracy(), AUC()])
     return model
-

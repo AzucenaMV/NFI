@@ -1,3 +1,6 @@
+# Plotting functions for single dye
+
+
 import matplotlib.pyplot as plt
 from src.classes import *
 import matplotlib.collections as collections
@@ -19,11 +22,19 @@ def plot_markers(dye_color: Dye, vertical=0, leftoffset=50):
     newloclist = []
     newlabellist = []
     for (locus_name, locus) in loci_on_dye.items():
-        plt.annotate(text="", xy=(locus.lower-leftoffset, vertical), xytext=(locus.upper-leftoffset, vertical),
+        plt.annotate(text="", xy=(locus.lower - leftoffset, vertical), xytext=(locus.upper - leftoffset, vertical),
                      arrowprops=dict(arrowstyle='<->', color='b'))
         newloclist.append((locus.lower + locus.upper) / 2 - leftoffset)
         newlabellist.append(locus_name)
     plt.xticks(newloclist, newlabellist)
+
+
+def finish_plot(show_or_title="show"):
+    if show_or_title == "show":
+        plt.show()
+    else:
+        plt.savefig(show_or_title + ".png")
+        plt.close()
 
 
 def plot_peaks_analyst(peak_list: list, dye_color: Dye):
@@ -43,14 +54,6 @@ def plot_peaks_expected(peak_list: list, max_rel, dye_color: Dye):
         if dye == dye_color:
             color = dye.plot_color
             plt.plot([peak.allele.mid], [peak.height * max_rel], str(color + "*"))
-
-
-def finish_plot(show_or_title="show"):
-    if show_or_title == "show":
-        plt.show()
-    else:
-        plt.savefig(show_or_title + ".png")
-        plt.close()
 
 
 def plot_analyst(peaks: list, sample: Sample):
@@ -120,17 +123,17 @@ def plot_labeled_background(sample_array, peak_bools, dye_index):
 
 
 def plot_results_FFN(image, prediction, label, title="show"):
-    fig, ax = initialise_figure(fig_size=(20,3))
+    fig, ax = initialise_figure(fig_size=(20, 3))
     image = image.squeeze()
     prediction = prediction.squeeze()
     label = label.squeeze()
     x = np.linspace(0, len(image) / 10, len(image))
-    y_max = 1            #min(1000, 0.1 * max(input[:,dye]))
-    y_min = 0#-0.1*y_max      # always a 10% gap on bottom for legibility
+    y_max = 1  # min(1000, 0.1 * max(input[:,dye]))
+    y_min = 0  # -0.1*y_max      # always a 10% gap on bottom for legibility
     ax.set_xlim([0, 480])
     ax.set_ylim([y_min, y_max])
     ax.plot(x, image, "k")
-    ax.axhline(y=0.5, linestyle="--", color = "gray")
+    ax.axhline(y=0.5, linestyle="--", color="gray")
     # plot result
     ax.plot(x, prediction, color="magenta")
     # plot truth
@@ -139,4 +142,3 @@ def plot_results_FFN(image, prediction, label, title="show"):
     ax.add_collection(collection)
     plot_markers(Dyes.BLUE, y_min, 50)
     finish_plot(title)
-

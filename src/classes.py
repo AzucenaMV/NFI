@@ -1,3 +1,7 @@
+# some dataclasses used throughout project
+# some global variables used throughout project
+
+
 from dataclasses import dataclass
 from typing import List, Dict
 import numpy as np

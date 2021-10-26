@@ -1,3 +1,6 @@
+# Plotting functions for all 6 dyes in one figure
+
+
 from matplotlib import pyplot as plt
 from src.classes import *
 import matplotlib.collections as collections
@@ -162,7 +165,7 @@ def plot_bins_vs_labels(input, labels_peaks, labels_bins, title=False, leftoffse
     plt.close()
 
 
-def plot_Unet_against_CNN(input_for_nn, Unet_output, CNN_output, title, rescale, fig_size = (10,15)):
+def plot_Unet_against_CNN(input_for_nn, Unet_output, CNN_output, title, rescale, fig_size=(10, 15)):
     number_of_dyes = 6
     fig, axes = plt.subplots(nrows=number_of_dyes, figsize=fig_size)
     input_for_nn = input_for_nn.squeeze()
@@ -170,10 +173,10 @@ def plot_Unet_against_CNN(input_for_nn, Unet_output, CNN_output, title, rescale,
     CNN_output = CNN_output.squeeze()
 
     x_array = np.linspace(0, len(Unet_output) / 10, len(Unet_output))
-    x_array_cnn = np.linspace(0+25, len(CNN_output)/rescale+25, len(CNN_output))
+    x_array_cnn = np.linspace(0 + 25, len(CNN_output) / rescale + 25, len(CNN_output))
     for dye in range(number_of_dyes):
         y_max = 1.1
-        y_min = -0.1 #* y_max  # always a 10% gap on bottom for legibility
+        y_min = -0.1  # * y_max  # always a 10% gap on bottom for legibility
         axes[dye].set_ylim([y_min, y_max])
         plot_markers(Dyes.color_list[dye], axes[dye], locus_dict_alt, y_min, 0)
         axes[dye].plot(x_array, Unet_output[:, dye], "m", alpha=0.3)
@@ -181,6 +184,5 @@ def plot_Unet_against_CNN(input_for_nn, Unet_output, CNN_output, title, rescale,
         axes[dye].plot(x_array, input_for_nn[:, dye], "k", alpha=0.7)
         axes[dye].set_xlim([0, 480])
     plt.suptitle(title)
-    plt.savefig(title+"_UnetCNN.png")
+    plt.savefig(title + "_UnetCNN.png")
     plt.close()
-

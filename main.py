@@ -1,4 +1,4 @@
-from src import data_prep_functions as dpf, plotting_functions as pf, reading_functions as rf, training_functions as trf, plotting_6C_functions as pf6, write_to_csv as wf, post_processing_functions as ppf, results as r, reading_data_DTDP as rdD
+from src import data_prep_functions as dpf, plotting_functions as pf, reading_functions as rf, training_functions as trf, plotting_6C_functions as pf6, write_to_csv as wf, post_processing_functions as ppf, results as r, OLD_reading_data_DTDP as rdD
 import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow.keras.metrics import BinaryAccuracy, AUC
