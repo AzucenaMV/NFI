@@ -142,3 +142,9 @@ def plot_results_FFN(image, prediction, label, title="show"):
     ax.add_collection(collection)
     plot_markers(Dyes.BLUE, y_min, 50)
     finish_plot(title)
+
+
+def boxplot_scores(dataframe, groupby: str, toplot: List):
+    # print(df[df['upper'] == df['upper'].min()])
+    dataframe.boxplot(toplot, groupby)
+    finish_plot('show')

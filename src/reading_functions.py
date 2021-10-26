@@ -225,3 +225,7 @@ def shallow_analyst(sample_name):
                 peak_list.append(str(locus) + "_" + str(allele))
     mixture_list.append(peak_list)
     return mixture_list
+
+
+def read_csv_to_dataframe(filename, loc):
+    return pd.read_csv(loc+filename)

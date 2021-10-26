@@ -11,16 +11,23 @@ tracedata_for_training = ['TraceDataSet11.txt', 'TraceDataSet12.txt', 'TraceData
              'TraceDataSet31.txt', 'TraceDataSet32.txt', 'TraceDataSet41.txt', 'TraceDataSet42.txt',
              'TraceDataSet51.txt', 'TraceDataSet52.txt']
 tracedata_for_testing = ['TraceDataSet61.txt', 'TraceDataSet62.txt']
-
-PROVEDIt_sized_trace_data_mix = ['PROVEDIt_RD14-0003(021016ADG_15sec)_sized_improved1.txt', 'PROVEDIt_RD14-0003(021016ADG_15sec)_sized_improved2.txt']
-PROVEDIt_sized_trace_data_SS = ['PROVEDIt_RD14-0003(100115ADG_15sec)_sized_improved1.txt', 'PROVEDIt_RD14-0003(100115ADG_15sec)_sized_improved2.txt']
-
-
-PROVEDIt_raw_trace_data_mix = ['PROVEDIt_RD14-0003(021016ADG_15sec)_raw_improved1.txt', 'PROVEDIt_RD14-0003(021016ADG_15sec)_raw_improved2.txt']
-PROVEDIt_raw_trace_data_SS = ['PROVEDIt_RD14-0003(100115ADG_15sec)_raw_improved1.txt', 'PROVEDIt_RD14-0003(100115ADG_15sec)_raw_improved2.txt']
+#
+# PROVEDIt_sized_trace_data_mix = ['PROVEDIt_RD14-0003(021016ADG_15sec)_sized_improved1.txt', 'PROVEDIt_RD14-0003(021016ADG_15sec)_sized_improved2.txt']
+# PROVEDIt_sized_trace_data_SS = ['PROVEDIt_RD14-0003(100115ADG_15sec)_sized_improved1.txt', 'PROVEDIt_RD14-0003(100115ADG_15sec)_sized_improved2.txt']
+#
+#
+# PROVEDIt_raw_trace_data_mix = ['PROVEDIt_RD14-0003(021016ADG_15sec)_raw_improved1.txt', 'PROVEDIt_RD14-0003(021016ADG_15sec)_raw_improved2.txt']
+# PROVEDIt_raw_trace_data_SS = ['PROVEDIt_RD14-0003(100115ADG_15sec)_raw_improved1.txt', 'PROVEDIt_RD14-0003(100115ADG_15sec)_raw_improved2.txt']
 
 
 if __name__ == '__main__':
+    df = rf.read_csv_to_dataframe('FFNvUnet_scores.csv', 'data_for_github/')
+    pf.boxplot_scores(df, 'mix_type', ['auc_FFN', 'auc_Unet'])
+    pf.boxplot_scores(df, 'noc', ['auc_FFN', 'auc_Unet'])
+    pf.boxplot_scores(df, 'mix_type', ['bin_acc_FFN', 'bin_acc_Unet'])
+    pf.boxplot_scores(df, 'noc', ['bin_acc_FFN', 'bin_acc_Unet'])
+
+
     # number_of_dyes = 6
     # leftoffset = 500
     # rightcutoff = 4800 + 500
@@ -64,12 +71,7 @@ if __name__ == '__main__':
     #     auc.update_state(truth, result)
     #     binacc = BinaryAccuracy()
     #     binacc.update_state(truth, result)
-    dataframe = pd.read_csv('data/results_paper/FFNvUnet_bluedye.csv')
-    ppf.average_scores_from_dataframe(dataframe, 'auc_Unet', ['2', '3', '4', '5', '6'], 2)
-    ppf.average_scores_from_dataframe(dataframe, 'bin_acc_Unet', ['2', '3', '4', '5', '6'], 2)
-    ppf.average_scores_from_dataframe(dataframe, 'auc_FFN', ['2', '3', '4', '5', '6'], 2)
-    ppf.average_scores_from_dataframe(dataframe, 'bin_acc_FFN', ['2', '3', '4', '5', '6'], 2)
-
+    print('hori')
     # ax = dataframe.plot.scatter(x='auc_FFN', y = 'auc_Unet', color= 'darkviolet', marker = '*')
     # ax.plot(range(0,1,50), range(0,1,50))
     # ax.set_xlim([0.93,1])
