@@ -1,3 +1,7 @@
+# This file contains functions used for training the neural nets
+# They call on functions in models.py
+
+
 from src.models import unet_small, FFN_DTDP
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from math import exp
@@ -29,7 +33,7 @@ def unet_train_test_split(train_input, test_input, length: int, weightpath='data
         # history is optional for plotting
         model.fit(train_images, train_labels, batch_size=batch_size, epochs=num_epochs, verbose=1, shuffle=True, validation_split=0.2, callbacks=[model_checkpoint])
     metric_values = model.evaluate(x=test_images, y=test_labels)
-    print('Final TEST performance')
+    print('Final test performance')
     for metric_value, metric_name in zip(metric_values, model.metrics_names):
         print('{}: {}'.format(metric_name, metric_value))
     return model

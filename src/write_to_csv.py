@@ -1,6 +1,6 @@
 # This file contains only a function to save data in csvs
 # This was used to create the csvs accompanying the code
-#
+
 
 import pandas as pd
 from src.classes import *

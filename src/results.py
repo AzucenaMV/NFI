@@ -1,6 +1,9 @@
+# This file was used to create boxplots for thesis report
+# Will be deleted as no longer used
+
+
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 
 
 def load_dataframe(filename = "data/F1_scores_29_6_2021.csv"):
