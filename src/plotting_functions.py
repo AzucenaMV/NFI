@@ -148,3 +148,50 @@ def boxplot_scores(dataframe, groupby: str, toplot: List):
     # print(df[df['upper'] == df['upper'].min()])
     dataframe.boxplot(toplot, groupby)
     finish_plot('show')
+
+
+def scatterplot_scores_noc(dataframe):
+    data_2 = dataframe[dataframe['noc'] == 2]
+    data_3 = dataframe[dataframe['noc'] == 3]
+    data_4 = dataframe[dataframe['noc'] == 4]
+    data_5 = dataframe[dataframe['noc'] == 5]
+
+    ax = data_2.plot.scatter(x='auc_FFN', y='auc_Unet', color='orange', marker='*')
+    data_3.plot.scatter(x='auc_FFN', y='auc_Unet', color='red', marker='*', ax=ax)
+    data_4.plot.scatter(x='auc_FFN', y='auc_Unet', color='purple', marker='*', ax=ax)
+    data_5.plot.scatter(x='auc_FFN', y='auc_Unet', color='blue', marker='*', ax=ax)
+    ax.set_xlim([0.93, 1])
+    ax.set_ylim([0.93, 1])
+    lims = [0.93, 1]
+    # now plot both limits against eachother
+    ax.plot(lims, lims, 'k-', alpha=0.75, zorder=0)
+    plt.grid()
+    ax.set_xlabel('AUC score FFN')
+    ax.set_ylabel('AUC score U-net')
+    plt.legend(['x=y', '2-donor', '3-donor', '4-donor', '5-donor'], loc='lower right')
+    plt.title('AUC (ROC) of U-net against FFN')
+    plt.show()
+
+def scatterplot_scores_mix(dataframe):
+    data_A = dataframe[dataframe['mix_type'] == 'A']
+    data_B = dataframe[dataframe['mix_type'] == 'B']
+    data_C = dataframe[dataframe['mix_type'] == 'C']
+    data_D = dataframe[dataframe['mix_type'] == 'D']
+    data_E = dataframe[dataframe['mix_type'] == 'E']
+
+    ax = data_A.plot.scatter(x='auc_FFN', y='auc_Unet', color='yellow', marker='*')
+    data_B.plot.scatter(x='auc_FFN', y='auc_Unet', color='darkorange', marker='*', ax=ax)
+    data_C.plot.scatter(x='auc_FFN', y='auc_Unet', color='magenta', marker='*', ax=ax)
+    data_D.plot.scatter(x='auc_FFN', y='auc_Unet', color='purple', marker='*', ax=ax)
+    data_E.plot.scatter(x='auc_FFN', y='auc_Unet', color='blue', marker='*', ax=ax)
+    ax.set_xlim([0.93, 1])
+    ax.set_ylim([0.93, 1])
+    lims = [0.93, 1]
+    # now plot both limits against eachother
+    ax.plot(lims, lims, 'k-', alpha=0.75, zorder=0)
+    plt.grid()
+    ax.set_xlabel('AUC score FFN')
+    ax.set_ylabel('AUC score U-net')
+    plt.legend(['x=y', 'mixture A', 'mixture B', 'mixture C', 'mixture D', 'mixture E'], loc='lower right')
+    plt.title('AUC (ROC) of U-net against FFN')
+    plt.show()

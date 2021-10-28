@@ -21,12 +21,6 @@ tracedata_for_testing = ['TraceDataSet61.txt', 'TraceDataSet62.txt']
 
 
 if __name__ == '__main__':
-    df = rf.read_csv_to_dataframe('FFNvUnet_scores.csv', 'data_for_github/')
-    pf.boxplot_scores(df, 'mix_type', ['auc_FFN', 'auc_Unet'])
-    pf.boxplot_scores(df, 'noc', ['auc_FFN', 'auc_Unet'])
-    pf.boxplot_scores(df, 'mix_type', ['bin_acc_FFN', 'bin_acc_Unet'])
-    pf.boxplot_scores(df, 'noc', ['bin_acc_FFN', 'bin_acc_Unet'])
-
 
     # number_of_dyes = 6
     # leftoffset = 500
@@ -42,7 +36,6 @@ if __name__ == '__main__':
     #     test_samples += rf.txt_read_sample(elt)
     # unnormalised_test, test_input, names_test = dpf.input_from_multiple_samples(test_samples, number_of_dyes, leftoffset, rightcutoff, True)
     # Unet = trf.unet_train_test_split(train_input, test_input, 4800, "data/weights_NFI/weights_clocktime.h5", train=False,epochs=100)
-
 
     # width = 80
     # input_dim = 6*(width*2+1)
@@ -71,16 +64,6 @@ if __name__ == '__main__':
     #     auc.update_state(truth, result)
     #     binacc = BinaryAccuracy()
     #     binacc.update_state(truth, result)
-    print('hori')
-    # ax = dataframe.plot.scatter(x='auc_FFN', y = 'auc_Unet', color= 'darkviolet', marker = '*')
-    # ax.plot(range(0,1,50), range(0,1,50))
-    # ax.set_xlim([0.93,1])
-    # ax.set_ylim([0.93,1])
-    # lims = [0.93, 1]
-    # # now plot both limits against eachother
-    # ax.plot(lims, lims, 'k-', alpha=0.75, zorder=0)
-    # plt.grid()
-    # ax.set_xlabel('AUC score FFN')
-    # ax.set_ylabel('AUC score U-net')
-    # plt.title('AUC (ROC) of U-net against FFN')
-    # plt.show()
+    dataframe = pd.read_csv('data_for_github/FFNvUnet_scores.csv')
+    pf.scatterplot_scores_noc(dataframe)
+    pf.scatterplot_scores_mix(dataframe)

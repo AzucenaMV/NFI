@@ -1,5 +1,4 @@
 # This file was used to create boxplots for thesis report
-# Will be deleted as no longer used
 
 
 import matplotlib.pyplot as plt
