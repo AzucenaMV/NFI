@@ -1,4 +1,5 @@
 from src import data_prep_functions as dpf, plotting_functions as pf, reading_functions as rf, training_functions as trf, plotting_6C_functions as pf6, write_to_csv as wf, post_processing_functions as ppf, results as r, OLD_reading_data_DTDP as rdD
+from src.models import MHCNN_DT, unet_small
 import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow.keras.metrics import BinaryAccuracy, AUC
@@ -21,6 +22,11 @@ tracedata_for_testing = ['TraceDataSet61.txt', 'TraceDataSet62.txt']
 
 
 if __name__ == '__main__':
+
+    my_model = unet_small()
+    my_model.summary()
+    new_model = MHCNN_DT()
+    new_model.summary()
 
     # number_of_dyes = 6
     # leftoffset = 500
@@ -64,6 +70,6 @@ if __name__ == '__main__':
     #     auc.update_state(truth, result)
     #     binacc = BinaryAccuracy()
     #     binacc.update_state(truth, result)
-    dataframe = pd.read_csv('data_for_github/FFNvUnet_scores.csv')
-    pf.scatterplot_scores_noc(dataframe)
-    pf.scatterplot_scores_mix(dataframe)
+    # dataframe = pd.read_csv('data_for_github/FFNvUnet_scores.csv')
+    # pf.scatterplot_scores_noc(dataframe)
+    # pf.scatterplot_scores_mix(dataframe)

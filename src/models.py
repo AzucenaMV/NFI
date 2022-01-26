@@ -1,8 +1,7 @@
 # Neural networks used in comparison
 # U-net and FFN
 
-
-from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.models import Model, Sequential, load_model
 from tensorflow.keras.layers import Input, Dropout, Conv2D, UpSampling2D, concatenate, AvgPool2D, Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.metrics import BinaryAccuracy, AUC
@@ -106,3 +105,8 @@ def FFN_DTDP(input_size=(1206,)):
     # categorical cross entropy loss is changed to binary
     model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=[BinaryAccuracy(), AUC()])
     return model
+
+def MHCNN_DT(filename = "data/EPG_classification_Keras_MHCNN_model.h5"):
+    model = load_model(filename)
+    return model
+
