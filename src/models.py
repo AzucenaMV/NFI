@@ -4,7 +4,7 @@
 from tensorflow.keras.models import Model, Sequential, load_model
 from tensorflow.keras.layers import Input, Dropout, Conv2D, UpSampling2D, concatenate, AvgPool2D, Dense
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.metrics import BinaryAccuracy, AUC
+from tensorflow.keras.metrics import BinaryAccuracy, AUC, Precision, Recall, FalseNegatives, FalsePositives, TrueNegatives, TruePositives
 
 
 def unet_small(input_size=(4800, 6, 1)):
@@ -90,7 +90,7 @@ def unet_small(input_size=(4800, 6, 1)):
                    )(conv7)
     conv8 = Conv2D(1, 1, activation='sigmoid')(conv7)
     model = Model(inputs=inputs, outputs=conv8)
-    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=[BinaryAccuracy(), AUC()])
+    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=[BinaryAccuracy(), AUC(), Precision(), Recall(), TrueNegatives(), FalseNegatives(), FalsePositives(), TruePositives()])
 
     return model
 
@@ -103,7 +103,7 @@ def FFN_DTDP(input_size=(1206,)):
     model.add(Dense(1, activation='sigmoid'))
     # final layer should be softmax, but sigmoid is better for binary
     # categorical cross entropy loss is changed to binary
-    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=[BinaryAccuracy(), AUC()])
+    model.compile(optimizer=Adam(lr=1e-3), loss='binary_crossentropy', metrics=[BinaryAccuracy(), AUC(), Precision(), Recall(), TrueNegatives(), FalseNegatives(), FalsePositives(), TruePositives()])
     return model
 
 def MHCNN_DT(filename = "data/EPG_classification_Keras_MHCNN_model.h5"):

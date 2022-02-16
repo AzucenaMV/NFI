@@ -43,7 +43,7 @@ def FFN(train_input, test_input, weightpath="data/weights_DTDP/weights_our_data_
         batchsize=10, epochs=10):
     model = FFN_DTDP(input_size=inputsize)
     model.summary()
-    # model.load_weights(weightpath)
+    model.load_weights(weightpath)
     test_images = test_input.data
     test_labels = test_input.labels
 
