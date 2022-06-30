@@ -1,40 +1,61 @@
 # This file is used for reading out all data
 # for profiles, csvs with genotypes, csvs with analyst readings.
 
-
+import re
 import pandas as pd
+
 from src.classes import *
+from pathlib import Path
 
 
-def txt_read_sample(filename: str):
-    """ Function to read data files
-    Returns a list of sample names, colors,
-    and the data itself as matrix."""
-    with open("data/trace_data/" + filename, "r") as text_file:
-        texts = text_file.read()
-    texts = texts.split("\n")  # split into lines
-    # lines 1 and 2 are not interesting
-    titles = texts[2].split('\t')  # get titles of files
-    titles = [item for item in titles if item != '']  # remove empty entries after splitting
-    colors = texts[3].split('\t')  # only needed for width of lines
-    data = np.zeros((len(texts[4:]), len(colors)))
-    counter = 0  # counter is needed for line number
-    for elt in texts[4:]:
-        new = np.array(elt.split('\t'))  # split into words
+DATA_DIR = Path("data/trace_data/")
+
+def file2sample(filename : str, data_dir :str = DATA_DIR, patt = re.compile("[\t]+")):
+    """ 
+    Function that reads a filename 
+    Returns a list of Sample objects (names, colors, data)
+
+    Args:
+        filename (str): file to read 
+        data_dir (str): directory of the file
+    Returns:
+        sample (list): List of Sample objects
+    """
+    with open(data_dir / filename, "r") as text_file:
+        #texts = text_file.readlines()#[:-2]
+        texts = text_file.read().split("\n")[2:] # lines 1 and 2 do not contain useful information
+
+    sample_names = filter(None,re.split(patt,texts[0]))  # get titles of files & remove empty spaces
+    colors = re.split(patt,texts[1])   # only needed for width of lines
+    data = np.zeros((len(texts[2:]), len(colors)))
+    for i,line in enumerate(texts[2:]):
+        new = np.array(line.split('\t'))  # split into words
         new[new == ''] = 0
-        data[counter, :] = new
-        counter += 1
-    # now pour contents into separate sample dataclasses
+        data[i, :] = new
+    sample_list = get_sample(sample_names, data)
+    return sample_list
+
+def get_sample(sample_names: list, data: np.array, number_of_dyes: str = 6):
+    """ 
+    Function that reads a filename 
+    Returns a list of Sample objects (names, colors, data)
+
+    Args:
+        title (list): a list with sample names
+        data (np.array): contains the data in arrays
+        data (int): contains the data in arrays
+    Returns:
+        sample (list): List of Sample objects
+    """
     sample_list = []
-    prevname = ""
-    replica = 1
-    for i in range(len(titles)):
-        name = titles[i].split('_')[0]
+    prevname, replica = "", 1
+    for i,title in enumerate(sample_names):
+        name = title.split('_')[0]
         if prevname == name:
             replica += 1
         else:
             replica = 1
-        new_sample = Sample(name, replica, data[:, 6 * i:6 * i + 6])
+        new_sample = Sample(name, replica, data[:, number_of_dyes * i:number_of_dyes * (i + 1)])
         sample_list.append(new_sample)
         prevname = name
     return sample_list
